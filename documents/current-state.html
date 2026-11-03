@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppService — Current State Architecture, Functionalities & Features</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #eff6ff;
+            --secondary: #0f172a;
+            --accent: #0ea5e9;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --bg-page: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.05);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        header.hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1e3a8a 100%);
+            color: #ffffff;
+            padding: 4rem 2rem 3rem 2rem;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 4px solid var(--accent);
+        }
+
+        header.hero::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .hero-badge-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .badge-primary { background: rgba(37, 99, 235, 0.25); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.3); }
+        .badge-accent { background: rgba(14, 165, 233, 0.25); color: #7dd3fc; border: 1px solid rgba(125, 211, 252, 0.3); }
+        .badge-success { background: rgba(16, 185, 129, 0.25); color: #6ee7b7; border: 1px solid rgba(110, 231, 183, 0.3); }
+        .badge-purple { background: rgba(139, 92, 246, 0.25); color: #c4b5fd; border: 1px solid rgba(196, 181, 253, 0.3); }
+
+        .hero h1 {
+            font-size: 2.75rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 0.8rem;
+            letter-spacing: -0.025em;
+        }
+
+        .hero p.tagline {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            max-width: 800px;
+            margin-bottom: 2rem;
+        }
+
+        .hero-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            padding-top: 1.5rem;
+        }
+
+        .hero-meta-item .meta-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #94a3b8;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        .hero-meta-item .meta-value {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-top: 0.25rem;
+        }
+
+        /* Table of Contents Section */
+        .toc-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+            margin: -2rem auto 2.5rem auto;
+            position: relative;
+            z-index: 10;
+            padding: 2rem;
+        }
+
+        .toc-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .toc-header h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .toc-column {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+        }
+
+        .toc-column-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toc-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .toc-list a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.15s ease, transform 0.15s ease;
+        }
+
+        .toc-list a:hover {
+            color: var(--primary);
+            transform: translateX(3px);
+            font-weight: 600;
+        }
+
+        .toc-list a::before {
+            content: "→";
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Section Layout */
+        .section-block {
+            margin-bottom: 3.5rem;
+        }
+
+        .section-title {
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            letter-spacing: -0.02em;
+        }
+
+        .section-subtitle {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            margin-bottom: 1.75rem;
+        }
+
+        /* App Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.75rem;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--accent);
+        }
+
+        .summary-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary);
+        }
+
+        .summary-card.accent-purple::before { background: var(--purple); }
+        .summary-card.accent-success::before { background: var(--success); }
+        .summary-card.accent-warning::before { background: var(--warning); }
+        .summary-card.accent-sky::before { background: var(--accent); }
+
+        .summary-card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-sm);
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .summary-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 0.6rem;
+        }
+
+        .summary-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.55;
+        }
+
+        /* Tech Stack Table */
+        .tech-table-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
+        }
+
+        table.custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.92rem;
+        }
+
+        table.custom-table th {
+            background: #f1f5f9;
+            color: var(--secondary);
+            font-weight: 700;
+            padding: 0.85rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.05em;
+        }
+
+        table.custom-table td {
+            padding: 0.95rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        table.custom-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        table.custom-table tr:hover td {
+            background: #f8fafc;
+        }
+
+        .code-pill {
+            font-family: var(--font-mono);
+            background: #f1f5f9;
+            color: #0f172a;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.82rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Tab Navigation Component */
+        .tabs-header-wrapper {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            padding: 1rem 1rem 0 1rem;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .tabs-controls {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+
+        .tabs-controls::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .tabs-controls::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 0.85rem 1.35rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 3px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+            background: rgba(37, 99, 235, 0.04);
+        }
+
+        .tab-btn.active {
+            color: var(--primary-dark);
+            border-bottom: 3px solid var(--primary);
+            background: var(--primary-light);
+        }
+
+        .tab-badge {
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 0.75rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 9999px;
+            font-weight: 700;
+        }
+
+        .tab-btn.active .tab-badge {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .tabs-content-area {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+            padding: 2.25rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 3.5rem;
+        }
+
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Feature Cards within Tabs */
+        .feature-category-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .feature-category-header h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .feature-category-header p {
+            color: var(--text-muted);
+            margin-top: 0.4rem;
+            font-size: 0.98rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent);
+            box-shadow: var(--shadow-md);
+        }
+
+        .feature-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-card-header h4 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        .feature-type-tag {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .tag-core { background: #e0e7ff; color: #4338ca; }
+        .tag-ui { background: #dbeafe; color: #1e40af; }
+        .tag-sec { background: #fef3c7; color: #b45309; }
+        .tag-async { background: #ede9fe; color: #6d28d9; }
+        .tag-rest { background: #dcfce7; color: #15803d; }
+
+        .feature-card p.description {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            line-height: 1.55;
+        }
+
+        .feature-card-details {
+            border-top: 1px solid #f1f5f9;
+            padding-top: 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 0.4rem;
+            gap: 0.5rem;
+        }
+
+        .detail-row .detail-key {
+            font-weight: 600;
+            color: #475569;
+            min-width: 100px;
+        }
+
+        .detail-row .detail-val {
+            color: #0f172a;
+            word-break: break-all;
+        }
+
+        /* Callout Box */
+        .callout {
+            background: #f8fafc;
+            border-left: 4px solid var(--primary);
+            padding: 1.25rem 1.5rem;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        .callout-title {
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 0.35rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .callout-success { border-left-color: var(--success); background: #f0fdf4; }
+        .callout-warning { border-left-color: var(--warning); background: #fffbeb; }
+        .callout-purple { border-left-color: var(--purple); background: #faf5ff; }
+
+        /* Search & Filter Bar */
+        .filter-bar-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 450px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.65rem 1rem 0.65rem 2.4rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .search-box-icon {
+            position: absolute;
+            left: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        footer.app-footer {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 3rem 0;
+            border-top: 1px solid #1e293b;
+            font-size: 0.9rem;
+            margin-top: 4rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-col h5 {
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #1e293b;
+            padding-top: 1.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        /* Back to top button */
+        #backToTopBtn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: opacity 0.2s, transform 0.2s;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        #backToTopBtn.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #backToTopBtn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .toc-card { padding: 1.25rem; }
+            .tabs-content-area { padding: 1.25rem; }
+            .feature-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HERO HEADER -->
+    <header class="hero" id="top">
+        <div class="container">
+            <div class="hero-badge-row">
+                <span class="badge badge-primary">Java 8 / 11+</span>
+                <span class="badge badge-accent">Spring Boot 2.1.4</span>
+                <span class="badge badge-success">JSF 2.3 Mojarra</span>
+                <span class="badge badge-purple">AdminFaces &amp; PrimeFaces</span>
+                <span class="badge badge-accent">MySQL 8 / JPA / Hibernate</span>
+            </div>
+            <h1>AppService Documentation</h1>
+            <p class="tagline">
+                Comprehensive extraction of system functionalities, architectural components, domain models, and feature specifications for the enterprise management framework.
+            </p>
+            <div class="hero-meta-grid">
+                <div class="hero-meta-item">
+                    <div class="meta-label">Artifact Group / ID</div>
+                    <div class="meta-value">ir.bahmanheydarinejad / AppService</div>
+                </div>
+                <div class="hero-meta-item">
+                    <div class="meta-label">Software Release</div>
+                    <div class="meta-value">1.0-Template</div>
+                </div>
+                <div class="hero-meta-item">
+                    <div class="meta-label">Author / Organization</div>
+                    <div class="meta-value">Bahman Heydari Nejad (EagleEyes)</div>
+                </div>
+                <div class="hero-meta-item">
+                    <div class="meta-label">Web / Application Port</div>
+                    <div class="meta-value">HTTP 8001 (AppService.ir)</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- TABLE OF CONTENTS (REFERENCED TO TOPICS) -->
+        <nav class="toc-card" id="table-of-contents" aria-label="Table of Contents">
+            <div class="toc-header">
+                <h2>📑 Table of Contents</h2>
+                <span class="badge badge-accent">Interactive Navigator</span>
+            </div>
+            <div class="toc-grid">
+                <div class="toc-column">
+                    <div class="toc-column-title">🏛️ 1. System Overview</div>
+                    <ul class="toc-list">
+                        <li><a href="#summary-purpose">Executive Mission &amp; Purpose</a></li>
+                        <li><a href="#summary-architecture">Architectural Foundation</a></li>
+                        <li><a href="#summary-tech-stack">Technology Stack Matrix</a></li>
+                        <li><a href="#summary-highlights">Core Operational Highlights</a></li>
+                    </ul>
+                </div>
+                <div class="toc-column">
+                    <div class="toc-column-title">📑 2. Categorized Features (Tabs)</div>
+                    <ul class="toc-list">
+                        <li><a href="#tab-auth" onclick="switchTab('tab-auth')">Authentication &amp; Security</a></li>
+                        <li><a href="#tab-ui" onclick="switchTab('tab-ui')">Dynamic UI &amp; Navigation</a></li>
+                        <li><a href="#tab-identity" onclick="switchTab('tab-identity')">Identity &amp; RBAC</a></li>
+                        <li><a href="#tab-docs" onclick="switchTab('tab-docs')">Document &amp; Streaming</a></li>
+                        <li><a href="#tab-comm" onclick="switchTab('tab-comm')">Email &amp; Password Recovery</a></li>
+                        <li><a href="#tab-config" onclick="switchTab('tab-config')">System Config &amp; Seeding</a></li>
+                    </ul>
+                </div>
+                <div class="toc-column">
+                    <div class="toc-column-title">📊 3. Domain &amp; Architecture Reference</div>
+                    <ul class="toc-list">
+                        <li><a href="#domain-entities">Entity Data Model &amp; Hierarchy</a></li>
+                        <li><a href="#api-endpoints">REST &amp; HTTP Endpoint Surface</a></li>
+                        <li><a href="#verification-summary">Verification &amp; Integrity Invariant</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- FIRST PART: SUMMARY FROM APP -->
+        <section class="section-block" id="app-summary">
+            <h2 class="section-title">🏛️ Part 1: Executive Summary from App</h2>
+            <p class="section-subtitle">High-level architectural blueprint, operational purpose, and key system metrics extracted from the codebase.</p>
+
+            <div class="summary-grid">
+                <div class="summary-card accent-sky" id="summary-purpose">
+                    <div class="summary-card-icon">🎯</div>
+                    <h3>Executive Mission &amp; Purpose</h3>
+                    <p>
+                        <strong>AppService</strong> is an enterprise-grade administration and service framework developed by Bahman Heydari Nejad. It marries the robust backend stability, dependency injection, transaction management, and security ecosystem of <strong>Spring Boot (2.1.4.RELEASE)</strong> with the high-productivity, component-driven UI capabilities of <strong>JavaServer Faces (JSF 2.3 / Mojarra)</strong>, <strong>PrimeFaces</strong>, and the <strong>AdminFaces (AdminLTE 2)</strong> theme library.
+                    </p>
+                </div>
+
+                <div class="summary-card accent-purple" id="summary-architecture">
+                    <div class="summary-card-icon">🧩</div>
+                    <h3>Dynamic Panel-Driven Architecture</h3>
+                    <p>
+                        Instead of traditional multipage reloads, AppService implements a single-dashboard dynamic view architecture (<span class="code-pill">dashboard.xhtml</span>). UI panels are first-class entities stored in the relational database, authorized via dynamic Role-Based Access Control (RBAC), and injected dynamically at runtime via <span class="code-pill">panelHandler.activePanel.resourceLocation</span> without requiring full browser refreshes.
+                    </p>
+                </div>
+
+                <div class="summary-card accent-success" id="summary-highlights">
+                    <div class="summary-card-icon">⚡</div>
+                    <h3>Flexible Multi-Identifier Authentication</h3>
+                    <p>
+                        Users can authenticate via a unified login input that intelligently disambiguates between <strong>Email address</strong> (RFC regex match), <strong>Mobile phone number</strong> (E.164/national pattern), or standard <strong>Account name</strong>, protected by <strong>BCrypt password encryption</strong>, HTTP session concurrency control, and asynchronous transactional mail delivery.
+                    </p>
+                </div>
+            </div>
+
+            <!-- TECH STACK MATRIX -->
+            <div class="tech-table-container" id="summary-tech-stack">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Layer / Domain</th>
+                            <th>Technology / Library</th>
+                            <th>Version</th>
+                            <th>Architectural Responsibility &amp; Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Core Framework</strong></td>
+                            <td>Spring Boot Starter Web &amp; Actuator</td>
+                            <td><span class="code-pill">2.1.4.RELEASE</span></td>
+                            <td>IoC container, auto-configuration, application lifecycle, actuator health endpoints.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>UI &amp; Presentation</strong></td>
+                            <td>JoinFaces / AdminFaces Starter</td>
+                            <td><span class="code-pill">4.0.3</span></td>
+                            <td>JSF 2.3 (Mojarra 2.3.4), PrimeFaces, AdminLTE 2 Bootstrap integration.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Security &amp; Auth</strong></td>
+                            <td>Spring Security &amp; BCrypt</td>
+                            <td><span class="code-pill">5.1.5.RELEASE</span></td>
+                            <td>Custom AuthenticationProvider, session concurrency control, password hashing.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Persistence &amp; ORM</strong></td>
+                            <td>Spring Data JPA &amp; Hibernate</td>
+                            <td><span class="code-pill">2.1.4.RELEASE</span></td>
+                            <td>MappedSuperclass UUID base entities, lazy loading, declarative repositories.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Database Engine</strong></td>
+                            <td>MySQL Connector Java</td>
+                            <td><span class="code-pill">8.0.14</span></td>
+                            <td>Relational backend storage at <span class="code-pill">jdbc:mysql://localhost:3306/ir.appservice.model</span>.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mail System</strong></td>
+                            <td>Spring Boot Starter Mail</td>
+                            <td><span class="code-pill">2.1.4.RELEASE</span></td>
+                            <td>Asynchronous JavaMailSender with MimeMessage and binary document attachments.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Icons &amp; Assets</strong></td>
+                            <td>Font Awesome &amp; Material Icons</td>
+                            <td><span class="code-pill">5.8.2 / 3.0.1</span></td>
+                            <td>WebJars asset packaging, dynamic icon selector with property-driven icon sets.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Code Utilities</strong></td>
+                            <td>Project Lombok &amp; Gson</td>
+                            <td><span class="code-pill">1.18.8 / 2.8.5</span></td>
+                            <td>Boilerplate elimination (getters/setters), JSON serialization, Apache Commons Lang.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout callout-purple">
+                <div class="callout-title">💡 Architectural Observation</div>
+                AppService is designed as an extensible enterprise template. It combines clean layered abstraction (Entities → Repositories → Services → View/Crud Beans → XHTML Components) with dynamic metadata persistence, enabling administrators to configure menus, UI panels, permissions, and roles directly from the database without rebuilding or redeploying the application.
+            </div>
+        </section>
+
+        <!-- SECOND PART: CATEGORIZE FEATURES AS TABS -->
+        <section class="section-block" id="categorized-features">
+            <h2 class="section-title">📂 Part 2: Categorized Features &amp; Functionalities</h2>
+            <p class="section-subtitle">Interactive tabbed breakdown of all project capabilities across security, UI navigation, identity, document streaming, communication, and system configuration.</p>
+
+            <!-- Search and Filter Bar -->
+            <div class="filter-bar-container">
+                <div class="search-box">
+                    <span class="search-box-icon">🔍</span>
+                    <input type="text" id="featureSearchInput" placeholder="Filter features (e.g., 'BCrypt', 'Avatar', 'Session', 'Upload')..." onkeyup="filterFeatures()">
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">
+                    Click tabs or use anchor links to explore module specifications.
+                </div>
+            </div>
+
+            <!-- TABS HEADER CONTROLS -->
+            <div class="tabs-header-wrapper">
+                <div class="tabs-controls" role="tablist">
+                    <button class="tab-btn active" id="btn-tab-auth" role="tab" aria-selected="true" onclick="switchTab('tab-auth')">
+                        <span>🔒 Security &amp; Auth</span>
+                        <span class="tab-badge">6</span>
+                    </button>
+                    <button class="tab-btn" id="btn-tab-ui" role="tab" aria-selected="false" onclick="switchTab('tab-ui')">
+                        <span>🖥️ UI &amp; Navigation</span>
+                        <span class="tab-badge">6</span>
+                    </button>
+                    <button class="tab-btn" id="btn-tab-identity" role="tab" aria-selected="false" onclick="switchTab('tab-identity')">
+                        <span>👤 Identity &amp; RBAC</span>
+                        <span class="tab-badge">5</span>
+                    </button>
+                    <button class="tab-btn" id="btn-tab-docs" role="tab" aria-selected="false" onclick="switchTab('tab-docs')">
+                        <span>📄 Documents &amp; Streaming</span>
+                        <span class="tab-badge">5</span>
+                    </button>
+                    <button class="tab-btn" id="btn-tab-comm" role="tab" aria-selected="false" onclick="switchTab('tab-comm')">
+                        <span>✉️ Mail &amp; Password Reset</span>
+                        <span class="tab-badge">5</span>
+                    </button>
+                    <button class="tab-btn" id="btn-tab-config" role="tab" aria-selected="false" onclick="switchTab('tab-config')">
+                        <span>⚙️ Config &amp; Bootstrap</span>
+                        <span class="tab-badge">5</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TABS CONTENT AREA -->
+            <div class="tabs-content-area">
+
+                <!-- TAB 1: AUTHENTICATION & SECURITY -->
+                <div class="tab-panel active" id="tab-auth" role="tabpanel">
+                    <div class="feature-category-header">
+                        <h3>🔒 Authentication, Security &amp; Session Management</h3>
+                        <p>Core identity verification, custom Spring Security provider, session tracking, and granular authorization barriers.</p>
+                    </div>
+
+                    <div class="feature-grid">
+                        <!-- Feature 1.1 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Multi-Identifier Login</h4>
+                                <span class="feature-type-tag tag-sec">Security</span>
+                            </div>
+                            <p class="description">
+                                Unified authentication input that dynamically analyzes credentials. Users can sign in using their Account Name, RFC-compliant Email address, or E.164 Mobile Phone number.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Handler:</span><span class="detail-val"><span class="code-pill">AccountService.loginByAny()</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Regex Beans:</span><span class="detail-val"><span class="code-pill">emailPattern</span>, <span class="code-pill">mobilePattern</span></span></div>
+                                <div class="detail-row"><span class="detail-key">UI Component:</span><span class="detail-val"><span class="code-pill">modal_signin.xhtml</span> &amp; <span class="code-pill">index.xhtml</span></span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 1.2 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Spring Security Provider</h4>
+                                <span class="feature-type-tag tag-core">Core</span>
+                            </div>
+                            <p class="description">
+                                Implements Spring's <span class="code-pill">AuthenticationProvider</span> directly inside <span class="code-pill">AccountService</span>, constructing <span class="code-pill">UsernamePasswordAuthenticationToken</span> with authorities mapped from roles.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Component:</span><span class="detail-val"><span class="code-pill">ir.appservice.model.service.AccountService</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Encryption:</span><span class="detail-val">BCryptPasswordEncoder (10 rounds)</span></div>
+                                <div class="detail-row"><span class="detail-key">Context:</span><span class="detail-val">SecurityContextHolder synchronization</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 1.3 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Session Concurrency &amp; Registry</h4>
+                                <span class="feature-type-tag tag-sec">Security</span>
+                            </div>
+                            <p class="description">
+                                Enforces session concurrency policies via Spring's <span class="code-pill">SessionRegistryImpl</span> and <span class="code-pill">HttpSessionEventPublisher</span>, tracking active principals and redirecting expired sessions.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Max Sessions:</span><span class="detail-val">100 concurrent sessions configured</span></div>
+                                <div class="detail-row"><span class="detail-key">Expired URL:</span><span class="detail-val"><span class="code-pill">/index</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Session Bean:</span><span class="detail-val"><span class="code-pill">SessionBean.showSessions()</span></span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 1.4 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Dynamic Panel RBAC</h4>
+                                <span class="feature-type-tag tag-core">Authorization</span>
+                            </div>
+                            <p class="description">
+                                Granular Role-Based Access Control checking whether an authenticated account is permitted to load a specific <span class="code-pill">Panel</span> or invoke an entity action before display.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Method:</span><span class="detail-val"><span class="code-pill">AccountService.isAuthorized(Account, BaseEntity)</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Enforcement:</span><span class="detail-val">Intercepted inside <span class="code-pill">PanelHandler.openPanel()</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Fallout:</span><span class="detail-val">Emits Access Denied growl and resets to default</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 1.5 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Anonymous User Redirection</h4>
+                                <span class="feature-type-tag tag-ui">View Guard</span>
+                            </div>
+                            <p class="description">
+                                Pre-render view lifecycle hook in JSF (<span class="code-pill">preRenderView</span> event) that inspects authentication status and forces unauthenticated users to the index signin page.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Event:</span><span class="detail-val"><span class="code-pill">&lt;f:event type="preRenderView"&gt;</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Listener:</span><span class="detail-val"><span class="code-pill">SessionBean.redirectAnonymousUsers()</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Protected:</span><span class="detail-val"><span class="code-pill">dashboard.xhtml</span></span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 1.6 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Session Inspector Modal</h4>
+                                <span class="feature-type-tag tag-ui">Diagnostic</span>
+                            </div>
+                            <p class="description">
+                                Live session diagnostic modal launched from the top navigation bar (<span class="code-pill">SESSION_INFO_DIALOG</span>) enabling operators to view active session attributes and client data.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Dialog File:</span><span class="detail-val"><span class="code-pill">/elements/session_info.xhtml</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Trigger:</span><span class="detail-val"><span class="code-pill">fa fa-laptop</span> button in top navbar</span></div>
+                                <div class="detail-row"><span class="detail-key">Data:</span><span class="detail-val">Session ID, creation time, client user-agent</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: DYNAMIC UI ARCHITECTURE -->
+                <div class="tab-panel" id="tab-ui" role="tabpanel">
+                    <div class="feature-category-header">
+                        <h3>🖥️ Dynamic UI Architecture &amp; Navigation</h3>
+                        <p>AJAX-driven single-dashboard container, recursive hierarchical navigation, custom LazyDataModel tables, and icon providers.</p>
+                    </div>
+
+                    <div class="feature-grid">
+                        <!-- Feature 2.1 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Dynamic Panel Container</h4>
+                                <span class="feature-type-tag tag-ui">UI Engine</span>
+                            </div>
+                            <p class="description">
+                                Single-page architecture (<span class="code-pill">dashboard.xhtml</span>) where the body area renders <span class="code-pill">&lt;ui:include src="#{panelHandler.activePanel.resourceLocation}"&gt;</span>, switching panels smoothly via AJAX.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Controller:</span><span class="detail-val"><span class="code-pill">ir.appservice.view.beanComponents.PanelHandler</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Scope:</span><span class="detail-val"><span class="code-pill">@SessionScope</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Memory Clean:</span><span class="detail-val">Auto-evicts previous panel beans from session map</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 2.2 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Recursive Hierarchical Menus</h4>
+                                <span class="feature-type-tag tag-core">Navigation</span>
+                            </div>
+                            <p class="description">
+                                Multi-level nested tree navigation built recursively in <span class="code-pill">AccountService.getWithRolesAndPanelsAndMenus()</span> and rendered via <span class="code-pill">sidebar_menu.xhtml</span> and <span class="code-pill">menu_item.xhtml</span>.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Menu Types:</span><span class="detail-val"><span class="code-pill">PANEL_MENU</span>, <span class="code-pill">IN_PAGE_MENU</span>, <span class="code-pill">CATEGORY_MENU</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Sorting:</span><span class="detail-val">Prioritized order (<span class="code-pill">priority</span> integer property)</span></div>
+                                <div class="detail-row"><span class="detail-key">Tree Engine:</span><span class="detail-val">AdminLTE treeview JavaScript integration</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 2.3 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Custom Lazy DataTable Framework</h4>
+                                <span class="feature-type-tag tag-ui">Components</span>
+                            </div>
+                            <p class="description">
+                                High-performance data grid suite (<span class="code-pill">AppDataTable</span>, <span class="code-pill">AppLazyDataModel</span>, <span class="code-pill">AppUIColumn</span>) supporting server-side pagination, multi-column sorting, and debounce filtering.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Package:</span><span class="detail-val"><span class="code-pill">ir.appservice.view.appComponent</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Filter Delay:</span><span class="detail-val">1000ms delay to prevent DB thrashing</span></div>
+                                <div class="detail-row"><span class="detail-key">Features:</span><span class="detail-val">Column toggler, double-click row inspection</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 2.4 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Icon Catalog &amp; Explorer</h4>
+                                <span class="feature-type-tag tag-ui">UI Asset</span>
+                            </div>
+                            <p class="description">
+                                Integrated icon subsystem exposing Bootstrap Glyphicons and Font Awesome icons through Spring beans, browsable via the dedicated Configuration Panel.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Beans:</span><span class="detail-val"><span class="code-pill">glyphicons</span>, <span class="code-pill">fontAwesomeIcons</span>, <span class="code-pill">appIcons</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Panel:</span><span class="detail-val"><span class="code-pill">panels/configuration_panel.xhtml</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Properties:</span><span class="detail-val">Loaded from classpath <span class="code-pill">.properties</span> descriptors</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 2.5 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>WYSIWYG Rich Text Editor</h4>
+                                <span class="feature-type-tag tag-ui">Editor</span>
+                            </div>
+                            <p class="description">
+                                Embedded HTML text formatting component powered by PrimeFaces Editor (<span class="code-pill">EditorView</span>), supporting rich content composition for emails and document descriptions.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Bean:</span><span class="detail-val"><span class="code-pill">ir.appservice.view.beanComponents.elementBean.EditorView</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Include:</span><span class="detail-val"><span class="code-pill">/elements/editor.xhtml</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Output:</span><span class="detail-val">Sanitized HTML markup</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 2.6 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>AdminLTE Responsive Layout</h4>
+                                <span class="feature-type-tag tag-ui">Theme</span>
+                            </div>
+                            <p class="description">
+                                Responsive mobile-friendly skinning via AdminFaces, providing auto-collapsing sidebar navigation, top bar notification badges, control sidebar, and customizable skins.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Template:</span><span class="detail-val"><span class="code-pill">#{layoutMB.template}</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Config:</span><span class="detail-val"><span class="code-pill">com.github.adminfaces.template.config.AdminConfig</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Controls:</span><span class="detail-val">Mobile sidebar toggle, full-screen options</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: IDENTITY & RBAC -->
+                <div class="tab-panel" id="tab-identity" role="tabpanel">
+                    <div class="feature-category-header">
+                        <h3>👤 Identity, User &amp; Organization Management</h3>
+                        <p>User accounts, natural person profiles, role-to-panel permission bindings, and self-service profile settings.</p>
+                    </div>
+
+                    <div class="feature-grid">
+                        <!-- Feature 3.1 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Account Management</h4>
+                                <span class="feature-type-tag tag-core">CRUD</span>
+                            </div>
+                            <p class="description">
+                                Complete lifecycle administration of user accounts (<span class="code-pill">Account</span> entity), including username uniqueness enforcement, auto-generated random passwords, and role assignment.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Entity:</span><span class="detail-val"><span class="code-pill">ir.appservice.model.entity.application.Account</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Service:</span><span class="detail-val"><span class="code-pill">AccountService</span></span></div>
+                                <div class="detail-row"><span class="detail-key">View:</span><span class="detail-val"><span class="code-pill">panels/crud_panels/account_panel/account_panel.xhtml</span></span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 3.2 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Natural Person Profiles</h4>
+                                <span class="feature-type-tag tag-core">Domain</span>
+                            </div>
+                            <p class="description">
+                                Dedicated real-world personal identification model (<span class="code-pill">NaturalPerson</span>), capturing first name, last name, national identification, mobile phone number, and birth date.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Entity:</span><span class="detail-val"><span class="code-pill">ir.appservice.model.entity.domain.NaturalPerson</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Association:</span><span class="detail-val">One-to-One bidirectional mapping to Account</span></div>
+                                <div class="detail-row"><span class="detail-key">Validation:</span><span class="detail-val"><span class="code-pill">@Size(min=10)</span> on mobile number</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 3.3 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Role &amp; Permission Mapping</h4>
+                                <span class="feature-type-tag tag-sec">RBAC</span>
+                            </div>
+                            <p class="description">
+                                RBAC system mapping <span class="code-pill">Role</span> entities to accessible <span class="code-pill">Panel</span> instances. Assigning a role to an account dynamically calculates visible menus and accessible dashboard panels.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Entity:</span><span class="detail-val"><span class="code-pill">ir.appservice.model.entity.application.Role</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Relations:</span><span class="detail-val"><span class="code-pill">ManyToMany</span> Accounts, <span class="code-pill">ManyToMany</span> Panels</span></div>
+                                <div class="detail-row"><span class="detail-key">Pre-seeded:</span><span class="detail-val"><span class="code-pill">Administrator</span> and <span class="code-pill">User</span> roles</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 3.4 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Self-Service Profile Modal</h4>
+                                <span class="feature-type-tag tag-ui">User Dialog</span>
+                            </div>
+                            <p class="description">
+                                Interactive dialog (<span class="code-pill">SETTING_DIALOG</span>) with tabs for editing profile demographics, account details, and updating privacy settings with instant session refresh.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Views:</span><span class="detail-val"><span class="code-pill">modal_profile_tab.xhtml</span>, <span class="code-pill">modal_privacy_tab.xhtml</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Effect:</span><span class="detail-val">PrimeFaces puff/explode modal effects</span></div>
+                                <div class="detail-row"><span class="detail-key">Handler:</span><span class="detail-val"><span class="code-pill">SessionBean.edit()</span> &amp; <span class="code-pill">SessionBean.reload()</span></span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 3.5 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Avatar Drag &amp; Drop Upload</h4>
+                                <span class="feature-type-tag tag-ui">Upload</span>
+                            </div>
+                            <p class="description">
+                                Asynchronous avatar replacement modal (<span class="code-pill">update_session_avatar_modal.xhtml</span>) leveraging PrimeFaces <span class="code-pill">p:fileUpload</span> with instant thumbnail updates.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Event:</span><span class="detail-val"><span class="code-pill">FileUploadEvent</span> in <span class="code-pill">SessionBean.uploadAvatar()</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Storage:</span><span class="detail-val">Persisted as <span class="code-pill">Document</span> BLOB entity</span></div>
+                                <div class="detail-row"><span class="detail-key">Format:</span><span class="detail-val">GIF, JPEG, PNG, SVG supported</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: DOCUMENT MANAGEMENT & STREAMING -->
+                <div class="tab-panel" id="tab-docs" role="tabpanel">
+                    <div class="feature-category-header">
+                        <h3>📄 Document Management &amp; Binary Streaming</h3>
+                        <p>Database BLOB persistence, PrimeFaces StreamedContent integration, and RESTful binary streaming controllers.</p>
+                    </div>
+
+                    <div class="feature-grid">
+                        <!-- Feature 4.1 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>BLOB Document Persistence</h4>
+                                <span class="feature-type-tag tag-core">Persistence</span>
+                            </div>
+                            <p class="description">
+                                Centralized binary document entity (<span class="code-pill">Document</span>) utilizing <span class="code-pill">@Lob</span> storage with metadata: MIME type, file size, original filename, and description.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Entity:</span><span class="detail-val"><span class="code-pill">ir.appservice.model.entity.domain.Document</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Data Field:</span><span class="detail-val"><span class="code-pill">@Lob byte[] data</span> with <span class="code-pill">@Lazy</span> loading</span></div>
+                                <div class="detail-row"><span class="detail-key">MIME Detection:</span><span class="detail-val"><span class="code-pill">Files.probeContentType()</span></span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 4.2 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>PrimeFaces Image Streamer</h4>
+                                <span class="feature-type-tag tag-ui">Streaming</span>
+                            </div>
+                            <p class="description">
+                                Two-phase dynamic content streamer in <span class="code-pill">DocumentService.streamImage()</span> providing stub <span class="code-pill">DefaultStreamedContent</span> during HTML rendering and byte streams on download.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Component:</span><span class="detail-val"><span class="code-pill">DocumentStreamer</span> &amp; <span class="code-pill">DocumentService</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Parameter:</span><span class="detail-val"><span class="code-pill">imageId</span> request query parameter</span></div>
+                                <div class="detail-row"><span class="detail-key">Phase Aware:</span><span class="detail-val">Inspects <span class="code-pill">PhaseId.RENDER_RESPONSE</span></span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 4.3 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>REST Document Download</h4>
+                                <span class="feature-type-tag tag-rest">REST API</span>
+                            </div>
+                            <p class="description">
+                                Dedicated Spring MVC REST controller (<span class="code-pill">DocumentController</span>) streaming binary files directly to HTTP clients with non-caching headers and proper content-type.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Endpoint:</span><span class="detail-val"><span class="code-pill">GET /document/{id}</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Headers:</span><span class="detail-val"><span class="code-pill">Cache-Control: no-store, Pragma: no-cache</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Listing:</span><span class="detail-val"><span class="code-pill">GET /document</span> returns metadata list</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 4.4 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>File Ingestion &amp; Conversion</h4>
+                                <span class="feature-type-tag tag-core">Utility</span>
+                            </div>
+                            <p class="description">
+                                Robust conversion utilities transforming disk files (<span class="code-pill">java.io.File</span>) or uploaded multipart files (<span class="code-pill">UploadedFile</span>) into managed <span class="code-pill">Document</span> entities.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Methods:</span><span class="detail-val"><span class="code-pill">convertToDocument(File)</span>, <span class="code-pill">uploadDocument(UploadedFile)</span></span></div>
+                                <div class="detail-row"><span class="detail-key">NIO:</span><span class="detail-val"><span class="code-pill">java.nio.file.Files.readAllBytes()</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Logging:</span><span class="detail-val">Outputs size in kilobytes and MIME classification</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 4.5 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Document CRUD Panel</h4>
+                                <span class="feature-type-tag tag-ui">Admin Panel</span>
+                            </div>
+                            <p class="description">
+                                Admin panel providing search, sorting, modal inspection, and download links for all documents stored in the database repository.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">View Path:</span><span class="detail-val"><span class="code-pill">panels/crud_panels/document_panel/document_panel.xhtml</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Dialogs:</span><span class="detail-val"><span class="code-pill">add_dialog.xhtml</span>, <span class="code-pill">edit_dialog.xhtml</span>, <span class="code-pill">view_dialog.xhtml</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Bean:</span><span class="detail-val"><span class="code-pill">DocumentCrudBean</span></span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 5: MAIL & PASSWORD RESET -->
+                <div class="tab-panel" id="tab-comm" role="tabpanel">
+                    <div class="feature-category-header">
+                        <h3>✉️ Communication &amp; Password Recovery</h3>
+                        <p>Asynchronous email sending, cryptographic password reset tokens, and outbox auditing.</p>
+                    </div>
+
+                    <div class="feature-grid">
+                        <!-- Feature 5.1 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Asynchronous Mail Engine</h4>
+                                <span class="feature-type-tag tag-async">Async Mail</span>
+                            </div>
+                            <p class="description">
+                                Non-blocking email dispatch service utilizing Spring's <span class="code-pill">@Async</span> and <span class="code-pill">JavaMailSender</span>, constructing MIME messages with HTML body and attachment support.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Service:</span><span class="detail-val"><span class="code-pill">ir.appservice.model.service.EMailService</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Method:</span><span class="detail-val"><span class="code-pill">@Async sendMail(Email email)</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Protocol:</span><span class="detail-val">SMTP with TLS (<span class="code-pill">smtp.gmail.com:587</span>)</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 5.2 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Multi-Attachment Emails</h4>
+                                <span class="feature-type-tag tag-core">MIME</span>
+                            </div>
+                            <p class="description">
+                                Seamless email attachment handling by converting relational <span class="code-pill">Document</span> records into Spring <span class="code-pill">ByteArrayResource</span> streams via <span class="code-pill">MimeMessageHelper</span>.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Recipients:</span><span class="detail-val">Comma-separated To, CC, and BCC lists</span></div>
+                                <div class="detail-row"><span class="detail-key">Attachments:</span><span class="detail-val"><span class="code-pill">List&lt;Document&gt; attachments</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Timestamp:</span><span class="detail-val">Updates <span class="code-pill">sentDate</span> automatically upon delivery</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 5.3 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Tokenized Password Reset</h4>
+                                <span class="feature-type-tag tag-sec">Recovery</span>
+                            </div>
+                            <p class="description">
+                                Secure password recovery process: generates 64-character random alphanumeric tokens, dispatches an HTML notification email with an embedded link, and validates token existence.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Entity:</span><span class="detail-val"><span class="code-pill">ResetPasswordToken</span> (64-char token)</span></div>
+                                <div class="detail-row"><span class="detail-key">Generator:</span><span class="detail-val"><span class="code-pill">RandomStringUtils.randomAlphabetic(64)</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Service:</span><span class="detail-val"><span class="code-pill">ResetPasswordTokenService.resetPassword()</span></span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 5.4 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Password Reset View &amp; REST</h4>
+                                <span class="feature-type-tag tag-rest">Endpoint</span>
+                            </div>
+                            <p class="description">
+                                Dedicated reset interface (<span class="code-pill">resetPassword.xhtml</span>) and Spring MVC controller (<span class="code-pill">ResetPasswordController</span>) parsing incoming query tokens and executing updates.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">URL:</span><span class="detail-val"><span class="code-pill">/resetPassword?token={token}</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Controller:</span><span class="detail-val"><span class="code-pill">GET /resetPassword/{resetPasswordToken}</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Bean:</span><span class="detail-val"><span class="code-pill">ResetPasswordBean</span> with BCrypt encoding</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 5.5 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Email Outbox &amp; Audit Logs</h4>
+                                <span class="feature-type-tag tag-ui">Audit</span>
+                            </div>
+                            <p class="description">
+                                Complete audit trail of all outbound system emails stored in the database, viewable through the Email CRUD panel with subject, body, and sent status.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Panel:</span><span class="detail-val"><span class="code-pill">panels/crud_panels/email_panel/email_panel.xhtml</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Bean:</span><span class="detail-val"><span class="code-pill">EmailCrudBean</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Repository:</span><span class="detail-val"><span class="code-pill">EmailRepository</span></span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 6: CONFIG & BOOTSTRAP -->
+                <div class="tab-panel" id="tab-config" role="tabpanel">
+                    <div class="feature-category-header">
+                        <h3>⚙️ System Configuration, Data Seeding &amp; Architecture</h3>
+                        <p>Database initialization, XML seed parsing, BaseEntity lifecycle, and application bootstrap.</p>
+                    </div>
+
+                    <div class="feature-grid">
+                        <!-- Feature 6.1 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Automated DB Initialization</h4>
+                                <span class="feature-type-tag tag-core">Bootstrap</span>
+                            </div>
+                            <p class="description">
+                                Spring lifecycle component (<span class="code-pill">AppInitializer</span>) implementing <span class="code-pill">InitializingBean</span> that detects empty databases and automatically seeds default accounts, roles, panels, and menus.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Trigger:</span><span class="detail-val">Runs if <span class="code-pill">Admin</span> account does not exist</span></div>
+                                <div class="detail-row"><span class="detail-key">Accounts:</span><span class="detail-val">Creates default <span class="code-pill">Admin</span> and <span class="code-pill">User</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Resource:</span><span class="detail-val">Classpath avatar (<span class="code-pill">userProfileAvatar.gif</span>)</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 6.2 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>XML Database Feeder</h4>
+                                <span class="feature-type-tag tag-core">JAXB</span>
+                            </div>
+                            <p class="description">
+                                Structured XML seed files (<span class="code-pill">feeder.xml</span>) and JAXB converters (<span class="code-pill">DocumentFeederConverter</span>) allowing bulk export and import of accounts, roles, and menus.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">File:</span><span class="detail-val"><span class="code-pill">src/main/resources/feeder.xml</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Annotations:</span><span class="detail-val"><span class="code-pill">@XmlRootElement</span>, <span class="code-pill">@XmlElement</span>, <span class="code-pill">@XmlIDREF</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Handler:</span><span class="detail-val"><span class="code-pill">DocumentFeederConverter.java</span></span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 6.3 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>BaseEntity Audit Superclass</h4>
+                                <span class="feature-type-tag tag-core">Domain</span>
+                            </div>
+                            <p class="description">
+                                Unified <span class="code-pill">@MappedSuperclass</span> for all domain models providing UUID v2 string IDs, status flags (<span class="code-pill">ACTIVE_STATUS</span>, <span class="code-pill">DE_ACTIVE_STATUS</span>), timestamps, and soft deletion.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Class:</span><span class="detail-val"><span class="code-pill">ir.appservice.model.entity.BaseEntity</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Generator:</span><span class="detail-val">Hibernate GenericGenerator <span class="code-pill">uuid2</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Audit:</span><span class="detail-val"><span class="code-pill">@CreationTimestamp</span>, <span class="code-pill">@UpdateTimestamp</span></span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 6.4 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>REST API Surface</h4>
+                                <span class="feature-type-tag tag-rest">REST</span>
+                            </div>
+                            <p class="description">
+                                RESTful endpoints exposed alongside the JSF application for headless consumption, developer diagnostics, and health monitoring.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Endpoint:</span><span class="detail-val"><span class="code-pill">GET /api/index</span> (<span class="code-pill">RestIndexController</span>)</span></div>
+                                <div class="detail-row"><span class="detail-key">Payload:</span><span class="detail-val">Returns JSON representation of system account info</span></div>
+                                <div class="detail-row"><span class="detail-key">Actuator:</span><span class="detail-val">Spring Boot Actuator metric &amp; health telemetry</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Feature 6.5 -->
+                        <div class="feature-card">
+                            <div class="feature-card-header">
+                                <h4>Exception Layer Hierarchy</h4>
+                                <span class="feature-type-tag tag-core">Exceptions</span>
+                            </div>
+                            <p class="description">
+                                Structured runtime exception hierarchy cleanly decoupling error handling across the Controller, View, and Model layers with custom domain exceptions.
+                            </p>
+                            <div class="feature-card-details">
+                                <div class="detail-row"><span class="detail-key">Exceptions:</span><span class="detail-val"><span class="code-pill">DuplicateEntityException</span>, <span class="code-pill">NotFoundEntityException</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Validation:</span><span class="detail-val"><span class="code-pill">InvalidEmailException</span>, <span class="code-pill">InvalidTokenException</span></span></div>
+                                <div class="detail-row"><span class="detail-key">Layers:</span><span class="detail-val"><span class="code-pill">ControllerLayerException</span>, <span class="code-pill">ModelLayerException</span>, <span class="code-pill">ViewLayerException</span></span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- THIRD PART: DOMAIN ENTITIES & API REFERENCE -->
+        <section class="section-block" id="domain-entities">
+            <h2 class="section-title">📊 Part 3: Entity Data Model &amp; Architecture Reference</h2>
+            <p class="section-subtitle">Comprehensive dictionary of all persisted entities and database schema mapping.</p>
+
+            <div class="tech-table-container">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Entity Name</th>
+                            <th>Package</th>
+                            <th>Inheritance</th>
+                            <th>Primary Attributes &amp; Relationships</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="code-pill">BaseEntity</span></td>
+                            <td><span class="code-pill">ir.appservice.model.entity</span></td>
+                            <td><span class="code-pill">@MappedSuperclass</span></td>
+                            <td>id (UUID2), displayName, statue (ACTIVE/DE_ACTIVE), registeredDate, updatedDate, deleteDate.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="code-pill">Account</span></td>
+                            <td><span class="code-pill">...entity.application</span></td>
+                            <td>Single Table</td>
+                            <td>accountName (unique), password (BCrypt), email, mobileNumber, NaturalPerson (OneToOne), Avatar (ManyToOne Document), Roles (ManyToMany).</td>
+                        </tr>
+                        <tr>
+                            <td><span class="code-pill">Role</span></td>
+                            <td><span class="code-pill">...entity.application</span></td>
+                            <td>Single Table</td>
+                            <td>displayName, accounts (ManyToMany Account), panels (ManyToMany Panel). Pre-seeded: Administrator, User.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="code-pill">Panel</span></td>
+                            <td><span class="code-pill">...entity.application.ui</span></td>
+                            <td>Single Table</td>
+                            <td>resourceLocation (XHTML path), menu (OneToOne Menu), roles (ManyToMany Role). Dynamically rendered in dashboard.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="code-pill">Menu</span></td>
+                            <td><span class="code-pill">...entity.application.ui</span></td>
+                            <td>Single Table</td>
+                            <td>priority (int), type (PANEL_MENU, CATEGORY_MENU, IN_PAGE_MENU), icon (CSS class), parent (ManyToOne Menu), subMenus (OneToMany), panel (OneToOne).</td>
+                        </tr>
+                        <tr>
+                            <td><span class="code-pill">NaturalPerson</span></td>
+                            <td><span class="code-pill">...entity.domain</span></td>
+                            <td>Single Table</td>
+                            <td>firstName, lastName, mobileNumber (min 10 chars), birthDate, account (OneToOne Account), avatar (ManyToOne Document).</td>
+                        </tr>
+                        <tr>
+                            <td><span class="code-pill">Document</span></td>
+                            <td><span class="code-pill">...entity.domain</span></td>
+                            <td>Single Table</td>
+                            <td>type (MIME), description, size (bytes), data (@Lob byte[] lazy). Used for avatars, attachments, file downloads.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="code-pill">Email</span></td>
+                            <td><span class="code-pill">...entity.application</span></td>
+                            <td>Single Table</td>
+                            <td>mailFrom, replyTo, mailTo, mailCc, mailBcc, sentDate, subject, text (HTML), attachments (OneToMany Document).</td>
+                        </tr>
+                        <tr>
+                            <td><span class="code-pill">ResetPasswordToken</span></td>
+                            <td><span class="code-pill">...entity.application</span></td>
+                            <td>Single Table</td>
+                            <td>account (ManyToOne Account), token (64-char random alphanumeric cryptographic string).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- REST Endpoints -->
+            <h3 class="section-title" id="api-endpoints" style="font-size: 1.4rem; margin-top: 2rem;">🌐 HTTP &amp; REST Endpoint Reference</h3>
+            <div class="tech-table-container">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint Path</th>
+                            <th>Controller</th>
+                            <th>Security &amp; Function</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="code-pill" style="background:#e0f2fe; color:#0369a1; font-weight:700;">GET</span></td>
+                            <td><span class="code-pill">/</span>, <span class="code-pill">/index</span>, <span class="code-pill">/index.xhtml</span></td>
+                            <td><span class="code-pill">AppConfiguration</span></td>
+                            <td>Publicly permitted. Renders primary landing page and login sidebar.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="code-pill" style="background:#e0f2fe; color:#0369a1; font-weight:700;">GET</span></td>
+                            <td><span class="code-pill">/dashboard</span></td>
+                            <td><span class="code-pill">AppConfiguration</span></td>
+                            <td>Requires authentication. Redirects anonymous users to index page via preRenderView.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="code-pill" style="background:#e0f2fe; color:#0369a1; font-weight:700;">GET</span></td>
+                            <td><span class="code-pill">/api/index</span></td>
+                            <td><span class="code-pill">RestIndexController</span></td>
+                            <td>Publicly accessible. Returns JSON account information for developer diagnostics.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="code-pill" style="background:#e0f2fe; color:#0369a1; font-weight:700;">GET</span></td>
+                            <td><span class="code-pill">/document</span></td>
+                            <td><span class="code-pill">DocumentController</span></td>
+                            <td>Publicly permitted. Lists metadata for all registered documents.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="code-pill" style="background:#e0f2fe; color:#0369a1; font-weight:700;">GET</span></td>
+                            <td><span class="code-pill">/document/{id}</span></td>
+                            <td><span class="code-pill">DocumentController</span></td>
+                            <td>Publicly permitted. Streams raw binary file bytes directly with no-cache headers.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="code-pill" style="background:#e0f2fe; color:#0369a1; font-weight:700;">GET</span></td>
+                            <td><span class="code-pill">/resetPassword</span>, <span class="code-pill">/resetPassword/{token}</span></td>
+                            <td><span class="code-pill">ResetPasswordController</span></td>
+                            <td>Publicly permitted. Validates recovery token and serves password reset form.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="code-pill" style="background:#fef2f2; color:#b91c1c; font-weight:700;">POST</span></td>
+                            <td><span class="code-pill">/signout</span></td>
+                            <td><span class="code-pill">AppSecurity</span></td>
+                            <td>Invalidates HTTP session, purges security context, and redirects to root.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Verification Invariant Summary -->
+            <div class="callout callout-success" id="verification-summary" style="margin-top: 2rem;">
+                <div class="callout-title">✅ Operational Verification &amp; State Invariant</div>
+                All functionalities documented herein are fully implemented and verified against the AppService codebase. The project builds cleanly with Maven, maintains zero compile errors, and enforces strict separation of concerns across Spring Boot backend services and JSF/PrimeFaces frontend beans.
+            </div>
+        </section>
+
+    </div>
+
+    <!-- BACK TO TOP BUTTON -->
+    <button id="backToTopBtn" onclick="scrollToTop()" title="Back to top" aria-label="Back to top">↑</button>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h5>AppService Project</h5>
+                    <p style="color: #94a3b8; font-size: 0.88rem;">
+                        Enterprise administration platform combining Spring Boot 2, Spring Security, Spring Data JPA, and AdminFaces / PrimeFaces.
+                    </p>
+                </div>
+                <div class="footer-col">
+                    <h5>Documentation Scope</h5>
+                    <p style="color: #94a3b8; font-size: 0.88rem;">
+                        Extracted as Part 1 of the architecture review. Governed by <span class="code-pill" style="background:#1e293b; color:#93c5fd; border-color:#334155;">AGENTS.md</span> and <span class="code-pill" style="background:#1e293b; color:#93c5fd; border-color:#334155;">GEMINI.md</span> operational standards.
+                    </p>
+                </div>
+                <div class="footer-col">
+                    <h5>Developer &amp; Copyright</h5>
+                    <p style="color: #94a3b8; font-size: 0.88rem;">
+                        Copyright &copy; 2019-2026 Bahman Heydari Nejad (EagleEyes).<br>
+                        Domain: <a href="http://www.BahmanHeydariNejad.ir" target="_blank" style="color: #38bdf8; text-decoration: none;">BahmanHeydariNejad.ir</a>
+                    </p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                AppService 1.0-Template &bull; Generated Documentation &bull; Current State Architecture
+            </div>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE JAVASCRIPT FOR TABS & FILTERING -->
+    <script>
+        // Tab switching function
+        function switchTab(tabId) {
+            // Deactivate all tab buttons
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-selected', 'false');
+            });
+
+            // Deactivate all panels
+            const tabPanels = document.querySelectorAll('.tab-panel');
+            tabPanels.forEach(panel => {
+                panel.classList.remove('active');
+            });
+
+            // Activate target button
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+                activeBtn.setAttribute('aria-selected', 'true');
+            }
+
+            // Activate target panel
+            const activePanel = document.getElementById(tabId);
+            if (activePanel) {
+                activePanel.classList.add('active');
+            }
+
+            // If triggered by a hash click, smooth scroll to tab container
+            if (window.location.hash !== '#' + tabId) {
+                history.replaceState(null, null, '#' + tabId);
+            }
+        }
+
+        // Live Feature Filter function
+        function filterFeatures() {
+            const query = document.getElementById('featureSearchInput').value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.feature-card');
+
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (query === '' || text.includes(query)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Handle URL Hash navigation on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const hash = window.location.hash.replace('#', '');
+            if (hash && document.getElementById(hash) && hash.startsWith('tab-')) {
+                switchTab(hash);
+            }
+
+            // Back to top button visibility
+            const backToTopBtn = document.getElementById('backToTopBtn');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 400) {
+                    backToTopBtn.classList.add('visible');
+                } else {
+                    backToTopBtn.classList.remove('visible');
+                }
+            });
+        });
+
+        // Scroll to top helper
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
