@@ -46,8 +46,8 @@ public class SessionBean extends BaseBean {
 
     public void redirectAnonymousUsers(ComponentSystemEvent event) throws IOException {
         if (!isAuthenticated()) {
-            logger.trace(event.getComponent().getId() + " => redirecting to index ..." + adminConfig.getIndexPage());
-            FacesContext.getCurrentInstance().getExternalContext().redirect(adminConfig.getIndexPage());
+            logger.trace("Anonymous user detected => redirecting to /signin");
+            FacesContext.getCurrentInstance().getExternalContext().redirect("/signin");
         }
     }
 

@@ -1,17 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <html
         xmlns:p="http://primefaces.org/ui"
         xmlns:h="http://java.sun.com/jsf/html"
 >
 
 <h:head>
+    <title>#{environment.getProperty('app.name')}</title>
     <h:outputStylesheet name="theme.css" library="primefaces-admin"/>
 </h:head>
 <h:body>
-    <h:form prependId="false">
+    <h:form id="INDEX_FORM" prependId="false">
         <p:commandButton icon="fa fa-sign-in" iconPos="right"
                          oncomplete="PF('INDEX_LOGIN_BAR').show()"
-                         value="Sing In"/>
+                         value="Sign In"/>
         <p:sidebar id="INDEX_LOGIN_BAR" widgetVar="INDEX_LOGIN_BAR" position="top">
             <p:growl id="MESSAGE_BOX" showDetail="true" sticky="false" life="5000">
                 <p:autoUpdate/>
@@ -33,6 +34,7 @@
 
                 <p:commandButton value="Login" icon="fa fa-sign-in" iconPos="right"
                                  styleClass="btn btn-success"
+                                 update="@form"
                                  action="#{authenticationBean.authenticate}"/>
 
                 <p:selectOneButton label="Receive?" id="PASSWORD_FORGOT_BUTTON_GROUP">
@@ -40,6 +42,7 @@
                                      value="Receive Mail?"
                                      icon="fa fa-envelope-o" iconPos="right"
                                      styleClass="btn btn-info"
+                                     update="@form"
                                      action="#{authenticationBean.restPasswordSendMail}"
                     />
                     <p:commandButton id="CANCEL_RESET_PASSWORD" widgetVar="CANCEL_RESET_PASSWORD"

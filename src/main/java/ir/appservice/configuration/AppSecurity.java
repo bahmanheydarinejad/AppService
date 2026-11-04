@@ -11,6 +11,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.DelegatingSecurityContextRepository;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -32,7 +36,19 @@ public class AppSecurity {
     }
 
     @Bean
+    public SecurityContextRepository securityContextRepository() {
+        return new DelegatingSecurityContextRepository(
+                new RequestAttributeSecurityContextRepository(),
+                new HttpSessionSecurityContextRepository()
+        );
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.securityContext(context -> context
+                .securityContextRepository(securityContextRepository())
+        );
+
         http.sessionManagement(session -> session
                 .maximumSessions(100)
                 .expiredUrl("/index")
@@ -44,14 +60,19 @@ public class AppSecurity {
                 .requestMatchers(
                         "/javax.faces.resource/**",
                         "/jakarta.faces.resource/**",
+                        "/webjars/**",
+                        "/css/**",
+                        "/js/**",
+                        "/images/**",
+                        "/favicon.ico",
                         "/",
                         "/index", "/index.xhtml",
                         "/signin", "/signin.xhtml",
-                        "/login.xhtml",   // AdminFaces default fallback — kept as permitAll safety net
+                        "/login", "/login.xhtml",
                         "/signout",
                         "/error",
                         "/document/**",
-                        "/resetPassword.xhtml", "/resetPassword", "/resetPassword/**"
+                        "/resetPassword", "/resetPassword.xhtml", "/resetPassword/**"
                 ).permitAll()
                 .anyRequest().authenticated()
         );

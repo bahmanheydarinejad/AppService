@@ -58,12 +58,11 @@ joinfaces:
   primefaces:
     font-awesome: true
   adminfaces:
-    # Must match the Spring Security loginPage("/signin") and the ViewController "/signin" -> "signin.xhtml"
-    # Without this, AdminFilter defaults to redirecting unauthenticated users to "login.xhtml" (404 loop)
+    # Disable AdminFilter so Spring Security has exclusive control over authentication,
+    # avoiding conflicting redirect loops between AdminFilter and Spring Security.
+    disable-filter: true
     login-page: signin.xhtml
-    index-page: index
-    # Skip AdminFilter redirect for public resources handled by Spring Security
-    ignored-resources: /signin,/signin.xhtml,/index,/index.xhtml,/,/document,/resetPassword,/jakarta.faces.resource,/javax.faces.resource
+    index-page: index.xhtml
     render-messages: false
     render-menu-search: true
     render-control-sidebar: true

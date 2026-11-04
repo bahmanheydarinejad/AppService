@@ -21,12 +21,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.ApplicationScope;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.mail.MessagingException;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -87,7 +93,10 @@ public class AccountService extends CrudService<Account> implements Authenticati
     }
 
     public Account getWithRolesAndPanelsAndMenus(String id) {
-        Account account = getAccountRepository().getOne(id);
+        Account account = getAccountRepository().findById(id).orElse(null);
+        if (account == null) {
+            return null;
+        }
 
         Set<Menu> rootAccountMenus = new HashSet();
         Set<Menu> availableAccountMenus = new HashSet();
@@ -183,7 +192,16 @@ public class AccountService extends CrudService<Account> implements Authenticati
         logger.trace(String.format("Authenticating: %s, password: %s", loginId, password));
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginId, password);
         Authentication auth = authenticate(authenticationToken);
-        SecurityContextHolder.getContext().setAuthentication(auth);
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(auth);
+        SecurityContextHolder.setContext(context);
+
+        ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attr != null) {
+            HttpServletRequest request = attr.getRequest();
+            HttpSession session = request.getSession(true);
+            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+        }
     }
 
     public void resetPasswordSendMail(String email) throws NotFoundEntityException, MessagingException {
@@ -268,6 +286,6 @@ public class AccountService extends CrudService<Account> implements Authenticati
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return false;
+        return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
     }
 }

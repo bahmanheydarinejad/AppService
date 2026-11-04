@@ -49,15 +49,25 @@ public class PanelHandler extends BaseBean {
         logger.trace(String.format("Active Panel: %s", activePanel.getDisplayName()));
     }
 
+    public Panel getActivePanel() {
+        if (activePanel == null) {
+            setDefaultPanel();
+        }
+        return activePanel;
+    }
+
     public void setDefaultPanel() {
         try {
-            activePanel = sessionBean.getAccount().getPanels().get(0);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            try {
-                FacesContext.getCurrentInstance().getExternalContext().redirect("/");
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            if (sessionBean != null && sessionBean.getAccount() != null
+                    && sessionBean.getAccount().getPanels() != null
+                    && !sessionBean.getAccount().getPanels().isEmpty()) {
+                activePanel = sessionBean.getAccount().getPanels().get(0);
+            } else {
+                activePanel = null;
             }
+        } catch (Exception e) {
+            logger.warn("Could not set default panel: {}", e.getMessage());
+            activePanel = null;
         }
     }
 
