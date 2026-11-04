@@ -5,10 +5,10 @@ import lombok.Setter;
 import org.primefaces.component.api.UIColumn;
 import org.primefaces.component.celleditor.CellEditor;
 
-import javax.el.MethodExpression;
-import javax.el.ValueExpression;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
+import jakarta.el.MethodExpression;
+import jakarta.el.ValueExpression;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
 import java.io.IOException;
 import java.util.List;
 
@@ -58,7 +58,6 @@ public class AppUIColumn<T> implements UIColumn {
         return null;
     }
 
-    @Override
     public String getSelectionMode() {
         return null;
     }
@@ -138,7 +137,6 @@ public class AppUIColumn<T> implements UIColumn {
         return 0;
     }
 
-    @Override
     public Object getFilterOptions() {
         return filterOptions;
     }
@@ -208,9 +206,13 @@ public class AppUIColumn<T> implements UIColumn {
         return null;
     }
 
-    @Override
     public int getPriority() {
         return 0;
+    }
+
+    @Override
+    public jakarta.faces.convert.Converter getConverter() {
+        return null;
     }
 
     @Override
@@ -245,6 +247,91 @@ public class AppUIColumn<T> implements UIColumn {
 
     @Override
     public boolean isGroupRow() {
+        return false;
+    }
+
+    @Override
+    public int getDisplayPriority() {
+        return 0;
+    }
+
+    @Override
+    public boolean isCaseSensitiveSort() {
+        return false;
+    }
+
+    @Override
+    public int getNullSortOrder() {
+        return 0;
+    }
+
+    @Override
+    public String getColumnKey(UIComponent parent, String columnKey) {
+        return null;
+    }
+
+    @Override
+    public boolean isSelectionBox() {
+        return false;
+    }
+
+    @Override
+    public String getTitle() {
+        return null;
+    }
+
+    @Override
+    public String getFilterPlaceholder() {
+        return null;
+    }
+
+    @Override
+    public int getResponsivePriority() {
+        return 0;
+    }
+
+    @Override
+    public Object getExportValue() {
+        return null;
+    }
+
+    @Override
+    public int getExportRowspan() {
+        return 0;
+    }
+
+    @Override
+    public int getExportColspan() {
+        return 0;
+    }
+
+    @Override
+    public Object getExportHeaderValue() {
+        return null;
+    }
+
+    @Override
+    public Object getExportFooterValue() {
+        return null;
+    }
+
+    @Override
+    public String getExportTag() {
+        return null;
+    }
+
+    @Override
+    public String getSortOrder() {
+        return null;
+    }
+
+    @Override
+    public int getSortPriority() {
+        return 0;
+    }
+
+    @Override
+    public boolean isDraggable() {
         return false;
     }
 }

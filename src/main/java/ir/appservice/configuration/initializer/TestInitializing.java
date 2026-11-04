@@ -11,8 +11,8 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 
 //@Configuration
 public class TestInitializing implements InitializingBean {
@@ -59,7 +59,7 @@ public class TestInitializing implements InitializingBean {
 ////        roleGraph.addAttributeNodes("panels");
 //
 //        Map<String, Object> hints = new HashMap();
-//        hints.put("javax.persistence.loadgraph", graph);
+//        hints.put("jakarta.persistence.loadgraph", graph);
 //        logger.trace("Graph: {}", graph.getAttributeNodes());
 //
 //        Account account = entityManager.find(Account.class, UUID.fromString("XXX"), hints);

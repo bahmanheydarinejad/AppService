@@ -28,6 +28,4 @@ public interface CrudRepository<T extends BaseEntity, ID extends Serializable> e
     List<T> findAllByDeleteDateIsNotNull();
 
     Page<T> findAllByDeleteDateIsNotNull(Pageable pageable);
-
-    T getById(String id);
 }

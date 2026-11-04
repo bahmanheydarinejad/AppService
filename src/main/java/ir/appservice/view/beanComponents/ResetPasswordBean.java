@@ -6,7 +6,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
-import javax.faces.context.FacesContext;
+import jakarta.faces.context.FacesContext;
 
 @Setter
 @Getter

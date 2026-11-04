@@ -9,8 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.*;
-import javax.persistence.criteria.*;
+import jakarta.persistence.*;
+import jakarta.persistence.criteria.*;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -49,15 +49,19 @@ public abstract class CrudService<T extends BaseEntity> {
         return (T) crudRepository.save(t);
     }
 
-    public T remove(String id) {
-        T temp;
-        try {
-            temp = (T) crudRepository.getOne(id);
-            temp.setDeleteDate(new Date());
-            return (T) crudRepository.save(temp);
-        } catch (EntityNotFoundException e) {
-            throw new NotFoundEntityException(e.getMessage());
+    @SuppressWarnings("unchecked")
+    private T findOrThrow(String id) {
+        T entity = (T) crudRepository.findById(id).orElse(null);
+        if (entity == null) {
+            throw new NotFoundEntityException("Entity not found: " + id);
         }
+        return entity;
+    }
+
+    public T remove(String id) {
+        T temp = findOrThrow(id);
+        temp.setDeleteDate(new Date());
+        return (T) crudRepository.save(temp);
     }
 
     public T remove(T t) {
@@ -65,36 +69,21 @@ public abstract class CrudService<T extends BaseEntity> {
     }
 
     public T recycle(String id) {
-        T temp;
-        try {
-            temp = (T) crudRepository.getOne(id);
-            temp.setDeleteDate(null);
-            return (T) crudRepository.save(temp);
-        } catch (EntityNotFoundException e) {
-            throw new NotFoundEntityException(e.getMessage());
-        }
+        T temp = findOrThrow(id);
+        temp.setDeleteDate(null);
+        return (T) crudRepository.save(temp);
     }
 
     public T activate(String id) {
-        T temp;
-        try {
-            temp = (T) crudRepository.getOne(id);
-            temp.setStatue(T.ACTIVE_STATUS);
-            return (T) crudRepository.save(temp);
-        } catch (EntityNotFoundException e) {
-            throw new NotFoundEntityException(e.getMessage());
-        }
+        T temp = findOrThrow(id);
+        temp.setStatue(T.ACTIVE_STATUS);
+        return (T) crudRepository.save(temp);
     }
 
     public T deActivate(String id) {
-        T temp;
-        try {
-            temp = (T) crudRepository.getOne(id);
-            temp.setStatue(T.DE_ACTIVE_STATUS);
-            return (T) crudRepository.save(temp);
-        } catch (EntityNotFoundException e) {
-            throw new NotFoundEntityException(e.getMessage());
-        }
+        T temp = findOrThrow(id);
+        temp.setStatue(T.DE_ACTIVE_STATUS);
+        return (T) crudRepository.save(temp);
     }
 
     public T recycle(T t) {
@@ -102,14 +91,9 @@ public abstract class CrudService<T extends BaseEntity> {
     }
 
     public T permanentRemove(String id) {
-        T temp;
-        try {
-            temp = (T) crudRepository.getById(id);
-            crudRepository.deleteById(id);
-            return temp;
-        } catch (EntityNotFoundException e) {
-            throw new NotFoundEntityException(e.getMessage());
-        }
+        T temp = findOrThrow(id);
+        crudRepository.deleteById(id);
+        return temp;
     }
 
     public T permanentRemove(T t) {
@@ -125,7 +109,7 @@ public abstract class CrudService<T extends BaseEntity> {
     }
 
     public T get(String id) {
-        return (T) crudRepository.getById(id);
+        return (T) crudRepository.findById(id).orElse(null);
     }
 
     public T lazyGet(String id, String... attributes) {
@@ -151,7 +135,7 @@ public abstract class CrudService<T extends BaseEntity> {
                 attributeNode.getAttributeName(), attributeNode.getKeySubgraphs(), attributeNode.getSubgraphs()));
 
         Map<String, Object> hints = new HashMap();
-        hints.put("javax.persistence.loadgraph", graph);
+        hints.put("jakarta.persistence.loadgraph", graph);
 
         return entityManager.find(clazz, id, hints);
     }

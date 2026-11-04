@@ -37,8 +37,8 @@ public class AppConfiguration implements WebMvcConfigurer {
     private Environment env;
 
     @Bean
-    public static ServletListenerRegistrationBean httpSessionEventPublisher() {
-        return new ServletListenerRegistrationBean(new HttpSessionEventPublisher());
+    public static ServletListenerRegistrationBean<HttpSessionEventPublisher> httpSessionEventPublisher() {
+        return new ServletListenerRegistrationBean<>(new HttpSessionEventPublisher());
     }
 
     @Bean
@@ -51,6 +51,8 @@ public class AppConfiguration implements WebMvcConfigurer {
         registry.addViewController("/").setViewName("/index.xhtml");
         registry.addViewController("/index").setViewName("/index.xhtml");
         registry.addViewController("/signin").setViewName("/signin.xhtml");
+        registry.addViewController("/login").setViewName("/signin.xhtml");   // AdminFaces default redirect alias
+        registry.addViewController("/login.xhtml").setViewName("/signin.xhtml"); // AdminFaces full-path alias
         registry.addViewController("/dashboard").setViewName("/dashboard.xhtml");
         registry.addViewController("/resetPassword").setViewName("/resetPassword.xhtml");
         registry.setOrder(Ordered.HIGHEST_PRECEDENCE);

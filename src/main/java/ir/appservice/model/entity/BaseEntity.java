@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.*;
 
-import javax.persistence.*;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlID;
+import jakarta.persistence.*;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlID;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +53,7 @@ public abstract class BaseEntity {
     @UpdateTimestamp
     @XmlElement
     protected Date updatedDate;
-    @Temporal(TemporalType.TIMESTAMP)
+    @jakarta.persistence.Temporal(TemporalType.TIMESTAMP)
     @XmlElement
     protected Date deleteDate;
 

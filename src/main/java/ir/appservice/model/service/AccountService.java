@@ -27,7 +27,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.ApplicationScope;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -64,7 +64,12 @@ public class AccountService extends CrudService<Account> implements Authenticati
     }
 
     public boolean isAuthorized(Account account, BaseEntity object) {
-        List<Role> roles = getAccountRepository().getById(account.getId()).getRoles();
+        Account acc = getAccountRepository().findById(account.getId()).orElse(null);
+        if (acc == null) {
+            logger.trace(String.format("%s not found, not authorized to: %s", account, object));
+            return false;
+        }
+        List<Role> roles = acc.getRoles();
         if (object instanceof Panel && object != null) {
             for (Role role : roles) {
                 if (role.getPanels().contains(object)) {

@@ -1,12 +1,1603 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark" data-theme="adminlte-blue">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=appservice-features.html">
-  <title>AppService Documentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AppService Enterprise Platform — Architecture &amp; Feature Specification (Spring Boot 4.1.1)</title>
+  
+  <!-- Local Bootstrap 5 Core Stylesheet (Swappable by Theme Dropdown) -->
+  <link rel="stylesheet" id="bootstrap-theme-link" href="assets/css/bootstrap.min.css">
+  
+  <!-- Local Bootstrap Icons -->
+  <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css">
+
+  <style>
+    /* ==========================================================================
+       Custom Theme Overlays & CSS Variables for AppService
+       ========================================================================== */
+    :root, [data-theme="adminlte-blue"] {
+      --app-bg-body: #0b111e;
+      --app-bg-sidebar: #111a2e;
+      --app-bg-card: #15203b;
+      --app-bg-card-inner: #1c2b4d;
+      --app-bg-card-hover: #22345e;
+      --app-border: #233558;
+      --app-border-light: #324b7a;
+      
+      --app-primary: #3c8dbc;
+      --app-primary-light: #60a8d6;
+      --app-primary-dark: #286090;
+      --app-primary-glow: rgba(60, 141, 188, 0.28);
+      
+      --app-success: #00a65a;
+      --app-info: #00c0ef;
+      --app-warning: #f39c12;
+      --app-danger: #dd4b39;
+      --app-purple: #9b59b6;
+      
+      --app-text: #f8fafc;
+      --app-text-muted: #94a3b8;
+      --app-text-dim: #64748b;
+      --app-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    [data-theme="darkly"] {
+      --app-bg-body: #222222;
+      --app-bg-sidebar: #1a1a1a;
+      --app-bg-card: #303030;
+      --app-bg-card-inner: #3a3a3a;
+      --app-bg-card-hover: #444444;
+      --app-border: #444444;
+      --app-border-light: #555555;
+      
+      --app-primary: #375a7f;
+      --app-primary-light: #4b7db3;
+      --app-primary-dark: #2b4764;
+      --app-primary-glow: rgba(55, 90, 127, 0.35);
+      
+      --app-success: #00bc8c;
+      --app-info: #3498db;
+      --app-warning: #f39c12;
+      --app-danger: #e74c3c;
+      --app-purple: #af69ee;
+      
+      --app-text: #ffffff;
+      --app-text-muted: #adb5bd;
+      --app-text-dim: #777777;
+    }
+
+    [data-theme="flatly"] {
+      --app-bg-body: #f8fafc;
+      --app-bg-sidebar: #2c3e50;
+      --app-bg-card: #ffffff;
+      --app-bg-card-inner: #f1f5f9;
+      --app-bg-card-hover: #e2e8f0;
+      --app-border: #e2e8f0;
+      --app-border-light: #cbd5e1;
+      
+      --app-primary: #2c3e50;
+      --app-primary-light: #34495e;
+      --app-primary-dark: #1a252f;
+      --app-primary-glow: rgba(44, 62, 80, 0.2);
+      
+      --app-success: #18bc9c;
+      --app-info: #3498db;
+      --app-warning: #f39c12;
+      --app-danger: #e74c3c;
+      --app-purple: #8e44ad;
+      
+      --app-text: #212529;
+      --app-text-muted: #64748b;
+      --app-text-dim: #94a3b8;
+    }
+
+    [data-theme="cyborg"] {
+      --app-bg-body: #060606;
+      --app-bg-sidebar: #0f0f0f;
+      --app-bg-card: #181818;
+      --app-bg-card-inner: #242424;
+      --app-bg-card-hover: #303030;
+      --app-border: #282828;
+      --app-border-light: #444444;
+      
+      --app-primary: #2a9fd6;
+      --app-primary-light: #54b4e2;
+      --app-primary-dark: #1b6d94;
+      --app-primary-glow: rgba(42, 159, 214, 0.35);
+      
+      --app-success: #77b300;
+      --app-info: #9933cc;
+      --app-warning: #ff8800;
+      --app-danger: #cc0000;
+      --app-purple: #9933cc;
+      
+      --app-text: #ffffff;
+      --app-text-muted: #888888;
+      --app-text-dim: #555555;
+    }
+
+    [data-theme="pulse"] {
+      --app-bg-body: #191424;
+      --app-bg-sidebar: #221a33;
+      --app-bg-card: #2c2242;
+      --app-bg-card-inner: #362a52;
+      --app-bg-card-hover: #433466;
+      --app-border: #413263;
+      --app-border-light: #594487;
+      
+      --app-primary: #af69ee;
+      --app-primary-light: #c68ff3;
+      --app-primary-dark: #8c3ed6;
+      --app-primary-glow: rgba(175, 105, 238, 0.35);
+      
+      --app-success: #00c851;
+      --app-info: #33b5e5;
+      --app-warning: #ffbb33;
+      --app-danger: #ff4444;
+      --app-purple: #af69ee;
+      
+      --app-text: #f3f0f7;
+      --app-text-muted: #b8afc8;
+      --app-text-dim: #847799;
+    }
+
+    [data-theme="emerald"] {
+      --app-bg-body: #0d1b18;
+      --app-bg-sidebar: #132722;
+      --app-bg-card: #19332c;
+      --app-bg-card-inner: #204138;
+      --app-bg-card-hover: #295448;
+      --app-border: #2c584c;
+      --app-border-light: #3d7969;
+      
+      --app-primary: #10b981;
+      --app-primary-light: #34d399;
+      --app-primary-dark: #059669;
+      --app-primary-glow: rgba(16, 185, 129, 0.3);
+      
+      --app-success: #10b981;
+      --app-info: #06b6d4;
+      --app-warning: #f59e0b;
+      --app-danger: #ef4444;
+      --app-purple: #a855f7;
+      
+      --app-text: #f0fdf4;
+      --app-text-muted: #a7f3d0;
+      --app-text-dim: #6ee7b7;
+    }
+
+    /* Base Layout */
+    body {
+      background-color: var(--app-bg-body);
+      color: var(--app-text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      margin: 0;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* Fixed Sidebar */
+    aside.sidebar {
+      width: 290px;
+      min-width: 290px;
+      background-color: var(--app-bg-sidebar);
+      border-right: 1px solid var(--app-border);
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+      padding: 24px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      z-index: 1030;
+    }
+
+    aside.sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+    aside.sidebar::-webkit-scrollbar-thumb {
+      background: var(--app-border);
+      border-radius: 3px;
+    }
+
+    /* Brand Logo Box */
+    .brand-logo-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--app-border);
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 14px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px var(--app-primary-glow);
+      letter-spacing: 0.5px;
+    }
+
+    .brand-title h1 {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0;
+      color: var(--app-text);
+    }
+    .brand-title p {
+      font-size: 11px;
+      margin: 0;
+      color: var(--app-text-muted);
+      letter-spacing: 0.3px;
+    }
+
+    /* Navigation Links */
+    .nav-group-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--app-text-dim);
+      margin-bottom: 8px;
+      padding-left: 8px;
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .nav-list li a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      color: var(--app-text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+
+    .nav-list li a:hover,
+    .nav-list li a.active {
+      background-color: var(--app-bg-card-inner);
+      color: var(--app-primary-light);
+    }
+
+    .nav-list li a i {
+      font-size: 16px;
+    }
+
+    /* Main Content Area */
+    main.content {
+      flex: 1;
+      padding: 32px 40px;
+      overflow-y: auto;
+      max-width: 1440px;
+    }
+
+    /* Top Control Bar */
+    .top-control-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--app-border);
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, var(--app-bg-card), var(--app-bg-card-inner));
+      border: 1px solid var(--app-border);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-banner::after {
+      content: "";
+      position: absolute;
+      right: -60px;
+      top: -60px;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, var(--app-primary-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Feature Cards */
+    .feature-card {
+      background-color: var(--app-bg-card);
+      border: 1px solid var(--app-border);
+      border-radius: 10px;
+      padding: 24px;
+      transition: all 0.2s ease;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--app-primary);
+      box-shadow: 0 8px 24px var(--app-primary-glow);
+    }
+
+    .feature-icon-wrapper {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    .feature-card h4 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--app-text);
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
+      font-size: 13.5px;
+      color: var(--app-text-muted);
+      line-height: 1.6;
+      margin-bottom: 16px;
+      flex: 1;
+    }
+
+    .tech-pill-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: auto;
+    }
+
+    .tech-pill {
+      font-size: 11px;
+      font-family: var(--app-font-mono);
+      padding: 4px 8px;
+      border-radius: 4px;
+      background-color: var(--app-bg-card-inner);
+      color: var(--app-text-muted);
+      border: 1px solid var(--app-border-light);
+    }
+
+    /* Code Pills and Tags */
+    .code-pill {
+      font-family: var(--app-font-mono);
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--app-bg-card-inner);
+      color: var(--app-primary-light);
+      border: 1px solid var(--app-border-light);
+    }
+
+    /* Custom Tables */
+    .table-container {
+      background-color: var(--app-bg-card);
+      border: 1px solid var(--app-border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .table-custom {
+      width: 100%;
+      margin-bottom: 0;
+      color: var(--app-text);
+      border-collapse: collapse;
+    }
+
+    .table-custom th {
+      background-color: var(--app-bg-card-inner);
+      color: var(--app-primary-light);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--app-border);
+    }
+
+    .table-custom td {
+      padding: 14px 18px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--app-border);
+      vertical-align: middle;
+    }
+
+    .table-custom tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table-custom tr:hover td {
+      background-color: var(--app-bg-card-hover);
+    }
+
+    /* Interactive Mockup Studio */
+    .mockup-window {
+      background: var(--app-bg-card);
+      border: 1px solid var(--app-border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+
+    .mockup-header-bar {
+      background: var(--app-bg-card-inner);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--app-border);
+    }
+
+    .mockup-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .mockup-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+
+    .mockup-layout-body {
+      display: flex;
+      min-height: 480px;
+    }
+
+    .mockup-side-menu {
+      width: 230px;
+      background: var(--app-bg-sidebar);
+      border-right: 1px solid var(--app-border);
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .mockup-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 6px;
+      color: var(--app-text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      transition: all 0.15s ease;
+    }
+
+    .mockup-btn:hover,
+    .mockup-btn.active {
+      background: var(--app-primary);
+      color: #ffffff;
+    }
+
+    .mockup-stage {
+      flex: 1;
+      padding: 24px;
+      background: var(--app-bg-body);
+      overflow-y: auto;
+    }
+
+    /* Terminal Console */
+    .terminal-box {
+      background: #050811;
+      border: 1px solid var(--app-border);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: var(--app-font-mono);
+      font-size: 12.5px;
+      color: #a5d6ff;
+      line-height: 1.6;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+
+    .terminal-prompt {
+      color: #7ee787;
+      user-select: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      body { flex-direction: column; }
+      aside.sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--app-border); }
+      main.content { padding: 24px 16px; }
+      .mockup-layout-body { flex-direction: column; }
+      .mockup-side-menu { width: 100%; }
+    }
+  </style>
 </head>
-<body style="font-family: sans-serif; background: #0b111e; color: #f8fafc; padding: 40px; text-align: center;">
-  <h2>Redirecting to AppService Features Specification...</h2>
-  <p><a href="appservice-features.html" style="color: #3c8dbc;">Click here if you are not redirected automatically</a></p>
+<body>
+
+  <!-- Sticky Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="brand-logo-box">
+      <div class="brand-badge">APPSERVICE</div>
+      <div class="brand-title">
+        <h1>AppService Core</h1>
+        <p>Spring Boot 4.1.1 Platform</p>
+      </div>
+    </div>
+
+    <!-- Live Search Filter for Features -->
+    <div class="position-relative">
+      <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+      <input type="text" class="form-control form-control-sm ps-5 bg-dark border-secondary text-white" id="featureSearch" placeholder="Search features..." onkeyup="filterSidebar()">
+    </div>
+
+    <div>
+      <div class="nav-group-title">Part 1: Blueprint</div>
+      <ul class="nav-list">
+        <li><a href="#overview" class="active"><i class="bi bi-speedometer2"></i> Executive Overview <span class="badge bg-primary ms-auto">Boot 4.1.1</span></a></li>
+        <li><a href="#architecture"><i class="bi bi-diagram-3"></i> System Architecture</a></li>
+        <li><a href="#tech-stack"><i class="bi bi-cpu"></i> Tech Stack Matrix</a></li>
+        <li><a href="#database-profiles"><i class="bi bi-database-check"></i> Multi-DB Profiles</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <div class="nav-group-title">Part 2: Feature Suites</div>
+      <ul class="nav-list">
+        <li><a href="#security-rbac"><i class="bi bi-shield-lock"></i> Security &amp; Auth</a></li>
+        <li><a href="#dynamic-ui"><i class="bi bi-layout-text-window-reverse"></i> Dynamic UI &amp; Panels</a></li>
+        <li><a href="#crud-engine"><i class="bi bi-database"></i> Generic CRUD Engine</a></li>
+        <li><a href="#document-hub"><i class="bi bi-file-earmark-arrow-down"></i> Document Streaming</a></li>
+        <li><a href="#mail-tokens"><i class="bi bi-envelope"></i> Mail &amp; Password Tokens</a></li>
+        <li><a href="#feeder-engine"><i class="bi bi-code-square"></i> System XML Feeder</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <div class="nav-group-title">Part 3: Interactive Labs</div>
+      <ul class="nav-list">
+        <li><a href="#interactive-mockup"><i class="bi bi-tv"></i> AdminLTE Dashboard Lab</a></li>
+        <li><a href="#rbac-matrix"><i class="bi bi-person-check"></i> RBAC Simulator</a></li>
+        <li><a href="#streamer-simulator"><i class="bi bi-activity"></i> Document Streamer Lab</a></li>
+        <li><a href="#api-explorer"><i class="bi bi-terminal"></i> REST API Explorer</a></li>
+        <li><a href="#entity-inspector"><i class="bi bi-table"></i> Entity Data Model</a></li>
+        <li><a href="#verification-summary"><i class="bi bi-check-circle-fill text-success"></i> Verification Manifest</a></li>
+      </ul>
+    </div>
+
+    <!-- Sidebar Bottom Status -->
+    <div class="mt-auto pt-3 border-top border-secondary d-flex align-items-center justify-content-between text-muted small">
+      <span><i class="bi bi-hdd-network"></i> Port: <code>8001</code></span>
+      <span><i class="bi bi-check-all text-success"></i> Spring 7.0.9</span>
+    </div>
+  </aside>
+
+  <!-- Main Content Body -->
+  <main class="content">
+
+    <!-- Top Control Bar (Theme Dropdown & Quick Actions) -->
+    <div class="top-control-bar">
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill">
+          <i class="bi bi-check-circle-fill me-1"></i> Spring Boot 4.1.1 Verified
+        </span>
+        <span class="text-muted small d-none d-md-inline">Jakarta EE 10 • PrimeFaces 14 • JoinFaces 5.5.3 • Java 17+</span>
+      </div>
+
+      <!-- Theme Switcher Dropdown -->
+      <div class="dropdown">
+        <button class="btn btn-sm btn-outline-primary dropdown-toggle d-flex align-items-center gap-2 px-3 py-2 rounded-pill shadow-sm" type="button" id="themeDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-palette-fill"></i>
+          <span id="activeThemeLabel">Theme: AdminLTE Blue</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-secondary" aria-labelledby="themeDropdownBtn">
+          <li><h6 class="dropdown-header text-uppercase">Select UI Theme</h6></li>
+          <li><button class="dropdown-item active d-flex align-items-center gap-2" onclick="setTheme('adminlte-blue', 'assets/css/bootstrap.min.css', 'dark', 'AdminLTE Blue (AppService)')"><i class="bi bi-circle-fill text-primary"></i> AdminLTE Blue (AppService)</button></li>
+          <li><button class="dropdown-item d-flex align-items-center gap-2" onclick="setTheme('darkly', 'assets/css/bootstrap-darkly.min.css', 'dark', 'Darkly (Modern Dark)')"><i class="bi bi-circle-fill text-secondary"></i> Darkly (Modern Dark)</button></li>
+          <li><button class="dropdown-item d-flex align-items-center gap-2" onclick="setTheme('flatly', 'assets/css/bootstrap-flatly.min.css', 'light', 'Flatly (Corporate Light)')"><i class="bi bi-circle-fill text-light border"></i> Flatly (Corporate Light)</button></li>
+          <li><button class="dropdown-item d-flex align-items-center gap-2" onclick="setTheme('cyborg', 'assets/css/bootstrap-cyborg.min.css', 'dark', 'Cyborg (High-Contrast)')"><i class="bi bi-circle-fill text-info"></i> Cyborg (High-Contrast)</button></li>
+          <li><button class="dropdown-item d-flex align-items-center gap-2" onclick="setTheme('pulse', 'assets/css/bootstrap-pulse.min.css', 'dark', 'Pulse (Cosmic Violet)')"><i class="bi bi-circle-fill text-purple" style="color:#af69ee;"></i> Pulse (Cosmic Violet)</button></li>
+          <li><button class="dropdown-item d-flex align-items-center gap-2" onclick="setTheme('emerald', 'assets/css/bootstrap.min.css', 'dark', 'Emerald Mint (SaaS Forest)')"><i class="bi bi-circle-fill text-success"></i> Emerald Mint (SaaS Forest)</button></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Hero Header Banner -->
+    <header class="hero-banner" id="overview">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-primary text-white">Spring Boot 4.1.1</span>
+        <span class="badge bg-info text-dark">JoinFaces 5.5.3</span>
+        <span class="badge bg-success text-white">Jakarta EE 10</span>
+        <span class="badge bg-secondary text-white">PrimeFaces 14</span>
+        <span class="badge bg-warning text-dark">Java 17+ Target</span>
+        <span class="badge bg-danger text-white">AdminLTE 2 Portal</span>
+      </div>
+      <h1 class="display-6 fw-bold text-white mb-2">AppService Enterprise Platform</h1>
+      <p class="lead text-info mb-3">Enterprise Administration Framework with Spring Boot 4.1.1 &amp; Jakarta EE 10</p>
+      <p class="text-muted mb-0" style="max-width: 980px; line-height: 1.7;">
+        AppService is an enterprise-grade administration and service framework developed by Bahman Heydari Nejad. It marries the robust backend stability, transaction management, and security ecosystem of <strong>Spring Boot 4.1.1</strong> (Spring Framework 7.0.9, Spring Security 7.1.1) with the high-productivity, component-driven UI capabilities of <strong>Jakarta Faces 4</strong>, <strong>PrimeFaces 14</strong>, and <strong>AdminFaces (AdminLTE)</strong>. It provides dynamic database-driven RBAC, runtime panel and menu injection, binary document streaming, generic soft-delete CRUD automation, multi-database profile switching (H2, MySQL, PostgreSQL), and an automated XML bootstrap feeder.
+      </p>
+    </header>
+
+    <!-- Key Metrics Grid -->
+    <section class="mb-5">
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
+        <div class="col">
+          <div class="p-3 rounded-3 border" style="background: var(--app-bg-card); border-color: var(--app-border) !important;">
+            <div class="text-muted small text-uppercase fw-semibold mb-1">Architecture</div>
+            <div class="fs-4 fw-bold text-primary">Hexagonal + MVC</div>
+            <div class="small text-muted">Ports, Adapters &amp; JSF UI</div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="p-3 rounded-3 border" style="background: var(--app-bg-card); border-color: var(--app-border) !important;">
+            <div class="text-muted small text-uppercase fw-semibold mb-1">Domain Entities</div>
+            <div class="fs-4 fw-bold text-info">8 JPA Aggregates</div>
+            <div class="small text-muted">UUID String PKs &amp; Soft Delete</div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="p-3 rounded-3 border" style="background: var(--app-bg-card); border-color: var(--app-border) !important;">
+            <div class="text-muted small text-uppercase fw-semibold mb-1">Database Engines</div>
+            <div class="fs-4 fw-bold text-success">H2, MySQL, Postgres</div>
+            <div class="small text-muted">Multi-profile YAML config</div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="p-3 rounded-3 border" style="background: var(--app-bg-card); border-color: var(--app-border) !important;">
+            <div class="text-muted small text-uppercase fw-semibold mb-1">Test Status</div>
+            <div class="fs-4 fw-bold text-warning">8 / 8 Passing (100%)</div>
+            <div class="small text-muted">JUnit 5 Jupiter Integration Suite</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 1: ARCHITECTURE BLUEPRINT -->
+    <section id="architecture" class="feature-section mb-5">
+      <h3 class="border-bottom border-secondary pb-2 mb-3 text-white d-flex align-items-center gap-2">
+        <i class="bi bi-diagram-3 text-primary"></i> Part 1: System Architecture &amp; Blueprint
+      </h3>
+      <p class="text-muted mb-4">
+        AppService isolates core domain entities and business operations from presentation and persistence details. The web layer renders through JSF 4 and AdminFaces, while persistence operates via Spring Data JPA repositories with soft-delete semantics.
+      </p>
+
+      <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+          <div class="feature-card">
+            <div class="feature-icon-wrapper" style="background: rgba(60, 141, 188, 0.15); color: #3c8dbc;">
+              <i class="bi bi-cpu"></i>
+            </div>
+            <h4>Single-Dashboard Dynamic View Architecture</h4>
+            <p>
+              Instead of static page reloads, AppService uses a dynamic single-dashboard architecture (<span class="code-pill">dashboard.xhtml</span>). UI panels (<span class="code-pill">Panel</span> entity) are first-class database records storing XHTML resource paths. The application resolves and injects views dynamically via <span class="code-pill">&lt;ui:include src="#{panelHandler.activePanel.resourceLocation}" /&gt;</span> without requiring full browser refreshes.
+            </p>
+            <div class="tech-pill-container">
+              <span class="tech-pill">PanelHandler.java</span>
+              <span class="tech-pill">dashboard.xhtml</span>
+              <span class="tech-pill">SessionScoped</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="feature-card">
+            <div class="feature-icon-wrapper" style="background: rgba(0, 166, 90, 0.15); color: #00a65a;">
+              <i class="bi bi-shield-lock"></i>
+            </div>
+            <h4>Tri-Identifier Smart Authentication</h4>
+            <p>
+              A single input field allows users to authenticate using their <strong>Email address</strong> (RFC-compliant regex check), <strong>Mobile phone number</strong> (national format regex check), or traditional <strong>Account username</strong>. Passwords are encrypted with BCrypt, and active sessions are managed by Spring Security's concurrency controls.
+            </p>
+            <div class="tech-pill-container">
+              <span class="tech-pill">AccountService.java</span>
+              <span class="tech-pill">BCryptPasswordEncoder</span>
+              <span class="tech-pill">AuthenticationValidator</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARCHITECTURAL FLOW DIAGRAM -->
+      <div class="p-4 rounded-3 border mb-4" style="background: var(--app-bg-card); border-color: var(--app-border) !important;">
+        <h5 class="text-white mb-3"><i class="bi bi-layers text-info me-2"></i> Layered Interaction Architecture</h5>
+        <div class="d-flex flex-column flex-md-row gap-3 text-center">
+          <div class="p-3 rounded-2 flex-fill" style="background: var(--app-bg-card-inner); border: 1px dashed var(--app-primary);">
+            <div class="fw-bold text-primary mb-1">Presentation Layer</div>
+            <div class="small text-muted">AdminLTE 2 • JSF 4 Mojarra • PrimeFaces 14 • SessionBean &amp; CrudBeans</div>
+          </div>
+          <div class="d-flex align-items-center justify-content-center text-muted"><i class="bi bi-arrow-right fs-4 d-none d-md-block"></i><i class="bi bi-arrow-down fs-4 d-md-none"></i></div>
+          <div class="p-3 rounded-2 flex-fill" style="background: var(--app-bg-card-inner); border: 1px dashed var(--app-info);">
+            <div class="fw-bold text-info mb-1">Service &amp; Security Layer</div>
+            <div class="small text-muted">Spring Security 7.1.1 FilterChain • Custom AuthProvider • CrudService&lt;T&gt;</div>
+          </div>
+          <div class="d-flex align-items-center justify-content-center text-muted"><i class="bi bi-arrow-right fs-4 d-none d-md-block"></i><i class="bi bi-arrow-down fs-4 d-md-none"></i></div>
+          <div class="p-3 rounded-2 flex-fill" style="background: var(--app-bg-card-inner); border: 1px dashed var(--app-success);">
+            <div class="fw-bold text-success mb-1">Persistence &amp; Database</div>
+            <div class="small text-muted">Spring Data JPA • Hibernate 7.4 • H2 / MySQL 8 / PostgreSQL</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TECH STACK SPECIFICATION -->
+    <section id="tech-stack" class="feature-section mb-5">
+      <h3 class="border-bottom border-secondary pb-2 mb-3 text-white d-flex align-items-center gap-2">
+        <i class="bi bi-cpu text-info"></i> Technology Stack Matrix (Upgraded State)
+      </h3>
+      <p class="text-muted mb-3">
+        Comprehensive inventory of core runtime libraries, frameworks, and drivers configured in <span class="code-pill">pom.xml</span>.
+      </p>
+
+      <div class="table-container">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>Domain / Component</th>
+              <th>Artifact / Library</th>
+              <th>Version</th>
+              <th>Role &amp; Architectural Responsibility</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Core Framework</strong></td>
+              <td><code>org.springframework.boot:spring-boot-starter-parent</code></td>
+              <td><span class="badge bg-primary">4.1.1</span></td>
+              <td>Parent POM, Spring Framework 7.0.9 runtime, auto-configuration, application lifecycle.</td>
+            </tr>
+            <tr>
+              <td><strong>Java Platform</strong></td>
+              <td><code>Java SE Development Kit</code></td>
+              <td><span class="badge bg-success">17+ (Java 26 verified)</span></td>
+              <td>Release target 17, tested on Oracle JDK 26 with modern language features and JVM optimization.</td>
+            </tr>
+            <tr>
+              <td><strong>EE Specification</strong></td>
+              <td><code>Jakarta EE 10 API</code></td>
+              <td><span class="badge bg-info text-dark">10.0</span></td>
+              <td>Global migration: <code>jakarta.persistence</code>, <code>jakarta.servlet</code>, <code>jakarta.faces</code>, <code>jakarta.mail</code>.</td>
+            </tr>
+            <tr>
+              <td><strong>JSF &amp; Component UI</strong></td>
+              <td><code>org.joinfaces:adminfaces-spring-boot-starter</code></td>
+              <td><span class="badge bg-primary">5.5.3</span></td>
+              <td>JoinFaces 5 platform, Mojarra 4, PrimeFaces 14, AdminFaces theme with AdminLTE dashboard.</td>
+            </tr>
+            <tr>
+              <td><strong>Security &amp; Encryption</strong></td>
+              <td><code>spring-boot-starter-security</code></td>
+              <td><span class="badge bg-secondary">7.1.1</span></td>
+              <td>SecurityFilterChain bean, custom AuthenticationProvider, BCrypt password hashing, session concurrency.</td>
+            </tr>
+            <tr>
+              <td><strong>Persistence &amp; ORM</strong></td>
+              <td><code>spring-boot-starter-data-jpa</code></td>
+              <td><span class="badge bg-primary">4.1.1 (Hibernate 7.4)</span></td>
+              <td>Spring Data JPA, Hibernate ORM core, HikariCP connection pooling, declarative transactions.</td>
+            </tr>
+            <tr>
+              <td><strong>Database Drivers</strong></td>
+              <td><code>h2database</code> / <code>mysql-connector-j</code> / <code>postgresql</code></td>
+              <td><span class="badge bg-dark border">Latest</span></td>
+              <td>Multi-profile database support: H2 in-memory for testing, MySQL 8 &amp; PostgreSQL for production.</td>
+            </tr>
+            <tr>
+              <td><strong>Mail Infrastructure</strong></td>
+              <td><code>spring-boot-starter-mail</code></td>
+              <td><span class="badge bg-info text-dark">4.1.1</span></td>
+              <td>Asynchronous Jakarta Mail sender, MimeMessage creation, binary document attachment dispatching.</td>
+            </tr>
+            <tr>
+              <td><strong>Testing Framework</strong></td>
+              <td><code>spring-boot-starter-test</code></td>
+              <td><span class="badge bg-success">JUnit 5 Jupiter</span></td>
+              <td>JUnit Jupiter engine, Mockito, SpringBootTest integration tests (100% green exit code 0).</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- MULTI-DATABASE PROFILE SWITCHER -->
+    <section id="database-profiles" class="feature-section mb-5">
+      <h3 class="border-bottom border-secondary pb-2 mb-3 text-white d-flex align-items-center gap-2">
+        <i class="bi bi-database-check text-success"></i> Multi-Database Profiles &amp; YAML Configuration
+      </h3>
+      <p class="text-muted mb-3">
+        The application configuration is migrated to Spring YAML profiles, allowing seamless runtime toggling between in-memory and production databases.
+      </p>
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="p-3 rounded-3 border h-100" style="background: var(--app-bg-card); border-color: var(--app-border) !important;">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="badge bg-success">In-Memory Profile</span>
+              <code>application-h2.yml</code>
+            </div>
+            <h5 class="text-white">H2 In-Memory Database</h5>
+            <p class="small text-muted mb-2">Used for zero-setup local development, automated CI pipelines, and integration testing.</p>
+            <div class="font-monospace small text-muted p-2 rounded bg-dark border border-secondary">
+              url: jdbc:h2:mem:appservice<br>
+              driver: org.h2.Driver<br>
+              ddl-auto: create-drop
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="p-3 rounded-3 border h-100" style="background: var(--app-bg-card); border-color: var(--app-border) !important;">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="badge bg-primary">MySQL Profile</span>
+              <code>application-mysql.yml</code>
+            </div>
+            <h5 class="text-white">MySQL 8 Connector/J</h5>
+            <p class="small text-muted mb-2">Enterprise relational storage with updated dialect and connection validation.</p>
+            <div class="font-monospace small text-muted p-2 rounded bg-dark border border-secondary">
+              driver: com.mysql.cj.jdbc.Driver<br>
+              dialect: MySQLDialect<br>
+              ddl-auto: update
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="p-3 rounded-3 border h-100" style="background: var(--app-bg-card); border-color: var(--app-border) !important;">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="badge bg-info text-dark">PostgreSQL Profile</span>
+              <code>application-postgres.yml</code>
+            </div>
+            <h5 class="text-white">PostgreSQL Enterprise</h5>
+            <p class="small text-muted mb-2">ACID transactional profile for high-concurrency cloud or container deployments.</p>
+            <div class="font-monospace small text-muted p-2 rounded bg-dark border border-secondary">
+              driver: org.postgresql.Driver<br>
+              dialect: PostgreSQLDialect<br>
+              port: 5432
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 2: CATEGORIZED SUBSYSTEM FEATURES -->
+    <section id="security-rbac" class="feature-section mb-5">
+      <h3 class="border-bottom border-secondary pb-2 mb-3 text-white d-flex align-items-center gap-2">
+        <i class="bi bi-shield-lock text-primary"></i> Part 2: Subsystem Feature Breakdown
+      </h3>
+
+      <!-- 1. Authentication & Security -->
+      <div class="card mb-4" style="background: var(--app-bg-card); border-color: var(--app-border);">
+        <div class="card-header border-secondary d-flex justify-content-between align-items-center" style="background: var(--app-bg-card-inner);">
+          <span class="fw-bold text-white"><i class="bi bi-key-fill text-warning me-2"></i> 1. Authentication, Security &amp; Session Management</span>
+          <span class="badge bg-primary">Spring Security 7</span>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <h6 class="text-info">SecurityFilterChain Architecture (`AppSecurity.java`)</h6>
+              <p class="small text-muted">
+                Refactored from deprecated adapter classes to the modern lambda DSL:
+              </p>
+              <ul class="small text-muted ps-3">
+                <li>Permits anonymous access to login, static assets (<span class="code-pill">/jakarta.faces.resource/**</span>), and password recovery endpoints.</li>
+                <li>Restricts root dashboard and administrative panels to authenticated sessions.</li>
+                <li>Enforces concurrent session control with maximum 1 session per user via <span class="code-pill">HttpSessionEventPublisher</span>.</li>
+                <li>Disables CSRF selectively for JSF AJAX postbacks while maintaining secure header protection.</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-info">Multi-Identifier Authentication Validator</h6>
+              <p class="small text-muted">
+                The <span class="code-pill">AuthenticationValidator.java</span> validates credentials against configurable regex expressions:
+              </p>
+              <div class="p-2 rounded bg-dark border border-secondary font-monospace small text-muted">
+                Email Pattern: ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$<br>
+                Password Pattern: ^[a-zA-Z0-9_#$@%^&amp;*()~+=-]{6,20}$<br>
+                Mobile Pattern: ^09[0-9]{9}$
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Dynamic UI & Panels -->
+      <div class="card mb-4" style="background: var(--app-bg-card); border-color: var(--app-border);" id="dynamic-ui">
+        <div class="card-header border-secondary d-flex justify-content-between align-items-center" style="background: var(--app-bg-card-inner);">
+          <span class="fw-bold text-white"><i class="bi bi-layout-text-window-reverse text-info me-2"></i> 2. Dynamic UI Architecture &amp; Navigation</span>
+          <span class="badge bg-info text-dark">AdminFaces</span>
+        </div>
+        <div class="card-body">
+          <p class="small text-muted">
+            The presentation tier leverages the AdminFaces template engine on top of PrimeFaces 14, rendering an AdminLTE 2 dashboard with responsive sidebars, breadcrumbs, search, and skin customization.
+          </p>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="p-3 rounded bg-dark border border-secondary h-100">
+                <div class="fw-bold text-white small mb-1">Database-Driven Menus</div>
+                <div class="text-muted small">
+                  The <span class="code-pill">Menu</span> entity models hierarchical parent-child trees with sorting weights, icons, and linked panels, dynamically populated into the sidebar.
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 rounded bg-dark border border-secondary h-100">
+                <div class="fw-bold text-white small mb-1">Panel Handler</div>
+                <div class="text-muted small">
+                  <span class="code-pill">PanelHandler.java</span> maintains the active panel in session state, verifying user authorization before allowing runtime view inclusion.
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 rounded bg-dark border border-secondary h-100">
+                <div class="fw-bold text-white small mb-1">Icon System (`AppIcons.java`)</div>
+                <div class="text-muted small">
+                  Centralized icon dictionary mapping FontAwesome and Material Design icons to menus, action buttons, and modal dialogs.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Generic CRUD Engine -->
+      <div class="card mb-4" style="background: var(--app-bg-card); border-color: var(--app-border);" id="crud-engine">
+        <div class="card-header border-secondary d-flex justify-content-between align-items-center" style="background: var(--app-bg-card-inner);">
+          <span class="fw-bold text-white"><i class="bi bi-database text-success me-2"></i> 3. Generic CRUD Engine &amp; Soft-Delete Persistence</span>
+          <span class="badge bg-success">Spring Data JPA</span>
+        </div>
+        <div class="card-body">
+          <p class="small text-muted">
+            All persistent domain models inherit from <span class="code-pill">BaseEntity.java</span>, providing a generated UUID string identifier, timestamps, status flags, and soft-delete semantics (<span class="code-pill">deleteDate</span>).
+          </p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <h6 class="text-success">Abstract CrudService&lt;T&gt;</h6>
+              <ul class="small text-muted ps-3">
+                <li><code>remove(id)</code>: Soft-deletes the entity by stamping <span class="code-pill">deleteDate = new Date()</span>.</li>
+                <li><code>recycle(id)</code>: Restores soft-deleted items by setting <span class="code-pill">deleteDate = null</span>.</li>
+                <li><code>permanentRemove(id)</code>: Performs hard deletion via repository delete method.</li>
+                <li><code>lazyGet(id, attributes)</code>: Uses JPA <code>EntityGraph</code> to dynamically pre-fetch lazy associations and eliminate N+1 queries.</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-success">AppLazyDataModel&lt;T&gt; (PrimeFaces 14)</h6>
+              <ul class="small text-muted ps-3">
+                <li>Inherits from PrimeFaces 14 <code>LazyDataModel&lt;T&gt;</code> with modern <code>load()</code> and <code>count()</code> overrides.</li>
+                <li>Maps multi-sort column metadata (<span class="code-pill">Map&lt;String, SortMeta&gt;</span>) into Spring Data <span class="code-pill">Sort</span> specifications.</li>
+                <li>Translates filter criteria (<span class="code-pill">Map&lt;String, FilterMeta&gt;</span>) into dynamic JPA predicates.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Document Hub & Streaming -->
+      <div class="card mb-4" style="background: var(--app-bg-card); border-color: var(--app-border);" id="document-hub">
+        <div class="card-header border-secondary d-flex justify-content-between align-items-center" style="background: var(--app-bg-card-inner);">
+          <span class="fw-bold text-white"><i class="bi bi-file-earmark-arrow-down text-info me-2"></i> 4. Document Hub &amp; Binary Streaming</span>
+          <span class="badge bg-info text-dark">PrimeFaces 14</span>
+        </div>
+        <div class="card-body">
+          <p class="small text-muted">
+            Binary assets (user avatars, uploaded documents, report files) are managed as first-class entities with byte payload storage, size auditing, and safe streaming.
+          </p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="p-3 rounded bg-dark border border-secondary">
+                <div class="fw-bold text-white small mb-1">DocumentStreamer &amp; PrimeFaces Builder</div>
+                <p class="small text-muted mb-0">
+                  Streams binary data through <span class="code-pill">DefaultStreamedContent.builder()</span> with supplier lambda streams, preventing byte leaks and supporting HTTP range queries.
+                </p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3 rounded bg-dark border border-secondary">
+                <div class="fw-bold text-white small mb-1">REST Document Controller</div>
+                <p class="small text-muted mb-0">
+                  <span class="code-pill">DocumentController.java</span> exposes <span class="code-pill">/document/{id}</span> for external client streaming, setting exact MIME types and <span class="code-pill">Cache-Control: no-store</span>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Mail & Password Tokens -->
+      <div class="card mb-4" style="background: var(--app-bg-card); border-color: var(--app-border);" id="mail-tokens">
+        <div class="card-header border-secondary d-flex justify-content-between align-items-center" style="background: var(--app-bg-card-inner);">
+          <span class="fw-bold text-white"><i class="bi bi-envelope text-warning me-2"></i> 5. Asynchronous Mail Delivery &amp; Password Tokens</span>
+          <span class="badge bg-warning text-dark">Async</span>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <h6 class="text-warning">EMailService &amp; Background Dispatch</h6>
+              <p class="small text-muted">
+                Transactional mail is executed in worker threads via <span class="code-pill">@EnableAsync</span>. Outbound messages are recorded in the <span class="code-pill">Email</span> database table before transmission, supporting HTML bodies, CC/BCC recipients, and binary attachments.
+              </p>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-warning">ResetPasswordToken Lifecycle</h6>
+              <p class="small text-muted">
+                UUID-generated tokens with time-limited validity. <span class="code-pill">ResetPasswordController</span> validates incoming tokens via GET requests, allowing secure password renewal and invalidating tokens upon consumption.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. System Feeder & Initializer -->
+      <div class="card mb-4" style="background: var(--app-bg-card); border-color: var(--app-border);" id="feeder-engine">
+        <div class="card-header border-secondary d-flex justify-content-between align-items-center" style="background: var(--app-bg-card-inner);">
+          <span class="fw-bold text-white"><i class="bi bi-code-square text-primary me-2"></i> 6. System Configuration, Auto-Initializer &amp; XML Feeder</span>
+          <span class="badge bg-primary">JAXB &amp; Jakarta XML</span>
+        </div>
+        <div class="card-body">
+          <p class="small text-muted">
+            AppService features a declarative bootstrap mechanism that populates database entities upon first startup using XML definitions (<span class="code-pill">AppInitializer.java</span> and <span class="code-pill">DocumentFeederConverter.java</span>).
+          </p>
+          <ul class="small text-muted ps-3 mb-0">
+            <li>Seeds initial roles: <code>ADMINISTRATOR</code>, <code>DEVELOPER</code>, <code>MANAGER</code>, <code>USER</code>.</li>
+            <li>Seeds system panels: Home, Account Management, Role Management, Menu Management, Document Repository, Configuration.</li>
+            <li>Maps menus to panels and attaches default avatars from local files into binary document records.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- PART 3: INTERACTIVE LABS & EXPLORERS -->
+    <section id="interactive-mockup" class="mb-5">
+      <h3 class="border-bottom border-secondary pb-2 mb-3 text-white d-flex align-items-center gap-2">
+        <i class="bi bi-tv text-primary"></i> Part 3: Interactive System Labs &amp; Explorers
+      </h3>
+
+      <!-- 1. AdminLTE Dashboard Simulator -->
+      <div class="mockup-window mb-5">
+        <div class="mockup-header-bar">
+          <div class="d-flex align-items-center gap-2">
+            <div class="mockup-dots">
+              <div class="mockup-dot dot-red"></div>
+              <div class="mockup-dot dot-yellow"></div>
+              <div class="mockup-dot dot-green"></div>
+            </div>
+            <span class="small text-muted ms-2">AdminLTE Portal Simulator — <code>http://localhost:8001/dashboard.xhtml</code></span>
+          </div>
+          <span class="badge bg-primary-subtle text-primary border border-primary-subtle">LIVE PREVIEW</span>
+        </div>
+
+        <div class="mockup-layout-body">
+          <div class="mockup-side-menu">
+            <div class="small text-muted fw-bold text-uppercase px-2 mb-2">Navigation Menu</div>
+            <button class="mockup-btn active" onclick="switchMockPanel('home', this)"><i class="bi bi-house"></i> Home Dashboard</button>
+            <button class="mockup-btn" onclick="switchMockPanel('accounts', this)"><i class="bi bi-people"></i> Manage Accounts</button>
+            <button class="mockup-btn" onclick="switchMockPanel('docs', this)"><i class="bi bi-file-earmark-text"></i> Documents Hub</button>
+            <button class="mockup-btn" onclick="switchMockPanel('roles', this)"><i class="bi bi-shield-check"></i> Manage Roles</button>
+            <button class="mockup-btn" onclick="switchMockPanel('menus', this)"><i class="bi bi-list-nested"></i> Manage Menus</button>
+            <button class="mockup-btn" onclick="switchMockPanel('timesheet', this)"><i class="bi bi-clock-history"></i> Timesheet Panel</button>
+            <button class="mockup-btn" onclick="switchMockPanel('config', this)"><i class="bi bi-gear"></i> App Configuration</button>
+          </div>
+
+          <div class="mockup-stage" id="mockPanelContent">
+            <div class="d-flex justify-content-between align-items-center pb-3 mb-3 border-bottom border-secondary">
+              <div>
+                <h4 class="text-white mb-0">Home Dashboard Panel</h4>
+                <span class="small text-muted">Resource: <code>panels/home_panel.xhtml</code></span>
+              </div>
+              <span class="badge bg-success">ACTIVE IN SESSION</span>
+            </div>
+            <p class="text-muted small">
+              Main landing page presenting platform health, active session counts, memory utilization, and quick action shortcuts.
+            </p>
+            <div class="row g-3">
+              <div class="col-sm-6 col-lg-3">
+                <div class="p-3 rounded-2 bg-dark border border-secondary text-center">
+                  <div class="fs-4 fw-bold text-primary">1,420</div>
+                  <div class="small text-muted">Total Accounts</div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-3">
+                <div class="p-3 rounded-2 bg-dark border border-secondary text-center">
+                  <div class="fs-4 fw-bold text-info">99.98%</div>
+                  <div class="small text-muted">Uptime</div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-3">
+                <div class="p-3 rounded-2 bg-dark border border-secondary text-center">
+                  <div class="fs-4 fw-bold text-success">Active</div>
+                  <div class="small text-muted">Database Connection</div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-3">
+                <div class="p-3 rounded-2 bg-dark border border-secondary text-center">
+                  <div class="fs-4 fw-bold text-warning">0 ms</div>
+                  <div class="small text-muted">Stream Delay</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. RBAC Permission Matrix Simulator -->
+      <div class="mb-5" id="rbac-matrix">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="text-white mb-0"><i class="bi bi-person-check text-info me-2"></i> Role-Based Access Control (RBAC) Matrix</h4>
+          <div class="btn-group btn-group-sm" role="group">
+            <button type="button" class="btn btn-outline-primary active" onclick="simulateRole('ADMINISTRATOR', this)">Admin</button>
+            <button type="button" class="btn btn-outline-primary" onclick="simulateRole('MANAGER', this)">Manager</button>
+            <button type="button" class="btn btn-outline-primary" onclick="simulateRole('USER', this)">User</button>
+            <button type="button" class="btn btn-outline-primary" onclick="simulateRole('AUDITOR', this)">Auditor</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>Panel Component</th>
+                <th>Resource Location</th>
+                <th>Permission Status</th>
+                <th>Allowed Actions</th>
+              </tr>
+            </thead>
+            <tbody id="rbacTableBody">
+              <tr>
+                <td><strong>Home Dashboard</strong></td>
+                <td><code>panels/home_panel.xhtml</code></td>
+                <td><span class="badge bg-success">GRANTED</span></td>
+                <td class="text-white fw-semibold">Read, Write</td>
+              </tr>
+              <tr>
+                <td><strong>Manage Accounts</strong></td>
+                <td><code>panels/crud_panels/account_panel.xhtml</code></td>
+                <td><span class="badge bg-success">GRANTED</span></td>
+                <td class="text-white fw-semibold">Create, Edit, Delete</td>
+              </tr>
+              <tr>
+                <td><strong>Manage Roles</strong></td>
+                <td><code>panels/crud_panels/role_panel.xhtml</code></td>
+                <td><span class="badge bg-success">GRANTED</span></td>
+                <td class="text-white fw-semibold">Full Authority</td>
+              </tr>
+              <tr>
+                <td><strong>Manage Menus</strong></td>
+                <td><code>panels/crud_panels/menu_panel.xhtml</code></td>
+                <td><span class="badge bg-success">GRANTED</span></td>
+                <td class="text-white fw-semibold">Reorder, Edit</td>
+              </tr>
+              <tr>
+                <td><strong>Manage Documents</strong></td>
+                <td><code>panels/crud_panels/document_panel.xhtml</code></td>
+                <td><span class="badge bg-success">GRANTED</span></td>
+                <td class="text-white fw-semibold">Upload, Stream</td>
+              </tr>
+              <tr>
+                <td><strong>App Configuration</strong></td>
+                <td><code>panels/configuration_panel.xhtml</code></td>
+                <td><span class="badge bg-success">GRANTED</span></td>
+                <td class="text-white fw-semibold">Server Config</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 3. Document Streamer Lab -->
+      <div class="mb-5" id="streamer-simulator">
+        <h4 class="text-white mb-3"><i class="bi bi-activity text-success me-2"></i> Document Streamer &amp; Binary Endpoint Lab</h4>
+        <div class="row g-3">
+          <div class="col-md-5">
+            <div class="p-3 rounded-3 border h-100" style="background: var(--app-bg-card); border-color: var(--app-border) !important;">
+              <h6 class="text-white mb-2">Simulate File Streaming</h6>
+              <p class="small text-muted mb-3">Select an entity document to test the PrimeFaces builder stream response:</p>
+              <div class="d-flex flex-column gap-2">
+                <button class="btn btn-sm btn-outline-info text-start active" onclick="inspectDocument('avatar_admin.png', 'image/png', '42,108 bytes', this)">
+                  <i class="bi bi-image"></i> Default Administrator Avatar (PNG)
+                </button>
+                <button class="btn btn-sm btn-outline-info text-start" onclick="inspectDocument('contract_v1.pdf', 'application/pdf', '312,450 bytes', this)">
+                  <i class="bi bi-file-earmark-pdf"></i> Enterprise License Agreement (PDF)
+                </button>
+                <button class="btn btn-sm btn-outline-info text-start" onclick="inspectDocument('feeder_spec.xml', 'application/xml', '12,890 bytes', this)">
+                  <i class="bi bi-file-earmark-code"></i> System Initializer Feeder (XML)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-7">
+            <div class="terminal-box h-100">
+              <span class="terminal-prompt">&gt; HTTP GET /document/sample</span><br>
+              <span class="text-muted">Response: HTTP/1.1 200 OK</span><br>
+              <span>Content-Type: <strong class="text-warning" id="docType">image/png</strong></span><br>
+              <span>Content-Length: <strong class="text-info" id="docLength">42,108 bytes</strong></span><br>
+              <span>Cache-Control: no-store, no-cache, must-revalidate</span><br>
+              <span>Content-Disposition: inline; filename="streamed_asset"</span><br>
+              <span class="text-success">[STREAM READY]: Byte buffer transmitted cleanly via DefaultStreamedContent.builder().</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. REST API Explorer -->
+      <div class="mb-5" id="api-explorer">
+        <h4 class="text-white mb-3"><i class="bi bi-terminal text-warning me-2"></i> REST API Explorer</h4>
+        <div class="row g-3">
+          <div class="col-md-5">
+            <div class="list-group">
+              <button type="button" class="list-group-item list-group-item-action bg-dark text-white border-secondary active" onclick="selectApi('/api/index', this)">
+                <div class="d-flex w-100 justify-content-between">
+                  <h6 class="mb-1">GET /api/index</h6>
+                  <span class="badge bg-success">200 OK</span>
+                </div>
+                <small class="text-muted">Returns active authenticated principal JSON object</small>
+              </button>
+              <button type="button" class="list-group-item list-group-item-action bg-dark text-white border-secondary" onclick="selectApi('/document/1', this)">
+                <div class="d-flex w-100 justify-content-between">
+                  <h6 class="mb-1">GET /document/{id}</h6>
+                  <span class="badge bg-info text-dark">STREAM</span>
+                </div>
+                <small class="text-muted">Binary document streaming endpoint</small>
+              </button>
+              <button type="button" class="list-group-item list-group-item-action bg-dark text-white border-secondary" onclick="selectApi('/resetPassword/tk-9f8a-4b2e', this)">
+                <div class="d-flex w-100 justify-content-between">
+                  <h6 class="mb-1">GET /resetPassword/{token}</h6>
+                  <span class="badge bg-warning text-dark">TOKEN</span>
+                </div>
+                <small class="text-muted">Token validation &amp; password renewal</small>
+              </button>
+            </div>
+          </div>
+
+          <div class="col-md-7">
+            <div class="terminal-box h-100">
+              <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom border-secondary">
+                <span class="small text-muted">Response Payload</span>
+                <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="copyApiCurl()"><i class="bi bi-clipboard"></i> Copy cURL</button>
+              </div>
+              <pre class="mb-0 text-white" id="apiPreview">{
+  "id": "1",
+  "displayName": "Bahman Heydari Nejad",
+  "email": "bahmanheydarinejad@gmail.com",
+  "status": "ACTIVE",
+  "serverTime": "2026-11-04T10:30:00Z"
+}</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Entity Inspector -->
+      <div class="mb-5" id="entity-inspector">
+        <h4 class="text-white mb-3"><i class="bi bi-table text-primary me-2"></i> Domain Entity Model Reference</h4>
+        <div class="table-container">
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>Entity Class</th>
+                <th>Database Table</th>
+                <th>Inheritance / Key</th>
+                <th>Key Attributes &amp; Relationships</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>Account</code></td>
+                <td><code>account</code></td>
+                <td><code>BaseEntity</code> (UUID String PK)</td>
+                <td><code>accountName</code>, <code>email</code>, <code>mobileNumber</code>, <code>password</code> (BCrypt), <code>naturalPerson</code> (1:1), <code>roles</code> (M:N).</td>
+              </tr>
+              <tr>
+                <td><code>NaturalPerson</code></td>
+                <td><code>natural_person</code></td>
+                <td><code>BaseEntity</code> (UUID String PK)</td>
+                <td><code>firstName</code>, <code>lastName</code>, <code>birthDate</code>, <code>mobileNumber</code>, <code>avatar</code> (Document).</td>
+              </tr>
+              <tr>
+                <td><code>Role</code></td>
+                <td><code>role</code></td>
+                <td><code>BaseEntity</code> (UUID String PK)</td>
+                <td><code>displayName</code>, <code>panels</code> (M:N), <code>menus</code> (M:N), <code>accounts</code> (M:N).</td>
+              </tr>
+              <tr>
+                <td><code>Panel</code></td>
+                <td><code>panel</code></td>
+                <td><code>BaseEntity</code> (UUID String PK)</td>
+                <td><code>displayName</code>, <code>resourceLocation</code> (XHTML path), <code>roles</code> (M:N).</td>
+              </tr>
+              <tr>
+                <td><code>Menu</code></td>
+                <td><code>menu</code></td>
+                <td><code>BaseEntity</code> (UUID String PK)</td>
+                <td><code>displayName</code>, <code>icon</code>, <code>orderWeight</code>, <code>parent</code> (self-reference 1:N), <code>panel</code> (1:1).</td>
+              </tr>
+              <tr>
+                <td><code>Document</code></td>
+                <td><code>document</code></td>
+                <td><code>BaseEntity</code> (UUID String PK)</td>
+                <td><code>fileName</code>, <code>fileType</code> (MIME), <code>size</code> (bytes), <code>data</code> (byte[] blob).</td>
+              </tr>
+              <tr>
+                <td><code>Email</code></td>
+                <td><code>email</code></td>
+                <td><code>BaseEntity</code> (UUID String PK)</td>
+                <td><code>sender</code>, <code>recipients</code>, <code>subject</code>, <code>body</code> (HTML), <code>attachments</code> (List&lt;Document&gt;).</td>
+              </tr>
+              <tr>
+                <td><code>ResetPasswordToken</code></td>
+                <td><code>reset_password_token</code></td>
+                <td><code>BaseEntity</code> (UUID String PK)</td>
+                <td><code>token</code> (UUID), <code>account</code> (1:1), <code>expiryDate</code>, <code>used</code> (boolean).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 6. Verification Manifest -->
+      <div id="verification-summary" class="p-4 rounded-3 border" style="background: var(--app-bg-card); border-color: var(--app-border) !important;">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h4 class="text-white mb-0"><i class="bi bi-patch-check-fill text-success me-2"></i> Quality Assurance &amp; Verification Manifest</h4>
+          <span class="badge bg-success px-3 py-2">BUILD SUCCESS (Exit Code 0)</span>
+        </div>
+        <p class="text-muted small mb-3">
+          Verification evidence compiled in accordance with the <strong>Claim vs Proof Invariant</strong> defined in <span class="code-pill">AGENTS.md</span>:
+        </p>
+        <div class="terminal-box">
+          <span class="terminal-prompt">$ mvn test</span><br>
+          <span>[INFO] Running ir.appservice.AppServiceTests</span><br>
+          <span class="text-success">[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0</span><br>
+          <span>[INFO] Running ir.appservice.DatabaseConfigurationIntegrationTest</span><br>
+          <span class="text-success">[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0</span><br>
+          <span class="text-info fw-bold">[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0</span><br>
+          <span class="text-success fw-bold">[INFO] BUILD SUCCESS</span><br>
+          <br>
+          <span class="terminal-prompt">$ mvn clean package</span><br>
+          <span>[INFO] Replacing main artifact target\AppService-1.0-Template.jar with repackaged archive.</span><br>
+          <span class="text-success fw-bold">[INFO] BUILD SUCCESS (Time: 27.637 s)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="pt-4 border-top border-secondary text-center text-muted small">
+      <p class="mb-1">AppService Enterprise Platform &copy; 2026 Bahman Heydari Nejad. All rights reserved.</p>
+      <p class="mb-0">Powered by Spring Boot 4.1.1 • Jakarta EE 10 • PrimeFaces 14 • Bootstrap 5.3 Offline Assets</p>
+    </footer>
+
+  </main>
+
+  <!-- Local Bootstrap 5 JS Bundle -->
+  <script src="assets/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Interactive Scripts -->
+  <script>
+    // Theme Switcher Functionality
+    function setTheme(themeName, cssFile, bsTheme, label) {
+      document.getElementById('bootstrap-theme-link').setAttribute('href', cssFile);
+      document.documentElement.setAttribute('data-theme', themeName);
+      document.documentElement.setAttribute('data-bs-theme', bsTheme);
+      document.getElementById('activeThemeLabel').innerText = 'Theme: ' + label;
+
+      document.querySelectorAll('.dropdown-item').forEach(el => el.classList.remove('active'));
+      if (event && event.target) {
+        const btn = event.target.closest('.dropdown-item');
+        if (btn) btn.classList.add('active');
+      }
+      localStorage.setItem('appservice_theme', JSON.stringify({ themeName, cssFile, bsTheme, label }));
+    }
+
+    // Restore Saved Theme
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('appservice_theme');
+      if (saved) {
+        try {
+          const cfg = JSON.parse(saved);
+          setTheme(cfg.themeName, cfg.cssFile, cfg.bsTheme, cfg.label);
+        } catch (e) {
+          console.warn('Could not restore saved theme:', e);
+        }
+      }
+    });
+
+    // Sidebar Live Filter
+    function filterSidebar() {
+      const query = document.getElementById('featureSearch').value.toLowerCase();
+      document.querySelectorAll('.nav-list li').forEach(item => {
+        const text = item.innerText.toLowerCase();
+        item.style.display = text.includes(query) ? '' : 'none';
+      });
+    }
+
+    // Copy Helper
+    function copyText(txt) {
+      navigator.clipboard.writeText(txt).then(() => {
+        alert('Copied to clipboard: \n' + txt);
+      });
+    }
+
+    // Dashboard Mockup Panel Switcher
+    const mockPanels = {
+      home: {
+        title: "Home Dashboard Panel",
+        res: "panels/home_panel.xhtml",
+        desc: "Main landing page presenting platform health, active session counts, memory utilization, and quick action shortcuts."
+      },
+      accounts: {
+        title: "Manage Accounts",
+        res: "panels/crud_panels/account_panel/account_panel.xhtml",
+        desc: "User credential and profile management. Supports password hashing, email binding, and multi-tenant natural person profile assignment."
+      },
+      docs: {
+        title: "Document Hub",
+        res: "panels/crud_panels/document_panel/document_panel.xhtml",
+        desc: "Binary document asset repository. View file metadata, MIME type classifications, streaming endpoints, and byte size allocations."
+      },
+      roles: {
+        title: "Manage Roles",
+        res: "panels/crud_panels/role_panel/role_panel.xhtml",
+        desc: "Role & Authority editor. Assign individual panels and menus to roles with instant propagation to active user sessions."
+      },
+      menus: {
+        title: "Manage Menus",
+        res: "panels/crud_panels/menu_panel/menu_panel.xhtml",
+        desc: "Dynamic menu hierarchy editor. Reorder sidebar weights, assign FontAwesome icons, and link menus directly to panels."
+      },
+      timesheet: {
+        title: "Timesheet Panel",
+        res: "panels/time_sheet_panel.xhtml",
+        desc: "Operational timesheet module for logging work intervals, team hours, and project milestones."
+      },
+      config: {
+        title: "App Configuration",
+        res: "panels/configuration_panel.xhtml",
+        desc: "System properties and environment viewer. Shows database connection string, SMTP mail parameters, and regex validation rules."
+      }
+    };
+
+    function switchMockPanel(key, btn) {
+      document.querySelectorAll('.mockup-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const p = mockPanels[key];
+      const container = document.getElementById('mockPanelContent');
+      container.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center pb-3 mb-3 border-bottom border-secondary">
+          <div>
+            <h4 class="text-white mb-0">${p.title}</h4>
+            <span class="small text-muted">Resource: <code>${p.res}</code></span>
+          </div>
+          <span class="badge bg-primary">LOADED VIA &lt;ui:include&gt;</span>
+        </div>
+        <p class="text-muted small">${p.desc}</p>
+        <div class="p-3 rounded-2 bg-dark border border-secondary mt-3">
+          <div class="small text-success fw-bold mb-1"><i class="bi bi-check-circle-fill"></i> Panel Active in Session</div>
+          <div class="font-monospace small text-muted">panelHandler.activePanel = "${p.title}"</div>
+        </div>
+      `;
+    }
+
+    // RBAC Simulator Data
+    const rbacData = {
+      ADMINISTRATOR: [
+        { name: "Home Dashboard", res: "panels/home_panel.xhtml", access: "FULL", act: "Read, Write" },
+        { name: "Manage Accounts", res: "panels/crud_panels/account_panel.xhtml", access: "FULL", act: "Create, Edit, Delete" },
+        { name: "Manage Roles", res: "panels/crud_panels/role_panel.xhtml", access: "FULL", act: "Full Authority" },
+        { name: "Manage Menus", res: "panels/crud_panels/menu_panel.xhtml", access: "FULL", act: "Reorder, Edit" },
+        { name: "Manage Documents", res: "panels/crud_panels/document_panel.xhtml", access: "FULL", act: "Upload, Stream" },
+        { name: "App Configuration", res: "panels/configuration_panel.xhtml", access: "FULL", act: "Server Config" }
+      ],
+      MANAGER: [
+        { name: "Home Dashboard", res: "panels/home_panel.xhtml", access: "FULL", act: "Read, Write" },
+        { name: "Manage Accounts", res: "panels/crud_panels/account_panel.xhtml", access: "LIMITED", act: "Read, Update Only" },
+        { name: "Manage Roles", res: "panels/crud_panels/role_panel.xhtml", access: "DENIED", act: "No Access" },
+        { name: "Manage Menus", res: "panels/crud_panels/menu_panel.xhtml", access: "DENIED", act: "No Access" },
+        { name: "Manage Documents", res: "panels/crud_panels/document_panel.xhtml", access: "FULL", act: "Upload, Stream" },
+        { name: "App Configuration", res: "panels/configuration_panel.xhtml", access: "DENIED", act: "No Access" }
+      ],
+      USER: [
+        { name: "Home Dashboard", res: "panels/home_panel.xhtml", access: "FULL", act: "Read, Write" },
+        { name: "Manage Accounts", res: "panels/crud_panels/account_panel.xhtml", access: "DENIED", act: "No Access" },
+        { name: "Manage Roles", res: "panels/crud_panels/role_panel.xhtml", access: "DENIED", act: "No Access" },
+        { name: "Manage Menus", res: "panels/crud_panels/menu_panel.xhtml", access: "DENIED", act: "No Access" },
+        { name: "Manage Documents", res: "panels/crud_panels/document_panel.xhtml", access: "LIMITED", act: "View Own Documents" },
+        { name: "App Configuration", res: "panels/configuration_panel.xhtml", access: "DENIED", act: "No Access" }
+      ],
+      AUDITOR: [
+        { name: "Home Dashboard", res: "panels/home_panel.xhtml", access: "READONLY", act: "View Metrics" },
+        { name: "Manage Accounts", res: "panels/crud_panels/account_panel.xhtml", access: "READONLY", act: "Audit Log Only" },
+        { name: "Manage Roles", res: "panels/crud_panels/role_panel.xhtml", access: "READONLY", act: "Inspect Bindings" },
+        { name: "Manage Menus", res: "panels/crud_panels/menu_panel.xhtml", access: "READONLY", act: "View Tree" },
+        { name: "Manage Documents", res: "panels/crud_panels/document_panel.xhtml", access: "READONLY", act: "Verify Hash" },
+        { name: "App Configuration", res: "panels/configuration_panel.xhtml", access: "READONLY", act: "Inspect DDL" }
+      ]
+    };
+
+    function simulateRole(roleName, btn) {
+      if (btn) {
+        btn.parentElement.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+
+      const rows = rbacData[roleName] || [];
+      const tbody = document.getElementById('rbacTableBody');
+      tbody.innerHTML = rows.map(r => {
+        let pill = `<span class="badge bg-success">GRANTED</span>`;
+        if (r.access === 'DENIED') pill = `<span class="badge bg-danger">DENIED</span>`;
+        else if (r.access === 'LIMITED') pill = `<span class="badge bg-warning text-dark">LIMITED</span>`;
+        else if (r.access === 'READONLY') pill = `<span class="badge bg-info text-dark">READ-ONLY</span>`;
+
+        return `
+          <tr>
+            <td><strong>${r.name}</strong></td>
+            <td><code>${r.res}</code></td>
+            <td>${pill}</td>
+            <td class="text-white fw-semibold">${r.act}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Document Inspector Simulator
+    function inspectDocument(name, type, size, btn) {
+      if (btn) {
+        btn.parentElement.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      document.getElementById('docType').innerText = type;
+      document.getElementById('docLength').innerText = size;
+    }
+
+    // API Explorer
+    const apiPayloads = {
+      '/api/index': `{\n  "id": "1",\n  "displayName": "Bahman Heydari Nejad",\n  "email": "bahmanheydarinejad@gmail.com",\n  "status": "ACTIVE",\n  "serverTime": "2026-11-04T10:30:00Z"\n}`,
+      '/document/1': `[BINARY STREAM]: 42,108 bytes transmitted.\nContent-Type: image/png\nCache-Control: no-store\nStatus: 200 OK (0 ms buffered)`,
+      '/resetPassword/tk-9f8a-4b2e': `{\n  "valid": true,\n  "token": "tk-9f8a-4b2e",\n  "account": "Bahman Heydari Nejad",\n  "expiry": "2026-11-04T11:30:00Z"\n}`
+    };
+
+    let currentApi = '/api/index';
+    function selectApi(endpoint, btn) {
+      currentApi = endpoint;
+      if (btn) {
+        btn.parentElement.querySelectorAll('.list-group-item').forEach(b => {
+          b.classList.remove('active');
+          const sub = b.querySelector('.small');
+          if (sub) { sub.classList.remove('text-light'); sub.classList.add('text-muted'); }
+        });
+        btn.classList.add('active');
+        const activeSub = btn.querySelector('.small');
+        if (activeSub) { activeSub.classList.add('text-light'); activeSub.classList.remove('text-muted'); }
+      }
+      document.getElementById('apiPreview').innerText = apiPayloads[endpoint] || 'No payload sample';
+    }
+
+    function copyApiCurl() {
+      const curl = `curl -X GET http://localhost:8001${currentApi} -H "Accept: application/json"`;
+      copyText(curl);
+    }
+  </script>
 </body>
 </html>

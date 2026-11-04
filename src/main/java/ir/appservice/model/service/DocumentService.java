@@ -4,12 +4,12 @@ import ir.appservice.model.entity.domain.Document;
 import ir.appservice.model.repository.DocumentRepository;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
-import org.primefaces.model.UploadedFile;
+import org.primefaces.model.file.UploadedFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.ApplicationScope;
 
-import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseId;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PhaseId;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -34,16 +34,22 @@ public class DocumentService extends CrudService<Document> {
             if (FacesContext.getCurrentInstance().getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
                 // So, we're rendering the HTML. Return a stub StreamedContent so that it will generate right URL.
                 logger.trace("DefaultStreamedContent");
-                return new DefaultStreamedContent();
+                return DefaultStreamedContent.builder().build();
             } else {
                 logger.trace("imageId: " + FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("imageId"));
                 document_id = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("imageId");
                 logger.trace(String.format("Streaming document: %s", document_id));
-                return new DefaultStreamedContent(new ByteArrayInputStream(getDocumentRepository().getById(document_id).getData()));
+                Document doc = getDocumentRepository().findById(document_id).orElse(null);
+                if (doc != null && doc.getData() != null) {
+                    return DefaultStreamedContent.builder()
+                            .stream(() -> new ByteArrayInputStream(doc.getData()))
+                            .build();
+                }
+                return DefaultStreamedContent.builder().build();
             }
         } catch (Exception e) {
             logger.error(String.format("Could not serve document: %s => %s", document_id, e.getMessage()));
-            return new DefaultStreamedContent();
+            return DefaultStreamedContent.builder().build();
         }
     }
 
@@ -53,7 +59,7 @@ public class DocumentService extends CrudService<Document> {
 
         Document document = new Document();
         document.setDisplayName(uploadedFile.getFileName());
-        document.setData(uploadedFile.getContents());
+        document.setData(uploadedFile.getContent());
         document.setType(uploadedFile.getContentType());
         document.setSize(uploadedFile.getSize());
 

@@ -4,6 +4,7 @@ import ir.appservice.model.entity.BaseEntity;
 import ir.appservice.model.service.CrudService;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortMeta;
 import org.primefaces.model.SortOrder;
@@ -15,10 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.JpaSort;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @Setter
@@ -45,68 +43,53 @@ public abstract class AppLazyDataModel<T extends BaseEntity> extends LazyDataMod
     }
 
     @Override
-    public List<T> load(int first, int pageSize, List<SortMeta> multiSortMeta, Map<String, Object> filters) {
-        logger.trace("First: {}, PageSize: {}, SortMeta: {}, Filters: {}", first, pageSize, multiSortMeta, filters);
-        newInstance();
+    public int count(Map<String, FilterMeta> filterBy) {
+        return (int) this.crudService.pagedList(PageRequest.of(0, 1), extractFilters(filterBy)).getTotalElements();
+    }
 
-        List<Sort.Order> orders = new ArrayList<>();
-        if (multiSortMeta != null) {
-            multiSortMeta.stream().forEach(
-                    sortMeta -> {
-                        switch (sortMeta.getSortOrder()) {
-                            case ASCENDING:
-                                orders.add(JpaSort.JpaOrder.asc(sortMeta.getSortField()));
-                                break;
-                            case DESCENDING:
-                                orders.add(JpaSort.JpaOrder.desc(sortMeta.getSortField()));
-                                break;
-                        }
-                    }
-            );
+    private Map<String, Object> extractFilters(Map<String, FilterMeta> filterBy) {
+        Map<String, Object> filters = new HashMap<>();
+        if (filterBy != null) {
+            filterBy.forEach((field, meta) -> {
+                if (meta != null && meta.getFilterValue() != null) {
+                    filters.put(field, meta.getFilterValue());
+                }
+            });
         }
-
-        Page<T> page = load(PageRequest.of(first / pageSize, pageSize, Sort.by(orders)), filters);
-        setWrappedData(page.getContent());
-        this.setRowCount((int) page.getTotalElements());
-        this.setPageSize(pageSize);
-
-        logger.trace("Multi Sort - AppLazyDataModel: Total:{} => {}", page.getNumberOfElements(), getWrappedData());
-        return getWrappedData();
+        return filters;
     }
 
     @Override
-    public List<T> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
-        logger.trace("First: {}, PageSize: {}, Sort Field: {}, SortOrder: {}, Filters: {}",
-                first,
-                pageSize,
-                sortField,
-                sortOrder,
-                filters
-        );
+    public List<T> load(int first, int pageSize, Map<String, SortMeta> sortBy, Map<String, FilterMeta> filterBy) {
+        logger.trace("First: {}, PageSize: {}, SortMeta: {}, Filters: {}", first, pageSize, sortBy, filterBy);
         newInstance();
-        Sort sort;
 
-        if (sortField == null || sortField.isEmpty()) {
-            sortField = "id";
+        List<Sort.Order> orders = new ArrayList<>();
+        if (sortBy != null && !sortBy.isEmpty()) {
+            for (SortMeta sortMeta : sortBy.values()) {
+                String field = sortMeta.getField();
+                if (field != null && !field.isEmpty()) {
+                    if (sortMeta.getOrder() == SortOrder.DESCENDING) {
+                        orders.add(JpaSort.JpaOrder.desc(field));
+                    } else {
+                        orders.add(JpaSort.JpaOrder.asc(field));
+                    }
+                }
+            }
+        }
+        if (orders.isEmpty()) {
+            orders.add(JpaSort.JpaOrder.asc("id"));
         }
 
-        switch (sortOrder) {
-            case ASCENDING:
-                sort = JpaSort.by(Sort.Direction.ASC, sortField);
-                break;
-            case DESCENDING:
-                sort = JpaSort.by(Sort.Direction.DESC, sortField);
-                break;
-            default:
-                sort = JpaSort.by(sortField);
-        }
-
-        Page<T> page = load(PageRequest.of(first / pageSize, pageSize, sort), filters);
+        Map<String, Object> filters = extractFilters(filterBy);
+        int pageIndex = pageSize > 0 ? first / pageSize : 0;
+        Page<T> page = load(PageRequest.of(pageIndex, pageSize, Sort.by(orders)), filters);
         setWrappedData(page.getContent());
         this.setRowCount((int) page.getTotalElements());
         this.setPageSize(pageSize);
+
         logger.trace("AppLazyDataModel: Total:{} => {}", page.getTotalElements(), getWrappedData());
-        return getWrappedData();
+        return page.getContent();
     }
 
     protected Page<T> load(Pageable pageable, Map<String, Object> filters) {
@@ -121,9 +104,9 @@ public abstract class AppLazyDataModel<T extends BaseEntity> extends LazyDataMod
     }
 
     @Override
-    public Object getRowKey(T object) {
-        logger.trace("getRowKey: {}", object.toString());
-        return object.getId();
+    public String getRowKey(T object) {
+        logger.trace("getRowKey: {}", object != null ? object.toString() : "null");
+        return object != null ? object.getId() : null;
     }
 
     public void add() {
@@ -163,15 +146,23 @@ public abstract class AppLazyDataModel<T extends BaseEntity> extends LazyDataMod
         logger.trace("DeActivated: {}", item);
     }
 
-    public void newInstance() {
-        try {
-            item = itemClass.newInstance();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        logger.trace("New Instance: {}", item);
+    public void delete() {
+        remove();
     }
 
+    public void restore() {
+        recycle();
+    }
+
+    public void purge() {
+        permanentRemove();
+    }
+
+    public void newInstance() {
+        try {
+            item = itemClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

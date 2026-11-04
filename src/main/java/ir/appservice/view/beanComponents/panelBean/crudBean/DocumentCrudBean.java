@@ -11,8 +11,8 @@ import org.primefaces.model.StreamedContent;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
-import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseId;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PhaseId;
 import java.io.ByteArrayInputStream;
 
 
@@ -38,10 +38,13 @@ public class DocumentCrudBean extends BaseLazyCrudBean<Document> {
         try {
             if (FacesContext.getCurrentInstance().getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
                 // So, we're rendering the HTML. Return a stub StreamedContent so that it will generate right URL.
-                imageStream = new DefaultStreamedContent();
+                imageStream = DefaultStreamedContent.builder().build();
             } else {
-                imageStream =
-                        new DefaultStreamedContent(new ByteArrayInputStream(this.appLazyDataModel.getItem().getData()));
+                imageStream = DefaultStreamedContent.builder()
+                        .stream(() -> new ByteArrayInputStream(this.appLazyDataModel.getItem().getData()))
+                        .contentType(this.appLazyDataModel.getItem().getType())
+                        .name(this.appLazyDataModel.getItem().getDisplayName())
+                        .build();
             }
         } catch (Exception e) {
             logger.error(String.format("Stream failed, Cause: {}", e.getMessage()));

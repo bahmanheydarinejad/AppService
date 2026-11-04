@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.ApplicationScope;
 
-import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseId;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PhaseId;
 import java.io.ByteArrayInputStream;
 
 @Getter
@@ -37,11 +37,14 @@ public class DocumentStreamer {
         try {
             if (FacesContext.getCurrentInstance().getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
                 // So, we're rendering the HTML. Return a stub StreamedContent so that it will generate right URL.
-                imageStream = new DefaultStreamedContent();
+                imageStream = DefaultStreamedContent.builder().build();
             } else {
                 Document document = documentService.get(documentId);
-                imageStream =
-                        new DefaultStreamedContent(new ByteArrayInputStream(document.getData()));
+                imageStream = DefaultStreamedContent.builder()
+                        .stream(() -> new ByteArrayInputStream(document.getData()))
+                        .contentType(document.getType())
+                        .name(document.getDisplayName())
+                        .build();
             }
         } catch (Exception e) {
             logger.error(String.format("Stream failed, Cause: {}", e.getMessage()));
