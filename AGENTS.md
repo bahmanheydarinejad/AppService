@@ -16,6 +16,7 @@
   - [2.2 Proximity Resolution: Closest-File-Wins](#22-proximity-resolution-closest-file-wins)
   - [2.3 Repository Configuration Precedence Ladder](#23-repository-configuration-precedence-ladder)
   - [2.4 Cross-Document Alignment: AGENTS, GEMINI, and ARCHITECTURE](#24-cross-document-alignment-agents-gemini-and-architecture)
+  - [2.5 Token-Optimization and File Routing Matrix](#25-token-optimization-and-file-routing-matrix)
 - [3. The 5-Stage Agent Execution Lifecycle](#3-the-5-stage-agent-execution-lifecycle)
   - [3.1 Stage 1: Reconnaissance and Context Acquisition](#31-stage-1-reconnaissance-and-context-acquisition)
   - [3.2 Stage 2: Task Planning and Decomposition](#32-stage-2-task-planning-and-decomposition)
@@ -31,6 +32,7 @@
   - [5.1 The Minimal Diff Rule](#51-the-minimal-diff-rule)
   - [5.2 Style, Idioms and Architectural Compliance](#52-style-idioms-and-architectural-compliance)
   - [5.3 Dependency Hygiene and External Libraries](#53-dependency-hygiene-and-external-libraries)
+  - [5.4 Core Engineering Principles: SOLID, YAGNI, OOP, OOD, AOP and Design Patterns](#54-core-engineering-principles-solid-yagni-oop-ood-aop-and-design-patterns)
 - [6. Testing, Verification and Quality Assurance](#6-testing-verification-and-quality-assurance)
   - [6.1 The Claim vs Proof Invariant](#61-the-claim-vs-proof-invariant)
   - [6.2 The 4-Tier Verification Ladder](#62-the-4-tier-verification-ladder)
@@ -48,6 +50,7 @@
   - [9.1 Autonomous Action vs Escalation Thresholds](#91-autonomous-action-vs-escalation-thresholds)
   - [9.2 Progress Tracking and State Heartbeats](#92-progress-tracking-and-state-heartbeats)
   - [9.3 Structured Delivery and Handoff Format](#93-structured-delivery-and-handoff-format)
+  - [9.4 Mandatory Task Completion Protocol](#94-mandatory-task-completion-protocol)
 - [10. Operational Checklists and Quick Reference](#10-operational-checklists-and-quick-reference)
   - [10.1 Pre-Flight Checklist](#101-pre-flight-checklist)
   - [10.2 Modification Checklist](#102-modification-checklist)
@@ -124,6 +127,18 @@ This repository maintains three specialized documentation pillars. Agents must r
 - **`AGENTS.md` (This File)**: The universal, vendor-agnostic operational standard for agent behavior, tool execution, minimal diffs, verification ladders, and error recovery.
 - **`ARCHITECTURE.md`**: The technical reference for software design (Hexagonal Architecture / Ports & Adapters, domain core isolation, and package dependencies). Agents must verify their changes against `ARCHITECTURE.md`.
 - **`GEMINI.md`**: Model-specific runtime configurations, context management strategies, prompt conventions, and CLI flags tailored for Google Gemini / Antigravity agents.
+
+### 2.5 Token-Optimization and File Routing Matrix
+To minimize latency and token consumption, agents must avoid broad codebase traversals. Use this dispatch table to locate the single authoritative document before querying source files:
+
+| Task Domain | Authoritative Reference File | Token Reduction Impact |
+|---|---|---|
+| **REST APIs, Controllers, Endpoints, Spring Security filter chains** | [`documents/contracts/api-endpoints.md`](documents/contracts/api-endpoints.md) | ~1.5k tokens vs scanning controller and security classes. |
+| **Database Tables, JPA Entities, Liquibase migrations, Constraints** | [`documents/contracts/database-schema.md`](documents/contracts/database-schema.md) | ~2.5k tokens vs scanning entities and changelog YAMLs. |
+| **Common Developer Workflows, JSF Panels, CrudBeans, Profiles** | [`documents/runbooks/recipes.md`](documents/runbooks/recipes.md) | ~2k tokens vs reverse-engineering multi-tier conventions. |
+| **Root Developer Reference, Build commands, Invariants** | [`CLAUDE.md`](CLAUDE.md) | Quick repository reference and environment commands. |
+| **Hexagonal Architecture, Boundary Contracts, Clean Domain** | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Structural Ports and Adapters governance. |
+| **Gemini AI Configuration, Context Caching, Function Calling** | [`GEMINI.md`](GEMINI.md) | LLM runtime hyperparameters and token caching. |
 
 ---
 
@@ -263,6 +278,39 @@ Every line in a git diff carries operational risk and cognitive load for human r
 - **No Unauthorized Dependencies**: An agent must never add a new third-party dependency to `pom.xml`, `build.gradle`, or `package.json` without explicit user permission.
 - **License Compliance**: If adding a dependency is approved, verify that it uses an enterprise-permissive open-source license (Apache 2.0, MIT, BSD-3-Clause). Viral copyleft licenses (GPL, AGPL) are prohibited.
 - **CVE Invariant**: Check that the requested library version has zero critical or high Common Vulnerabilities and Exposures (CVEs).
+
+### 5.4 Core Engineering Principles: SOLID, YAGNI, OOP, OOD, AOP and Design Patterns
+All code contributions in this repository must actively implement and adhere to standard software engineering principles:
+
+1. **SOLID Principles**:
+   - **Single Responsibility Principle (SRP)**: Maintain clear segregation across architectural layers. Controllers (`BaseController`, `DocumentController`) handle HTTP contracts; Services (`CrudService`, `AccountService`) execute business rules; Repositories (`CrudRepository`) interact with JPA persistence; Backing Beans (`BaseCrudBean`, `AuthenticationBean`) manage JSF UI state.
+   - **Open/Closed Principle (OCP)**: Extend functionality through abstractions and template methods without modifying stable classes. Subclass `BaseEntity` for persistence models, `CrudService` for transactional services, and `BaseLazyCrudBean` for data table views.
+   - **Liskov Substitution Principle (LSP)**: Maintain interchangeable contracts. Concrete entities (`Account`, `NaturalPerson`, `Document`) must honor `BaseEntity` contracts for identity, lifecycle status, and soft-delete behavior.
+   - **Interface Segregation Principle (ISP)**: Avoid monolithic interfaces. Repositories extend focused Spring Data abstractions (`CrudRepository`, `JpaSpecificationExecutor`).
+   - **Dependency Inversion Principle (DIP)**: Depend on abstractions rather than concrete implementations. Inject interfaces (`CrudRepository`, `UserDetailsManager`) via constructor injection.
+
+2. **YAGNI (You Aren't Gonna Need It)**:
+   - Avoid speculative generic wrappers, unused entity fields, premature caching layers, or unused helper methods.
+   - Write only the minimal code necessary to fulfill the immediate requirements.
+
+3. **OOP & OOD (Object-Oriented Programming and Design)**:
+   - **Encapsulation**: Guard domain state inside entities with explicit getters/setters and lifecycle controls. Keep UI state encapsulated within `@ViewScoped` managed beans.
+   - **Composition over Inheritance**: Backing beans compose service beans via injection rather than inheriting business domain logic.
+
+4. **AOP (Aspect-Oriented Programming)**:
+   - Isolate cross-cutting concerns (declarative transactions via `@Transactional`, security filtering via `AppSecurityFilter`, audit dates) in dedicated filters and aspects rather than entangling them in domain services.
+   - Centralize error handling in `ir.appservice.configuration.exception` classes.
+
+5. **Architectural & In-Code Design Patterns**:
+   - **Architectural Patterns**:
+     - *Hexagonal Architecture (Ports and Adapters)*: Decouple domain entities from external web delivery and persistence adapters.
+     - *Layered Architecture*: Strict unidirectional dependencies (`Controller` / `View` -> `Service` -> `Repository` -> `Database`).
+     - *MVVM for JSF*: ManagedBeans act as ViewModels binding UI event handlers to PrimeFaces components.
+   - **GoF In-Code Patterns**:
+     - *Template Method Pattern*: `BaseCrudBean` and `BaseConverter` define processing workflows while subclasses provide entity-specific bindings.
+     - *Converter / Adapter Pattern*: JSF Converters (`AccountConverter`, `RoleConverter`) adapt between HTTP string parameters and domain objects.
+     - *Repository Pattern*: `CrudRepository` abstracts SQL/HQL operations.
+     - *Service Layer Pattern*: `CrudService` coordinates use cases and transactions.
 
 ---
 
@@ -434,6 +482,15 @@ Upon task completion, agents must submit a structured report containing the five
 4. **Conclusion**: Concise statement of final state.
 5. **Verification Method**: The exact terminal commands a developer can run to verify the solution independently.
 
+### 9.4 Mandatory Task Completion Protocol
+To prevent documentation drift and preserve agent velocity across iterative engineering sessions, agents must enforce this invariant:
+
+> **On completing ANY task, you MUST update the affected contract and documentation files before finishing:**
+> 1. Changed an endpoint, controller, route, or security rule? ──► Update [`documents/contracts/api-endpoints.md`](documents/contracts/api-endpoints.md).
+> 2. Changed a database entity, column, index, constraint, or migration? ──► Update [`documents/contracts/database-schema.md`](documents/contracts/database-schema.md).
+> 3. Changed an engineering pattern, build workflow, or recipe? ──► Update [`documents/runbooks/recipes.md`](documents/runbooks/recipes.md).
+> 4. Changed an architectural boundary or universal standard? ──► Update [`ARCHITECTURE.md`](ARCHITECTURE.md), [`AGENTS.md`](AGENTS.md), and [`CLAUDE.md`](CLAUDE.md).
+
 ---
 
 ## 10. Operational Checklists and Quick Reference
@@ -476,6 +533,7 @@ Copy and verify this checklist before declaring task completion:
 - [ ] Tier 4: Full regression test suite passes (`mvn test` reports 0 failures, 0 errors).
 - [ ] Rule of Three obeyed (no churn loops or blind retries).
 - [ ] Working tree audited (`git status` shows only intended file changes).
+- [ ] Mandatory task completion contracts updated if affected (api-endpoints.md, database-schema.md, recipes.md).
 - [ ] Scratch files and temporary artifacts removed.
 - [ ] Structured delivery report generated with verbatim verification proof.
 ```

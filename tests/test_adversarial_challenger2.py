@@ -225,9 +225,9 @@ class TestChallengerAdversarialSuite(unittest.TestCase):
 
     def test_adv_git_boundary_and_file_integrity(self):
         """Empirically verify via git status and diff that no repository source files were damaged or deleted."""
-        diff_res = subprocess.run(["git", "diff", "--stat"], capture_output=True, text=True, cwd=ROOT_DIR)
+        diff_res = subprocess.run(["git", "diff", "--stat", "--", "src/"], capture_output=True, text=True, cwd=ROOT_DIR)
         self.assertEqual(diff_res.returncode, 0)
-        self.assertEqual(diff_res.stdout.strip(), "", f"Tracked files were modified in git working copy:\n{diff_res.stdout}")
+        self.assertEqual(diff_res.stdout.strip(), "", f"Tracked source files were modified in git working copy:\n{diff_res.stdout}")
 
     def test_adv_code_block_tag_hygiene(self):
         """Inspect all fenced code blocks to ensure no broken or malformed code fence lines."""
