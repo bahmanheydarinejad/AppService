@@ -108,7 +108,141 @@ Spring Security (`ir.appservice.configuration.AppSecurity`) enforces a perimeter
 
 ---
 
-## 3. Standard HTTP Status Codes & Error Mapping
+---
+
+## 3. Standardized Generic CRUD Search API Specification
+
+> **Architectural Standard**: All search and query operations across every administrative entity share an identical signature, contract, and underlying execution pipeline.
+
+### 3.1 Uniform Search Route Contract
+- **HTTP Method**: `POST`
+- **Route Pattern**: `/api/admin/{subject}/search`
+- **Supported Subjects**: `users`, `roles`, `permissions`, `tenants`, `audit-events`, `jobs`, `sms-logs`, `mail-logs`, `clients`, `documents`, `i18n-messages`
+- **Headers**:
+  - `Authorization: Bearer <JWT_TOKEN>`
+  - `X-Trace-Id: <UUID>` (Optional, auto-generated if omitted)
+  - `Content-Type: application/json`
+
+#### Universal Search Request Schema
+```json
+{
+  "filters": [
+    {
+      "field": "status",
+      "operator": "EQUALS",
+      "value": "ACTIVE"
+    },
+    {
+      "field": "createdAt",
+      "operator": "BETWEEN",
+      "value": ["2026-01-01T00:00:00Z", "2026-11-07T00:00:00Z"]
+    }
+  ],
+  "searchQuery": "optional full-text token",
+  "logic": "AND",
+  "sorts": [
+    {
+      "field": "createdAt",
+      "direction": "DESC"
+    }
+  ],
+  "page": 0,
+  "size": 20,
+  "traceId": "tr-9481-ac2d"
+}
+```
+
+#### Universal Search Response Envelope (`PagedApiResponse<T>`)
+```json
+{
+  "success": true,
+  "traceId": "tr-9481-ac2d",
+  "timestamp": "2026-11-07T02:20:00Z",
+  "subject": "users",
+  "page": 0,
+  "size": 20,
+  "totalElements": 1250,
+  "totalPages": 63,
+  "executionTimeMs": 14,
+  "data": [
+    {
+      "id": "usr_94a821",
+      "username": "admin_sys",
+      "email": "admin@appservice.internal",
+      "status": "ACTIVE",
+      "tenantId": "tenant_system"
+    }
+  ]
+}
+```
+
+---
+
+## 4. Dedicated Administrative Control Plane Endpoints
+
+### 4.1 Audit Log Dashboard (Trace Filters)
+| Method | Route | Description | Scope Required |
+|---|---|---|---|
+| `POST` | `/api/admin/audit-events/search` | Search audit logs by `traceId`, `spanId`, `correlationId`, actor, IP, outcome. | `AUDIT_READ` |
+| `GET` | `/api/admin/audit-events/{id}/diff` | Side-by-side JSON before/after state comparison with masked secrets. | `AUDIT_READ` |
+
+### 4.2 Job Scheduler Management
+| Method | Route | Description | Scope Required |
+|---|---|---|---|
+| `GET` | `/api/admin/jobs` | List clustered Quartz jobs, triggers, cron expressions, next fire times. | `JOBS_READ` |
+| `POST` | `/api/admin/jobs/{id}/fire` | Trigger instant execution ("Fire Now") on cluster. | `JOBS_EXECUTE` |
+| `POST` | `/api/admin/jobs/{id}/pause` | Pause trigger execution. | `JOBS_MANAGE` |
+| `POST` | `/api/admin/jobs/{id}/resume` | Resume paused job trigger. | `JOBS_MANAGE` |
+
+### 4.3 Mail Management & Template Studio
+| Method | Route | Description | Scope Required |
+|---|---|---|---|
+| `GET` | `/api/admin/mail/providers` | Outbound SMTP / API provider configs and health status. | `MAIL_READ` |
+| `POST` | `/api/admin/mail/templates` | Create or update Jinja2 / HTML email template with tokens. | `MAIL_MANAGE` |
+| `POST` | `/api/admin/mail/test-send` | Dispatch test email with simulated token payload. | `MAIL_MANAGE` |
+| `POST` | `/api/admin/mail-logs/search` | Standard CRUD search across email delivery and bounce records. | `MAIL_READ` |
+
+### 4.4 Intelligent Multi-Provider SMS Management
+| Method | Route | Description | Scope Required |
+|---|---|---|---|
+| `GET` | `/api/admin/sms/providers` | List configured SMS providers (Kavenegar, FarazSms, Twilio, AWS SNS). | `SMS_READ` |
+| `GET` | `/api/admin/sms/health` | Live carrier latency, rolling delivery rate, and circuit breaker status. | `SMS_READ` |
+| `PUT` | `/api/admin/sms/routing-policy` | Configure routing strategy (Cost-Optimized, Latency-Optimized, Balanced). | `SMS_MANAGE` |
+| `POST` | `/api/admin/sms/send` | Intelligent dispatch choosing optimal provider with fallback circuit breaker. | `SMS_SEND` |
+| `POST` | `/api/admin/sms-logs/search` | Standard CRUD search across SMS dispatch and carrier DLR logs. | `SMS_READ` |
+
+### 4.5 Monitoring & Operations Telemetry
+| Method | Route | Description | Scope Required |
+|---|---|---|---|
+| `GET` | `/api/admin/ops/metrics` | Real-time API latency percentiles (P50, P95, P99), 4xx/5xx HTTP error rates. | `OPS_READ` |
+| `GET` | `/api/admin/ops/pools` | HikariCP database connection pool metrics (active, idle, wait time). | `OPS_READ` |
+| `GET` | `/api/admin/ops/circuits` | Resilience4j circuit breaker state and failure rate thresholds. | `OPS_READ` |
+
+### 4.6 Tenant Management Panel (Hybrid Multi-Tenancy)
+| Method | Route | Description | Scope Required |
+|---|---|---|---|
+| `POST` | `/api/admin/tenants/search` | Standard CRUD search across registered customer tenants. | `TENANTS_READ` |
+| `PUT` | `/api/admin/tenants/{id}/strategy` | Update tenant isolation tier: `SHARED_DB`, `POSTGRESQL_SCHEMA`, `DEDICATED_DB`. | `TENANTS_MANAGE` |
+| `POST` | `/api/admin/tenants/{id}/provision` | Execute automated Liquibase schema / DB migration for tenant. | `TENANTS_MANAGE` |
+
+### 4.7 Client & API Key Management
+| Method | Route | Description | Scope Required |
+|---|---|---|---|
+| `POST` | `/api/admin/clients/search` | Standard CRUD search across OAuth2 clients and external consumer apps. | `CLIENTS_READ` |
+| `POST` | `/api/admin/clients` | Register new OAuth2 confidential client with PKCE enforcement. | `CLIENTS_MANAGE` |
+| `POST` | `/api/admin/clients/{id}/keys/rotate` | Rotate API secret key; returns newly generated secret once, stores SHA-256. | `CLIENTS_MANAGE` |
+
+### 4.8 AI Agent Infrastructure Plane (MCP & Tool Execution)
+| Method | Route | Description | Scope Required |
+|---|---|---|---|
+| `GET` | `/api/admin/ai/agents` | List authorized AI agent identities, capability tokens, and rate limits. | `AI_MANAGE` |
+| `GET` | `/api/admin/ai/mcp/tools` | Model Context Protocol discovery endpoint exposing available tools and JSON schemas. | `AI_TOOLS_READ` |
+| `POST` | `/api/admin/ai/mcp/invoke` | Sandboxed AI tool invocation endpoint with parameter verification and audit logging. | `AI_INVOKE` |
+| `POST` | `/api/admin/ai-audit/search` | Standard CRUD search across AI agent prompt tokens, tool calls, and diff records. | `AUDIT_READ` |
+
+---
+
+## 5. Standard HTTP Status Codes & Error Mapping
 
 The application maps service-layer exceptions to standardized error responses via `ir.appservice.configuration.exception`:
 

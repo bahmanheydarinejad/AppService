@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark" data-theme="adminlte-blue" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AppService Enterprise Platform Redesign — Architectural Specification &amp; Master Blueprint</title>
+  
+  <!-- Local Bootstrap 5 Core Stylesheet (Theme-Swappable) -->
+  <link rel="stylesheet" id="bootstrap-theme-link" href="assets/css/bootstrap.min.css">
+  
+  <!-- Local Bootstrap Icons -->
+  <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css">
+
+  <style>
+    /* ==========================================================================
+       AppService Theme Variables & Modern Enterprise Palette
+       ========================================================================== */
+    :root, [data-theme="adminlte-blue"] {
+      --app-bg-body: #0a0f1d;
+      --app-bg-sidebar: #0f172a;
+      --app-bg-card: #141e33;
+      --app-bg-card-inner: #1b2845;
+      --app-bg-card-hover: #223254;
+      --app-border: #233454;
+      --app-border-light: #324771;
+      
+      --app-primary: #3b82f6;
+      --app-primary-light: #60a5fa;
+      --app-primary-dark: #1d4ed8;
+      --app-primary-glow: rgba(59, 130, 246, 0.28);
+      
+      --app-success: #10b981;
+      --app-info: #06b6d4;
+      --app-warning: #f59e0b;
+      --app-danger: #ef4444;
+      --app-purple: #8b5cf6;
+      
+      --app-text: #f8fafc;
+      --app-text-muted: #94a3b8;
+      --app-text-dim: #64748b;
+      --app-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    [data-theme="darkly"] {
+      --app-bg-body: #1e1e1e;
+      --app-bg-sidebar: #151515;
+      --app-bg-card: #282828;
+      --app-bg-card-inner: #333333;
+      --app-bg-card-hover: #3d3d3d;
+      --app-border: #404040;
+      --app-border-light: #525252;
+      
+      --app-primary: #375a7f;
+      --app-primary-light: #4b7db3;
+      --app-primary-dark: #2b4764;
+      --app-primary-glow: rgba(55, 90, 127, 0.35);
+      
+      --app-success: #00bc8c;
+      --app-info: #3498db;
+      --app-warning: #f39c12;
+      --app-danger: #e74c3c;
+      --app-purple: #af69ee;
+      
+      --app-text: #ffffff;
+      --app-text-muted: #adb5bd;
+      --app-text-dim: #777777;
+    }
+
+    [data-theme="flatly"] {
+      --app-bg-body: #f8fafc;
+      --app-bg-sidebar: #1e293b;
+      --app-bg-card: #ffffff;
+      --app-bg-card-inner: #f1f5f9;
+      --app-bg-card-hover: #e2e8f0;
+      --app-border: #e2e8f0;
+      --app-border-light: #cbd5e1;
+      
+      --app-primary: #0284c7;
+      --app-primary-light: #38bdf8;
+      --app-primary-dark: #0369a1;
+      --app-primary-glow: rgba(2, 132, 199, 0.2);
+      
+      --app-success: #10b981;
+      --app-info: #06b6d4;
+      --app-warning: #f59e0b;
+      --app-danger: #ef4444;
+      --app-purple: #8b5cf6;
+      
+      --app-text: #0f172a;
+      --app-text-muted: #475569;
+      --app-text-dim: #94a3b8;
+    }
+
+    [data-theme="cyborg"] {
+      --app-bg-body: #050505;
+      --app-bg-sidebar: #0d0d0d;
+      --app-bg-card: #151515;
+      --app-bg-card-inner: #222222;
+      --app-bg-card-hover: #2d2d2d;
+      --app-border: #262626;
+      --app-border-light: #3d3d3d;
+      
+      --app-primary: #2a9fd6;
+      --app-primary-light: #54b4e2;
+      --app-primary-dark: #1b6d94;
+      --app-primary-glow: rgba(42, 159, 214, 0.35);
+      
+      --app-success: #77b300;
+      --app-info: #9933cc;
+      --app-warning: #ff8800;
+      --app-danger: #cc0000;
+      --app-purple: #9933cc;
+      
+      --app-text: #ffffff;
+      --app-text-muted: #888888;
+      --app-text-dim: #555555;
+    }
+
+    [data-theme="pulse"] {
+      --app-bg-body: #171321;
+      --app-bg-sidebar: #1e182d;
+      --app-bg-card: #271f3a;
+      --app-bg-card-inner: #322849;
+      --app-bg-card-hover: #3f335b;
+      --app-border: #3c3057;
+      --app-border-light: #534377;
+      
+      --app-primary: #a855f7;
+      --app-primary-light: #c084fc;
+      --app-primary-dark: #7e22ce;
+      --app-primary-glow: rgba(168, 85, 247, 0.35);
+      
+      --app-success: #10b981;
+      --app-info: #06b6d4;
+      --app-warning: #f59e0b;
+      --app-danger: #ef4444;
+      --app-purple: #a855f7;
+      
+      --app-text: #f5f3ff;
+      --app-text-muted: #b4a7d6;
+      --app-text-dim: #7f6e9e;
+    }
+
+    [data-theme="emerald"] {
+      --app-bg-body: #0b1714;
+      --app-bg-sidebar: #10211d;
+      --app-bg-card: #152c26;
+      --app-bg-card-inner: #1c3b33;
+      --app-bg-card-hover: #244940;
+      --app-border: #23463d;
+      --app-border-light: #326456;
+      
+      --app-primary: #10b981;
+      --app-primary-light: #34d399;
+      --app-primary-dark: #059669;
+      --app-primary-glow: rgba(16, 185, 129, 0.3);
+      
+      --app-success: #10b981;
+      --app-info: #06b6d4;
+      --app-warning: #f59e0b;
+      --app-danger: #ef4444;
+      --app-purple: #8b5cf6;
+      
+      --app-text: #f0fdf4;
+      --app-text-muted: #a7f3d0;
+      --app-text-dim: #6ee7b7;
+    }
+
+    /* Layout & Bidirectional RTL Handling */
+    body {
+      background-color: var(--app-bg-body);
+      color: var(--app-text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      margin: 0;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    [dir="rtl"] body {
+      direction: rtl;
+      text-align: right;
+    }
+
+    aside.sidebar {
+      width: 320px;
+      min-width: 320px;
+      background-color: var(--app-bg-sidebar);
+      border-right: 1px solid var(--app-border);
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+      padding: 22px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      z-index: 1030;
+      transition: border-color 0.2s ease;
+    }
+
+    [dir="rtl"] aside.sidebar {
+      border-right: none;
+      border-left: 1px solid var(--app-border);
+    }
+
+    aside.sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+    aside.sidebar::-webkit-scrollbar-thumb {
+      background: var(--app-border);
+      border-radius: 3px;
+    }
+
+    .brand-logo-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--app-border);
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      box-shadow: 0 4px 14px var(--app-primary-glow);
+      letter-spacing: 0.5px;
+    }
+
+    .brand-title h1 {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0;
+      color: var(--app-text);
+    }
+    .brand-title p {
+      font-size: 11px;
+      margin: 0;
+      color: var(--app-text-muted);
+    }
+
+    .nav-group-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--app-text-dim);
+      margin-bottom: 8px;
+      padding-left: 8px;
+    }
+    [dir="rtl"] .nav-group-title {
+      padding-left: 0;
+      padding-right: 8px;
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .nav-list li a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 11px;
+      border-radius: 6px;
+      color: var(--app-text-muted);
+      text-decoration: none;
+      font-size: 12.5px;
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+
+    .nav-list li a:hover,
+    .nav-list li a.active {
+      background-color: var(--app-bg-card-inner);
+      color: var(--app-primary-light);
+    }
+
+    .nav-list li a i {
+      font-size: 15px;
+    }
+
+    main.content {
+      flex: 1;
+      padding: 28px 36px;
+      overflow-y: auto;
+      max-width: 1480px;
+    }
+
+    .top-control-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--app-border);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .hero-banner {
+      background: linear-gradient(135deg, var(--app-bg-card), var(--app-bg-card-inner));
+      border: 1px solid var(--app-border);
+      border-radius: 14px;
+      padding: 32px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    }
+
+    .hero-banner::after {
+      content: "";
+      position: absolute;
+      right: -60px;
+      top: -60px;
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, var(--app-primary-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .feature-card {
+      background-color: var(--app-bg-card);
+      border: 1px solid var(--app-border);
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.2s ease;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--app-primary);
+      box-shadow: 0 10px 28px var(--app-primary-glow);
+    }
+
+    .feature-icon-wrapper {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 16px;
+    }
+
+    .feature-card h4 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--app-text);
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
+      font-size: 13.5px;
+      color: var(--app-text-muted);
+      line-height: 1.6;
+      margin-bottom: 16px;
+      flex: 1;
+    }
+
+    .tech-pill-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: auto;
+    }
+
+    .tech-pill {
+      font-size: 11px;
+      font-family: var(--app-font-mono);
+      padding: 4px 8px;
+      border-radius: 4px;
+      background-color: var(--app-bg-card-inner);
+      color: var(--app-text-muted);
+      border: 1px solid var(--app-border-light);
+    }
+
+    .code-pill {
+      font-family: var(--app-font-mono);
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--app-bg-card-inner);
+      color: var(--app-primary-light);
+      border: 1px solid var(--app-border-light);
+    }
+
+    .table-container {
+      background-color: var(--app-bg-card);
+      border: 1px solid var(--app-border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 28px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .table-custom {
+      width: 100%;
+      margin-bottom: 0;
+      color: var(--app-text);
+      border-collapse: collapse;
+    }
+
+    .table-custom th {
+      background-color: var(--app-bg-card-inner);
+      color: var(--app-primary-light);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--app-border);
+    }
+
+    .table-custom td {
+      padding: 13px 18px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--app-border);
+      vertical-align: middle;
+    }
+
+    .table-custom tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table-custom tr:hover td {
+      background-color: var(--app-bg-card-hover);
+    }
+
+    /* Architecture Visual Blocks */
+    .arch-box {
+      border: 1px solid var(--app-border);
+      border-radius: 10px;
+      padding: 16px;
+      background-color: var(--app-bg-card-inner);
+      height: 100%;
+      transition: all 0.2s ease;
+    }
+    .arch-box:hover {
+      border-color: var(--app-primary-light);
+    }
+
+    /* Dependency Graph Flow Nodes */
+    .dep-node {
+      border: 1px solid var(--app-border);
+      border-radius: 8px;
+      padding: 14px;
+      background-color: var(--app-bg-card);
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .dep-badge-p0 { background: #dc2626; color: #fff; }
+    .dep-badge-p1 { background: #d97706; color: #fff; }
+    .dep-badge-p2 { background: #2563eb; color: #fff; }
+
+    /* Interactive Mockup Studio */
+    .mockup-window {
+      background: var(--app-bg-card);
+      border: 1px solid var(--app-border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+
+    .mockup-header-bar {
+      background: var(--app-bg-card-inner);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--app-border);
+    }
+
+    .mockup-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .mockup-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+
+    .mockup-layout-body {
+      display: flex;
+      min-height: 520px;
+    }
+
+    .mockup-side-menu {
+      width: 260px;
+      background: var(--app-bg-sidebar);
+      border-right: 1px solid var(--app-border);
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    [dir="rtl"] .mockup-side-menu {
+      border-right: none;
+      border-left: 1px solid var(--app-border);
+    }
+
+    .mockup-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      color: var(--app-text-muted);
+      text-decoration: none;
+      font-size: 12.5px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      transition: all 0.15s ease;
+    }
+    [dir="rtl"] .mockup-btn {
+      text-align: right;
+    }
+
+    .mockup-btn:hover,
+    .mockup-btn.active {
+      background: var(--app-primary);
+      color: #ffffff;
+    }
+
+    .mockup-stage {
+      flex: 1;
+      padding: 24px;
+      background: var(--app-bg-body);
+      overflow-y: auto;
+    }
+
+    .terminal-box {
+      background: #050811;
+      border: 1px solid var(--app-border);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: var(--app-font-mono);
+      font-size: 12.5px;
+      color: #a5d6ff;
+      line-height: 1.6;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+
+    .terminal-prompt {
+      color: #7ee787;
+      user-select: none;
+    }
+
+    @media (max-width: 992px) {
+      body { flex-direction: column; }
+      aside.sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--app-border); }
+      main.content { padding: 24px 16px; }
+      .mockup-layout-body { flex-direction: column; }
+      .mockup-side-menu { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="brand-logo-box">
+      <div class="brand-badge">APPSERVICE 2.0</div>
+      <div class="brand-title">
+        <h1>AppService Core</h1>
+        <p>Enterprise Starter &amp; Admin Plane</p>
+      </div>
+    </div>
+
+    <!-- Live Search Filter for Blueprint Sections -->
+    <div class="position-relative">
+      <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+      <input type="text" class="form-control form-control-sm ps-5 bg-dark border-secondary text-white" id="featureSearch" placeholder="Filter blueprint &amp; specs..." onkeyup="filterSidebar()">
+    </div>
+
+    <!-- Part 1: Architecture & Purpose -->
+    <div>
+      <div class="nav-group-title">Part 1: Vision &amp; Foundations</div>
+      <ul class="nav-list">
+        <li><a href="#vision" class="active"><i class="bi bi-compass"></i> Vision &amp; Fork Philosophy</a></li>
+        <li><a href="#multi-module"><i class="bi bi-layers-half"></i> Multi-Module Hierarchy</a></li>
+        <li><a href="#hexagonal-ports"><i class="bi bi-hexagon-half"></i> Hexagonal Boundaries</a></li>
+        <li><a href="#hybrid-multitenant"><i class="bi bi-building"></i> Hybrid Multi-Tenancy</a></li>
+        <li><a href="#security-oauth2"><i class="bi bi-shield-lock-fill"></i> OAuth2 / OIDC &amp; PKCE</a></li>
+        <li><a href="#standard-crud-search"><i class="bi bi-search"></i> Uniform CRUD Search Engine</a></li>
+      </ul>
+    </div>
+
+    <!-- Part 2: Dynamic Capabilities & Engines -->
+    <div>
+      <div class="nav-group-title">Part 2: Engines &amp; UI Plane</div>
+      <ul class="nav-list">
+        <li><a href="#dynamic-i18n"><i class="bi bi-translate"></i> DB Localization &amp; RTL</a></li>
+        <li><a href="#theme-engine"><i class="bi bi-palette2"></i> Multi-Theming Engine</a></li>
+        <li><a href="#intelligent-sms"><i class="bi bi-chat-square-dots-fill"></i> Intelligent Multi-SMS Router</a></li>
+        <li><a href="#ai-agent-infra"><i class="bi bi-robot"></i> AI Agent Infrastructure Plane</a></li>
+        <li><a href="#primefaces-ui"><i class="bi bi-window-desktop"></i> PrimeFaces Single-Page UI</a></li>
+      </ul>
+    </div>
+
+    <!-- Part 3: Dedicated Control Panels -->
+    <div>
+      <div class="nav-group-title">Part 3: Dedicated Control Panels</div>
+      <ul class="nav-list">
+        <li><a href="#panel-audit"><i class="bi bi-funnel"></i> Audit Logs (Trace Filters)</a></li>
+        <li><a href="#panel-scheduler"><i class="bi bi-clock-history"></i> Job Scheduler Panel</a></li>
+        <li><a href="#panel-mail"><i class="bi bi-envelope-at"></i> Mail Management Panel</a></li>
+        <li><a href="#panel-sms"><i class="bi bi-phone"></i> SMS Management Panel</a></li>
+        <li><a href="#panel-ops"><i class="bi bi-activity"></i> Monitoring &amp; Operations</a></li>
+        <li><a href="#panel-tenants"><i class="bi bi-buildings"></i> Tenant Management Panel</a></li>
+        <li><a href="#panel-clients"><i class="bi bi-key"></i> Client / API Key Panel</a></li>
+        <li><a href="#panel-ai"><i class="bi bi-cpu"></i> AI Agent Control Panel</a></li>
+      </ul>
+    </div>
+
+    <!-- Part 4: Roadmap & Dependencies -->
+    <div>
+      <div class="nav-group-title">Part 4: Execution Plan</div>
+      <ul class="nav-list">
+        <li><a href="#dependency-graph"><i class="bi bi-bezier2"></i> Dependency Chain Map</a></li>
+        <li><a href="#phased-roadmap"><i class="bi bi-calendar-check"></i> P0 - P2 Phased Roadmap</a></li>
+        <li><a href="#qa-acceptance"><i class="bi bi-patch-check"></i> Acceptance &amp; QA Matrix</a></li>
+      </ul>
+    </div>
+
+    <!-- Part 5: Interactive Simulator Labs -->
+    <div>
+      <div class="nav-group-title">Part 5: Live Simulators</div>
+      <ul class="nav-list">
+        <li><a href="#interactive-console"><i class="bi bi-tv"></i> 8-Panel Admin Console Lab</a></li>
+        <li><a href="#sms-router-sim"><i class="bi bi-shuffle"></i> Intelligent SMS Router Lab</a></li>
+        <li><a href="#i18n-simulator"><i class="bi bi-chat-left-dots"></i> Live i18n &amp; RTL Tester</a></li>
+        <li><a href="#api-spec-explorer"><i class="bi bi-terminal"></i> Standard CRUD REST Explorer</a></li>
+      </ul>
+    </div>
+
+    <!-- Sidebar Bottom Status -->
+    <div class="mt-auto pt-3 border-top border-secondary d-flex align-items-center justify-content-between text-muted small">
+      <span><i class="bi bi-cpu"></i> Java 17+ • Boot 4.1.1</span>
+      <span><i class="bi bi-shield-check text-success"></i> Spring 7.0.9</span>
+    </div>
+  </aside>
+
+  <!-- Main Content Body -->
+  <main class="content">
+
+    <!-- Top Control Bar (Theme, RTL, & Quick Settings) -->
+    <div class="top-control-bar">
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill">
+          <i class="bi bi-stars me-1"></i> Master Architectural Blueprint
+        </span>
+        <span class="text-muted small d-none d-lg-inline">
+          Multi-Module Maven • Spring Boot REST • PrimeFaces Decoupled UI • AI Agent Infrastructure (MCP)
+        </span>
+      </div>
+
+      <!-- Controls: Theme Dropdown & RTL Toggle -->
+      <div class="d-flex align-items-center gap-2">
+        <!-- RTL Toggle Button -->
+        <button class="btn btn-sm btn-outline-info rounded-pill px-3 py-2 d-flex align-items-center gap-2" id="rtlToggleBtn" onclick="toggleRTL()">
+          <i class="bi bi-arrow-left-right"></i>
+          <span id="rtlBtnLabel">Direction: LTR</span>
+        </button>
+
+        <!-- Theme Switcher Dropdown -->
+        <div class="dropdown">
+          <button class="btn btn-sm btn-outline-primary dropdown-toggle d-flex align-items-center gap-2 px-3 py-2 rounded-pill shadow-sm" type="button" id="themeDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-palette-fill"></i>
+            <span id="activeThemeLabel">Theme: AdminLTE Blue</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow-lg border-secondary" aria-labelledby="themeDropdownBtn">
+            <li><h6 class="dropdown-header text-uppercase">Select UI Theme</h6></li>
+            <li><button class="dropdown-item active d-flex align-items-center gap-2" onclick="setTheme('adminlte-blue', 'assets/css/bootstrap.min.css', 'dark', 'AdminLTE Blue (AppService)')"><i class="bi bi-circle-fill text-primary"></i> AdminLTE Blue (AppService)</button></li>
+            <li><button class="dropdown-item d-flex align-items-center gap-2" onclick="setTheme('darkly', 'assets/css/bootstrap-darkly.min.css', 'dark', 'Darkly (Modern Dark)')"><i class="bi bi-circle-fill text-secondary"></i> Darkly (Modern Dark)</button></li>
+            <li><button class="dropdown-item d-flex align-items-center gap-2" onclick="setTheme('flatly', 'assets/css/bootstrap-flatly.min.css', 'light', 'Flatly (Clean Light)')"><i class="bi bi-circle-fill text-info"></i> Flatly (Clean Light)</button></li>
+            <li><button class="dropdown-item d-flex align-items-center gap-2" onclick="setTheme('cyborg', 'assets/css/bootstrap-cyborg.min.css', 'dark', 'Cyborg (High Contrast Dark)')"><i class="bi bi-circle-fill text-dark"></i> Cyborg (High Contrast Dark)</button></li>
+            <li><button class="dropdown-item d-flex align-items-center gap-2" onclick="setTheme('pulse', 'assets/css/bootstrap-pulse.min.css', 'dark', 'Pulse (Deep Purple)')"><i class="bi bi-circle-fill text-purple"></i> Pulse (Deep Purple)</button></li>
+            <li><button class="dropdown-item d-flex align-items-center gap-2" onclick="setTheme('emerald', 'assets/css/bootstrap.min.css', 'dark', 'Emerald (Forest Dark)')"><i class="bi bi-circle-fill text-success"></i> Emerald (Forest Dark)</button></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Banner -->
+    <section class="hero-banner" id="vision">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-primary bg-opacity-25 border border-primary text-primary-light small mb-3">
+            <i class="bi bi-shield-check"></i> Standardized Enterprise Application Template
+          </div>
+          <h2 class="display-6 fw-bold text-white mb-2">AppService Platform Redesign Blueprint</h2>
+          <p class="lead text-muted mb-4">
+            A production-grade, reusable foundation engineered to be forked for any business domain. Features decoupled Spring Boot REST backend, standalone PrimeFaces Single-Page Admin Console, dynamic database-backed localization (i18n) with full RTL/LTR bidirectional support, multi-theming, hybrid multi-tenancy, intelligent multi-provider SMS routing, and native infrastructure for AI agents to safely operate across parts of the application.
+          </p>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-secondary"><i class="bi bi-boxes"></i> Multi-Module Maven</span>
+            <span class="badge bg-secondary"><i class="bi bi-cpu"></i> Spring Boot 4.1.1</span>
+            <span class="badge bg-secondary"><i class="bi bi-window"></i> PrimeFaces 14 / JoinFaces 6.1.1</span>
+            <span class="badge bg-secondary"><i class="bi bi-key-fill"></i> OAuth2 / OIDC + PKCE</span>
+            <span class="badge bg-secondary"><i class="bi bi-chat-square-dots"></i> Intelligent SMS Routing</span>
+            <span class="badge bg-secondary"><i class="bi bi-robot"></i> AI Agent (MCP) Harness</span>
+            <span class="badge bg-secondary"><i class="bi bi-search"></i> Uniform CRUD Search</span>
+          </div>
+        </div>
+        <div class="col-lg-4 text-center d-none d-lg-block">
+          <div class="p-4 rounded-3 border border-secondary bg-dark bg-opacity-50">
+            <div class="display-5 text-primary mb-2"><i class="bi bi-diagram-3"></i></div>
+            <h5 class="text-white">Clean Hexagonal Core</h5>
+            <p class="text-muted small mb-0">Domain models isolated from frameworks, databases, and UI dependencies.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: Standardized Generic CRUD Search API Architecture -->
+    <section class="mb-5" id="standard-crud-search">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <div class="feature-icon-wrapper bg-primary bg-opacity-10 text-primary mb-0">
+          <i class="bi bi-search"></i>
+        </div>
+        <div>
+          <h3 class="h4 fw-bold text-white mb-0">Standardized Generic CRUD Search API Contract</h3>
+          <p class="text-muted small mb-0">Identical signature and underlying implementation across all entities, varying only by Subject</p>
+        </div>
+      </div>
+
+      <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+          <div class="feature-card">
+            <h4><i class="bi bi-braces text-primary me-2"></i> Uniform Contract Specification</h4>
+            <p>
+              Rather than inventing disparate query parameters or custom controller endpoints for each entity, every manageable entity follows the <strong>exact same search signature</strong>:
+            </p>
+            <div class="terminal-box mb-3">
+              <div class="terminal-prompt">// Uniform Search Endpoint Pattern</div>
+              <div class="text-info">POST /api/admin/{subject}/search</div>
+              <div class="text-muted">Headers: X-Trace-Id, Authorization: Bearer &lt;token&gt;</div>
+              <div class="text-success mt-2">// Request Payload Contract (Generic across all subjects):</div>
+              <div class="text-white">{
+  "filters": [
+    { "field": "status", "operator": "EQUALS", "value": "ACTIVE" },
+    { "field": "createdAt", "operator": "BETWEEN", "value": ["2026-01-01", "2026-11-07"] }
+  ],
+  "searchQuery": "admin",
+  "logic": "AND",
+  "sorts": [{ "field": "createdAt", "direction": "DESC" }],
+  "page": 0,
+  "size": 20,
+  "traceId": "tr-9481-ac2d"
+}</div>
+            </div>
+            <p class="text-muted small mb-0">Supported operators: <span class="code-pill">EQUALS</span>, <span class="code-pill">NOT_EQUALS</span>, <span class="code-pill">CONTAINS</span>, <span class="code-pill">STARTS_WITH</span>, <span class="code-pill">GREATER_THAN</span>, <span class="code-pill">LESS_THAN</span>, <span class="code-pill">IN</span>, <span class="code-pill">BETWEEN</span>, <span class="code-pill">IS_NULL</span>.</p>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="feature-card">
+            <h4><i class="bi bi-layers text-success me-2"></i> Shared Generic Implementation Architecture</h4>
+            <p>The entire search pipeline uses a single reusable abstraction in the persistence layer:</p>
+            <ol class="text-muted small mb-3">
+              <li><strong class="text-white">GenericSpecificationBuilder&lt;T&gt;:</strong> Dynamically constructs a Spring Data JPA <span class="code-pill">Specification&lt;T&gt;</span> from the incoming JSON filter tokens via Criteria API.</li>
+              <li><strong class="text-white">BaseSearchService&lt;T, ID&gt;:</strong> Handles tenant isolation guards, authorization scope checks, and pagination cursor execution.</li>
+              <li><strong class="text-white">Standardized Envelope:</strong> Every response returns <span class="code-pill">PagedApiResponse&lt;T&gt;</span> containing:
+                <div class="p-2 rounded bg-dark border border-secondary mt-1 font-monospace text-info small">
+                  { success: true, traceId: "...", subject: "users", page: 0, size: 20, totalElements: 1250, totalPages: 63, data: [ ... ] }
+                </div>
+              </li>
+            </ol>
+            <div class="tech-pill-container">
+              <span class="tech-pill">Single Implementation</span>
+              <span class="tech-pill">JPA Criteria API</span>
+              <span class="tech-pill">Zero Duplication</span>
+              <span class="tech-pill">Uniform Envelopes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: Intelligent Multi-Provider Best-Choice SMS Gateway -->
+    <section class="mb-5" id="intelligent-sms">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <div class="feature-icon-wrapper bg-warning bg-opacity-10 text-warning mb-0">
+          <i class="bi bi-chat-square-dots-fill"></i>
+        </div>
+        <div>
+          <h3 class="h4 fw-bold text-white mb-0">Intelligent Multi-Provider Best-Choice SMS Engine</h3>
+          <p class="text-muted small mb-0">Dynamic gateway orchestrating multiple providers based on cost, delivery success rate, carrier latency, and circuit breaking</p>
+        </div>
+      </div>
+
+      <div class="hero-banner p-4 mb-4">
+        <div class="row align-items-center">
+          <div class="col-lg-7">
+            <h5 class="text-white fw-bold">Intelligent Routing &amp; Failover Architecture</h5>
+            <p class="text-muted small">
+              Rather than locking the application to a single SMS vendor, AppService implements a pluggable <strong>Multi-Provider Smart SMS Gateway</strong> (`SmsProviderGateway`). When a dispatch request is received:
+            </p>
+            <ul class="text-muted small">
+              <li><strong class="text-white">Real-Time Health &amp; Latency Scoring:</strong> Calculates rolling delivery rate and acknowledgment latency per provider (e.g. Twilio, Kavenegar, FarazSms, Infobip, AWS SNS).</li>
+              <li><strong class="text-white">Cost &amp; Carrier Optimization:</strong> Evaluates destination prefix (domestic vs international) and selects the provider with the lowest cost per delivered message.</li>
+              <li><strong class="text-white">Circuit Breaker &amp; Instant Fallback:</strong> If Provider A fails 3 times consecutively or latency exceeds 1,200ms, the router instantly reroutes to Provider B without dropping the message.</li>
+              <li><strong class="text-white">Fast-Track OTP Priority:</strong> Authentication tokens bypass bulk promotional queues through a dedicated priority channel.</li>
+            </ul>
+          </div>
+          <div class="col-lg-5">
+            <div class="terminal-box">
+              <div class="terminal-prompt">// Intelligent SMS Router Decision Pipeline</div>
+              <div class="text-muted">1. Inbound SMS: +98912XXXXXXX (Type: OTP_TOKEN)</div>
+              <div class="text-info">2. Candidate Providers: [Kavenegar, FarazSms, Twilio]</div>
+              <div class="text-white">3. Health Check: Kavenegar (Score: 99.4%, Latency: 320ms, Cost: $0.008)</div>
+              <div class="text-white">4. Health Check: FarazSms (Score: 98.1%, Latency: 480ms, Cost: $0.009)</div>
+              <div class="text-success">5. Decision: Kavenegar Selected &rarr; Dispatched (Trace: sms-7a1b)</div>
+              <div class="text-muted">6. Fallback Buffer: FarazSms armed if DLR not received in 3000ms</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: Dedicated Administrative Control Panels -->
+    <section class="mb-5">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <div class="feature-icon-wrapper bg-success bg-opacity-10 text-success mb-0">
+          <i class="bi bi-grid-1x2-fill"></i>
+        </div>
+        <div>
+          <h3 class="h4 fw-bold text-white mb-0">Dedicated Administrative Control Panels Specification</h3>
+          <p class="text-muted small mb-0">Eight specialized management dashboards designed for operator visibility and platform control</p>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <!-- 1. Audit Log Dashboard -->
+        <div class="col-md-6" id="panel-audit">
+          <div class="feature-card">
+            <h4><i class="bi bi-funnel text-danger me-2"></i> 1. Audit Log Dashboard (Trace Filter Engine)</h4>
+            <p>Provides deep query capabilities over immutable security and business event logs. Allows filtering by correlation tokens across distributed transactions.</p>
+            <ul class="text-muted small mb-3">
+              <li><strong class="text-white">Trace Filters:</strong> Query by <span class="code-pill">traceId</span>, <span class="code-pill">correlationId</span>, <span class="code-pill">spanId</span>, actor ID, client IP, action verb, and UTC date-time range.</li>
+              <li><strong class="text-white">Before/After Diff Inspector:</strong> Side-by-side JSON diff viewer highlighting modified fields with sensitive data and credentials automatically redacted.</li>
+            </ul>
+            <div class="tech-pill-container"><span class="tech-pill">Trace Field Filters</span><span class="tech-pill">JSON Diffs</span><span class="tech-pill">Tamper-Proof</span></div>
+          </div>
+        </div>
+
+        <!-- 2. Job Scheduler Management Panel -->
+        <div class="col-md-6" id="panel-scheduler">
+          <div class="feature-card">
+            <h4><i class="bi bi-clock-history text-warning me-2"></i> 2. Job Scheduler Management Panel</h4>
+            <p>Clustered Quartz and Spring Scheduler dashboard giving full oversight over background batches and automated triggers.</p>
+            <ul class="text-muted small mb-3">
+              <li><strong class="text-white">Trigger Table:</strong> Displays cron expressions, previous fire time, next scheduled run, and node ownership.</li>
+              <li><strong class="text-white">Manual Controls:</strong> "Fire Now", "Pause Trigger", "Resume", and "Abort Active Thread".</li>
+              <li><strong class="text-white">Execution Logs:</strong> Historical duration charts, retry counts, and full stack-traces on error.</li>
+            </ul>
+            <div class="tech-pill-container"><span class="tech-pill">Clustered Quartz</span><span class="tech-pill">Fire Now</span><span class="tech-pill">Failure Diagnostics</span></div>
+          </div>
+        </div>
+
+        <!-- 3. Mail Management Panel -->
+        <div class="col-md-6" id="panel-mail">
+          <div class="feature-card">
+            <h4><i class="bi bi-envelope-at text-info me-2"></i> 3. Mail Management Panel</h4>
+            <p>Comprehensive email delivery and template administration console supporting multiple outbound SMTP and API transports.</p>
+            <ul class="text-muted small mb-3">
+              <li><strong class="text-white">Provider Setup:</strong> Configure primary and fallback SMTP / API credentials (SendGrid, SES, Mailgun).</li>
+              <li><strong class="text-white">Template Studio:</strong> Visual HTML/Jinja template editor with live preview, token placeholders (`{{resetLink}}`, `{{accountName}}`), and instant test-send dispatch.</li>
+              <li><strong class="text-white">Delivery Ledger:</strong> Monitor sent messages, bounce rates, spam complaints, and retry queues.</li>
+            </ul>
+            <div class="tech-pill-container"><span class="tech-pill">Multi-SMTP</span><span class="tech-pill">Live Template Editor</span><span class="tech-pill">Bounce Analytics</span></div>
+          </div>
+        </div>
+
+        <!-- 4. SMS Management Panel -->
+        <div class="col-md-6" id="panel-sms">
+          <div class="feature-card">
+            <h4><i class="bi bi-phone text-warning me-2"></i> 4. SMS Management Panel</h4>
+            <p>Control center for the Intelligent Multi-Provider SMS Engine. Configure vendor weights, pricing thresholds, and delivery rules.</p>
+            <ul class="text-muted small mb-3">
+              <li><strong class="text-white">Routing Strategy:</strong> Set active algorithm (Cost-Optimized, Latency-Optimized, or Balanced).</li>
+              <li><strong class="text-white">Carrier Health Monitor:</strong> Live status indicators for Kavenegar, FarazSms, Twilio, and AWS SNS.</li>
+              <li><strong class="text-white">Template &amp; Test Utility:</strong> Regex pattern approval, phone number testing tool, and balance quota alerts.</li>
+            </ul>
+            <div class="tech-pill-container"><span class="tech-pill">Smart Routing Policy</span><span class="tech-pill">Vendor Health</span><span class="tech-pill">Balance Quota</span></div>
+          </div>
+        </div>
+
+        <!-- 5. Monitoring & Operations Panel -->
+        <div class="col-md-6" id="panel-ops">
+          <div class="feature-card">
+            <h4><i class="bi bi-activity text-primary me-2"></i> 5. Monitoring &amp; Operations Panel</h4>
+            <p>Telemetry dashboard aggregating runtime application metrics, database connection pools, memory states, and health probes.</p>
+            <ul class="text-muted small mb-3">
+              <li><strong class="text-white">API Latency Percentiles:</strong> Real-time P50, P95, and P99 response durations across all REST endpoints.</li>
+              <li><strong class="text-white">Database Pool:</strong> HikariCP active connections, idle threads, pending acquires, and query latency.</li>
+              <li><strong class="text-white">JVM &amp; Circuit Breakers:</strong> Heap utilization, garbage collection pause frequency, and Resilience4j circuit states.</li>
+            </ul>
+            <div class="tech-pill-container"><span class="tech-pill">Spring Actuator</span><span class="tech-pill">HikariCP Metrics</span><span class="tech-pill">Circuit Breakers</span></div>
+          </div>
+        </div>
+
+        <!-- 6. Tenant Management Panel -->
+        <div class="col-md-6" id="panel-tenants">
+          <div class="feature-card">
+            <h4><i class="bi bi-buildings text-success me-2"></i> 6. Tenant Management Panel</h4>
+            <p>Multi-tenancy administration console managing customer organizations and the dynamic Hybrid Isolation Model.</p>
+            <ul class="text-muted small mb-3">
+              <li><strong class="text-white">Isolation Strategy Picker:</strong> Assign tenant to Tier 1 (Shared DB column), Tier 2 (PostgreSQL Schema), or Tier 3 (Dedicated DB).</li>
+              <li><strong class="text-white">Provisioning Wizard:</strong> Automates Liquibase migrations for new schemas or databases upon tenant onboarding.</li>
+              <li><strong class="text-white">Quotas &amp; Governance:</strong> Maximum registered users, document storage limits, API rate quotas, and tenant kill-switch.</li>
+            </ul>
+            <div class="tech-pill-container"><span class="tech-pill">Hybrid Strategy Router</span><span class="tech-pill">Schema Provisioner</span><span class="tech-pill">Tenant Quotas</span></div>
+          </div>
+        </div>
+
+        <!-- 7. Client & API Key Management Panel -->
+        <div class="col-md-6" id="panel-clients">
+          <div class="feature-card">
+            <h4><i class="bi bi-key text-info me-2"></i> 7. Client &amp; API Key Management Panel</h4>
+            <p>Administration panel for OAuth2 / OIDC client applications, third-party API consumers, and automated service accounts.</p>
+            <ul class="text-muted small mb-3">
+              <li><strong class="text-white">Client Registration:</strong> Issue Client IDs and cryptographically secure secrets (stored as SHA-256 hashes).</li>
+              <li><strong class="text-white">Grant Types &amp; Scopes:</strong> Configure PKCE requirement, Authorization Code, Client Credentials, and specific permission scopes.</li>
+              <li><strong class="text-white">Rate Limits &amp; Expiration:</strong> Token TTL, rotation schedules, and per-client token bucket rate limiters.</li>
+            </ul>
+            <div class="tech-pill-container"><span class="tech-pill">OAuth2 Clients</span><span class="tech-pill">PKCE Enforcement</span><span class="tech-pill">Hashed Secrets</span></div>
+          </div>
+        </div>
+
+        <!-- 8. AI Agent Infrastructure Plane -->
+        <div class="col-md-6" id="panel-ai">
+          <div class="feature-card">
+            <h4><i class="bi bi-robot text-purple me-2"></i> 8. AI Agent Infrastructure &amp; Tool Plane</h4>
+            <p>Specialized control plane and execution harness enabling autonomous AI coding and operational agents to safely interact with the application.</p>
+            <ul class="text-muted small mb-3">
+              <li><strong class="text-white">Model Context Protocol (MCP) Endpoints:</strong> Exposes structured tool interfaces, OpenAPI schemas, and read-only resource feeds for AI agents.</li>
+              <li><strong class="text-white">Role-Scoped Agent Tokens:</strong> AI agents operate under least-privilege service accounts with strict blast-radius controls.</li>
+              <li><strong class="text-white">Execution Audit &amp; Guardrails:</strong> Every AI tool call, argument payload, generated diff, and token count is permanently recorded in the audit trail. Destructive actions require human approval tokens.</li>
+            </ul>
+            <div class="tech-pill-container"><span class="tech-pill">MCP Protocol</span><span class="tech-pill">Bounded Agent Roles</span><span class="tech-pill">Tool Audit Trail</span><span class="tech-pill">Human-in-the-Loop</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: Dependency Chain & Phased Implementation Roadmap -->
+    <section class="mb-5" id="dependency-graph">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <div class="feature-icon-wrapper bg-primary bg-opacity-10 text-primary mb-0">
+          <i class="bi bi-bezier2"></i>
+        </div>
+        <div>
+          <h3 class="h4 fw-bold text-white mb-0">Dependency Chain &amp; Execution Prerequisite Hierarchy</h3>
+          <p class="text-muted small mb-0">Strict topological ordering: which module must be built before another can proceed</p>
+        </div>
+      </div>
+
+      <div class="hero-banner p-4 mb-4">
+        <h5 class="text-white fw-bold mb-3"><i class="bi bi-diagram-3-fill text-primary me-2"></i> Topological Dependency Matrix</h5>
+        
+        <div class="row g-3">
+          <div class="col-md-3">
+            <div class="dep-node border-primary">
+              <span class="badge dep-badge-p0 mb-2">Step 1 (Root Prerequisite)</span>
+              <h6 class="text-white fw-bold">appservice-core-domain</h6>
+              <p class="small text-muted mb-0">User, Role, Permission, Tenant, AuditEvent, SmsMessage, Job POJOs &amp; Outbound Ports. Depended upon by all modules.</p>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="dep-node border-info">
+              <span class="badge dep-badge-p0 mb-2">Step 2 (Data &amp; Security SPI)</span>
+              <h6 class="text-white fw-bold">persistence &amp; security</h6>
+              <p class="small text-muted mb-0">GenericSpecificationBuilder, Hybrid Multi-Tenant routing datasource, OAuth2 server, PKCE verifiers, PBKDF2 encryption.</p>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="dep-node border-warning">
+              <span class="badge dep-badge-p0 mb-2">Step 3 (Engines &amp; REST)</span>
+              <h6 class="text-white fw-bold">smart-sms, i18n &amp; api-rest</h6>
+              <p class="small text-muted mb-0">Intelligent SMS provider router, dynamic DB i18n, Quartz scheduler, uniform CRUD search controller, MCP server endpoints.</p>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="dep-node border-success">
+              <span class="badge dep-badge-p1 mb-2">Step 4 (Frontend UI Plane)</span>
+              <h6 class="text-white fw-bold">ui-primefaces &amp; 8 Panels</h6>
+              <p class="small text-muted mb-0">Single-page layout, dynamic include handler, theme switcher, RTL layout, 8 specialized dashboard backing beans.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phased Roadmap P0 - P2 -->
+      <div class="row g-4" id="phased-roadmap">
+        <div class="col-md-4">
+          <div class="feature-card border-danger">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="badge dep-badge-p0">Phase 0 — Foundation (P0)</span>
+              <span class="text-danger small fw-bold">Core Invariants</span>
+            </div>
+            <h4>Platform Kernel</h4>
+            <ul class="text-muted small mb-0">
+              <li>Clean Domain POJO core &amp; ports.</li>
+              <li>Hybrid Multi-Tenant routing datasource.</li>
+              <li>OAuth2.1 / OIDC + PKCE Authentication.</li>
+              <li>Uniform Generic CRUD Search Specification.</li>
+              <li>Dynamic DB-backed i18n with RTL layout.</li>
+              <li>Immutable audit logging for sensitive actions.</li>
+              <li>PrimeFaces Single-Page layout skeleton.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="feature-card border-warning">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="badge dep-badge-p1">Phase 1 — Operational Control (P1)</span>
+              <span class="text-warning small fw-bold">Management Panels</span>
+            </div>
+            <h4>Management Hub</h4>
+            <ul class="text-muted small mb-0">
+              <li>Audit Log Dashboard with Trace Filters.</li>
+              <li>Job Scheduler Management Panel.</li>
+              <li>Mail Management Panel &amp; Template Studio.</li>
+              <li>Intelligent Multi-Provider SMS Router &amp; Panel.</li>
+              <li>Monitoring &amp; Operations Telemetry Panel.</li>
+              <li>Tenant Registry &amp; Isolation Provisioner.</li>
+              <li>OAuth2 Client &amp; API Key Management.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="feature-card border-primary">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="badge dep-badge-p2">Phase 2 — Advanced (P2)</span>
+              <span class="text-primary small fw-bold">Ecosystem Ready</span>
+            </div>
+            <h4>AI &amp; Enterprise Extensions</h4>
+            <ul class="text-muted small mb-0">
+              <li>AI Agent Infrastructure Plane (MCP tools).</li>
+              <li>Automated Backup &amp; verified Restore drill.</li>
+              <li>Async CSV/Excel chunked Import &amp; Export.</li>
+              <li>Feature Flag dynamic targeting engine.</li>
+              <li>Emergency Maintenance Mode switch.</li>
+              <li>IoT, SaaS, and E-commerce domain starter packs.</li>
+              <li>MFA (TOTP/WebAuthn) for privileged roles.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: Interactive Blueprint Simulators & Spec Labs -->
+    <section class="mb-5" id="interactive-console">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <div class="feature-icon-wrapper bg-primary bg-opacity-10 text-primary mb-0">
+          <i class="bi bi-tv"></i>
+        </div>
+        <div>
+          <h3 class="h4 fw-bold text-white mb-0">Interactive 8-Panel Admin Console Lab</h3>
+          <p class="text-muted small mb-0">Simulate single-page AJAX panel switching across all eight specialized administrative dashboards</p>
+        </div>
+      </div>
+
+      <!-- Mockup Window Studio -->
+      <div class="mockup-window mb-4">
+        <div class="mockup-header-bar">
+          <div class="mockup-dots">
+            <span class="mockup-dot dot-red"></span>
+            <span class="mockup-dot dot-yellow"></span>
+            <span class="mockup-dot dot-green"></span>
+          </div>
+          <div class="small font-monospace text-muted">
+            <i class="bi bi-window"></i> AppService Admin Console — Single-Page AJAX Runtime Simulator
+          </div>
+          <span class="badge bg-primary">PrimeFaces 14 + JoinFaces</span>
+        </div>
+
+        <div class="mockup-layout-body">
+          <!-- Mockup Navigation Side Menu -->
+          <div class="mockup-side-menu">
+            <div class="text-muted small text-uppercase fw-bold px-2 mb-2">Dedicated Panels</div>
+            <button class="mockup-btn active" onclick="switchMockPanel('audit', this)">
+              <i class="bi bi-funnel"></i> Audit Logs (Trace Filters)
+            </button>
+            <button class="mockup-btn" onclick="switchMockPanel('scheduler', this)">
+              <i class="bi bi-clock-history"></i> Job Scheduler
+            </button>
+            <button class="mockup-btn" onclick="switchMockPanel('mail', this)">
+              <i class="bi bi-envelope-at"></i> Mail Management
+            </button>
+            <button class="mockup-btn" onclick="switchMockPanel('sms', this)">
+              <i class="bi bi-phone"></i> SMS Management
+            </button>
+            <button class="mockup-btn" onclick="switchMockPanel('monitoring', this)">
+              <i class="bi bi-activity"></i> Monitoring &amp; Operations
+            </button>
+            <button class="mockup-btn" onclick="switchMockPanel('tenants', this)">
+              <i class="bi bi-buildings"></i> Tenant Management
+            </button>
+            <button class="mockup-btn" onclick="switchMockPanel('clients', this)">
+              <i class="bi bi-key"></i> Client Management
+            </button>
+            <button class="mockup-btn" onclick="switchMockPanel('ai', this)">
+              <i class="bi bi-robot"></i> AI Agent Infrastructure
+            </button>
+          </div>
+
+          <!-- Mockup Stage Content -->
+          <div class="mockup-stage" id="mockPanelContent">
+            <!-- Dynamic Content Injected by switchMockPanel() -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive SMS Provider Router Lab -->
+      <div class="row g-4 mb-4" id="sms-router-sim">
+        <div class="col-lg-6">
+          <div class="feature-card">
+            <h4><i class="bi bi-shuffle text-warning me-2"></i> Intelligent SMS Router Lab</h4>
+            <p class="text-muted small">Simulate destination carrier routing and automatic failover calculation:</p>
+            
+            <div class="mb-3">
+              <label class="form-label small text-muted">Test Recipient Phone Number:</label>
+              <div class="input-group input-group-sm">
+                <input type="text" class="form-control bg-dark border-secondary text-white font-monospace" id="smsPhoneInput" value="+989121234567">
+                <select class="form-select bg-dark border-secondary text-white" id="smsTypeSelect">
+                  <option value="OTP">OTP Token (Latency Priority)</option>
+                  <option value="BULK">Bulk Notification (Cost Priority)</option>
+                  <option value="ALERT">Emergency Alert (High Redundancy)</option>
+                </select>
+                <button class="btn btn-warning" type="button" onclick="runSmsRouterSim()">Simulate Routing</button>
+              </div>
+            </div>
+
+            <div class="p-3 rounded bg-dark border border-secondary" id="smsSimResult">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="badge bg-success font-monospace" id="smsSelectedProvider">SELECTED: Kavenegar (Primary)</span>
+                <span class="badge bg-info" id="smsLatencyScore">LATENCY: 310ms • COST: $0.008</span>
+              </div>
+              <p class="small text-white mb-1" id="smsRouteReason">Decision: Iranian MCI prefix (+98912) routed through domestic low-latency direct carrier connection.</p>
+              <div class="small text-muted font-monospace" id="smsFallbackInfo">Fallback Chain: FarazSms (Priority 2) &rarr; Twilio (Priority 3)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REST API Contract Explorer (Uniform CRUD Search) -->
+        <div class="col-lg-6" id="api-spec-explorer">
+          <div class="feature-card">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h4 class="mb-0"><i class="bi bi-terminal text-info me-2"></i> Standard CRUD Search Explorer</h4>
+              <button class="btn btn-sm btn-outline-secondary" onclick="copyApiCurl()"><i class="bi bi-clipboard"></i> Copy cURL</button>
+            </div>
+            <p class="text-muted small">Inspect identical search API contract executed across different subjects:</p>
+            
+            <div class="list-group list-group-flush mb-3">
+              <button class="list-group-item list-group-item-action bg-dark text-white border-secondary active" onclick="selectApi('/api/admin/users/search', this)">
+                <span class="badge bg-primary me-2">POST</span> <code>/api/admin/users/search</code>
+              </button>
+              <button class="list-group-item list-group-item-action bg-dark text-white border-secondary" onclick="selectApi('/api/admin/audit-events/search', this)">
+                <span class="badge bg-primary me-2">POST</span> <code>/api/admin/audit-events/search</code>
+              </button>
+              <button class="list-group-item list-group-item-action bg-dark text-white border-secondary" onclick="selectApi('/api/admin/tenants/search', this)">
+                <span class="badge bg-primary me-2">POST</span> <code>/api/admin/tenants/search</code>
+              </button>
+              <button class="list-group-item list-group-item-action bg-dark text-white border-secondary" onclick="selectApi('/api/admin/sms/search', this)">
+                <span class="badge bg-primary me-2">POST</span> <code>/api/admin/sms/search</code>
+              </button>
+            </div>
+
+            <pre class="terminal-box mb-0 p-3" id="apiPreview" style="max-height: 180px;"></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live i18n & RTL Tester Lab -->
+      <div class="row g-4 mb-4" id="i18n-simulator">
+        <div class="col-12">
+          <div class="feature-card">
+            <h4><i class="bi bi-translate text-warning me-2"></i> Live Dynamic i18n &amp; RTL Tester</h4>
+            <p class="text-muted small">Select a language to see real-time database translation lookup and font adaptation:</p>
+            
+            <div class="btn-group mb-3" role="group">
+              <button type="button" class="btn btn-outline-primary active" onclick="simulateI18n('en', this)">English (LTR)</button>
+              <button type="button" class="btn btn-outline-primary" onclick="simulateI18n('fa', this)">Persian (فارسی - RTL)</button>
+              <button type="button" class="btn btn-outline-primary" onclick="simulateI18n('ar', this)">Arabic (العربية - RTL)</button>
+              <button type="button" class="btn btn-outline-primary" onclick="simulateI18n('fr', this)">French (Français - LTR)</button>
+            </div>
+
+            <div class="p-3 rounded bg-dark border border-secondary" id="i18nOutputBox">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="badge bg-secondary font-monospace" id="i18nKeyName">app.welcome.headline</span>
+                <span class="badge bg-success" id="i18nCacheState">CACHE: HIT (0.1ms)</span>
+              </div>
+              <h5 class="text-white mb-2" id="i18nSampleText">Welcome to AppService Enterprise Control Plane</h5>
+              <p class="text-muted small mb-0" id="i18nSampleSub">Empowering modular architectures with zero boilerplate, smart SMS routing, and AI infrastructure.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: Acceptance Criteria & Verification Matrix -->
+    <section class="mb-5" id="qa-acceptance">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <div class="feature-icon-wrapper bg-success bg-opacity-10 text-success mb-0">
+          <i class="bi bi-patch-check"></i>
+        </div>
+        <div>
+          <h3 class="h4 fw-bold text-white mb-0">Acceptance Criteria &amp; Verification Protocol</h3>
+          <p class="text-muted small mb-0">Strict requirements validating that the platform meets the highest engineering standards</p>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-3">
+          <div class="feature-card text-center">
+            <div class="display-6 text-success mb-2"><i class="bi bi-shield-check"></i></div>
+            <h6 class="text-white fw-bold">100% Auth Checked</h6>
+            <p class="small text-muted mb-0">Every endpoint verified against unauthorized and cross-tenant access attempts.</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="feature-card text-center">
+            <div class="display-6 text-primary mb-2"><i class="bi bi-arrow-repeat"></i></div>
+            <h6 class="text-white fw-bold">Zero Search Duplication</h6>
+            <p class="small text-muted mb-0">All CRUD search endpoints share identical GenericSpecificationBuilder contract.</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="feature-card text-center">
+            <div class="display-6 text-warning mb-2"><i class="bi bi-chat-square-dots"></i></div>
+            <h6 class="text-white fw-bold">Sub-Second SMS Failover</h6>
+            <p class="small text-muted mb-0">Circuit breaker activates alternative SMS vendor upon 3 consecutive timeouts.</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="feature-card text-center">
+            <div class="display-6 text-purple mb-2"><i class="bi bi-robot"></i></div>
+            <h6 class="text-white fw-bold">Audited AI Agent Tools</h6>
+            <p class="small text-muted mb-0">All MCP tool executions permanently recorded with token counts and parameter diffs.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="pt-4 mt-5 border-top border-secondary text-muted small d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div>
+        <strong>AppService Enterprise Platform</strong> — Authoritative Architectural Redesign Specification
+      </div>
+      <div>
+        <span>Built with Spring Boot 4.1.1 • PrimeFaces 14 • JoinFaces 6.1.1 • OAuth2.1 OIDC • MCP Harness</span>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- Local Bootstrap 5 Bundle JS -->
+  <script src="assets/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // =========================================================================
+    // Theme Switcher & Live Stylesheet Replacement
+    // =========================================================================
+    function setTheme(themeName, cssPath, bsTheme, label) {
+      document.documentElement.setAttribute('data-theme', themeName);
+      document.documentElement.setAttribute('data-bs-theme', bsTheme);
+      
+      const linkTag = document.getElementById('bootstrap-theme-link');
+      if (linkTag && cssPath) {
+        linkTag.setAttribute('href', cssPath);
+      }
+      
+      const labelTag = document.getElementById('activeThemeLabel');
+      if (labelTag) {
+        labelTag.innerText = `Theme: ${label}`;
+      }
+
+      document.querySelectorAll('#themeDropdownBtn + .dropdown-menu .dropdown-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.innerText.includes(label.split(' ')[0])) {
+          item.classList.add('active');
+        }
+      });
+
+      localStorage.setItem('appservice_redesign_theme', JSON.stringify({ themeName, cssPath, bsTheme, label }));
+    }
+
+    // =========================================================================
+    // Bidirectional Layout (LTR / RTL) Switcher
+    // =========================================================================
+    let currentDir = 'ltr';
+    function toggleRTL() {
+      const html = document.documentElement;
+      const btnLabel = document.getElementById('rtlBtnLabel');
+      if (currentDir === 'ltr') {
+        html.setAttribute('dir', 'rtl');
+        currentDir = 'rtl';
+        if (btnLabel) btnLabel.innerText = 'Direction: RTL (فارسی / العربية)';
+      } else {
+        html.setAttribute('dir', 'ltr');
+        currentDir = 'ltr';
+        if (btnLabel) btnLabel.innerText = 'Direction: LTR (Standard)';
+      }
+    }
+
+    // =========================================================================
+    // Sidebar Live Filter
+    // =========================================================================
+    function filterSidebar() {
+      const input = document.getElementById('featureSearch');
+      const filter = input.value.toLowerCase();
+      const links = document.querySelectorAll('.nav-list li');
+
+      links.forEach(li => {
+        const text = li.innerText.toLowerCase();
+        if (text.includes(filter)) {
+          li.style.display = '';
+        } else {
+          li.style.display = 'none';
+        }
+      });
+    }
+
+    // =========================================================================
+    // Interactive Admin Console 8-Panel Mockup
+    // =========================================================================
+    const mockPanels = {
+      audit: {
+        title: "Audit Log Dashboard (Trace Filter Engine)",
+        res: "panels/audit_log_dashboard.xhtml",
+        desc: "Deep traceability ledger. Filter immutable action logs by correlationId, traceId, spanId, actorId, client IP, outcome, and inspect side-by-side JSON before/after diffs with secret masking."
+      },
+      scheduler: {
+        title: "Job Scheduler Management Panel",
+        res: "panels/job_scheduler_panel.xhtml",
+        desc: "Clustered Quartz and Spring Scheduler console. View cron triggers, fire jobs on-demand, pause/resume execution threads, and view historical failure stack-traces."
+      },
+      mail: {
+        title: "Mail Management Panel",
+        res: "panels/mail_management_panel.xhtml",
+        desc: "Outbound email configuration and template studio. Live preview with Jinja2 token substitution, test-send dispatch, and delivery bounce ledger."
+      },
+      sms: {
+        title: "SMS Management Panel (Intelligent Multi-Provider)",
+        res: "panels/sms_management_panel.xhtml",
+        desc: "Orchestrate SMS gateways. Configure auto-routing weights (cost vs latency), view live provider health scores, configure OTP fast-tracks, and test recipient dispatch."
+      },
+      monitoring: {
+        title: "Monitoring & Operations Panel",
+        res: "panels/monitoring_operations_panel.xhtml",
+        desc: "Real-time system observability. Monitor API latency percentiles (P50, P95, P99), HikariCP database pool utilization, JVM memory GC pauses, and circuit breaker states."
+      },
+      tenants: {
+        title: "Tenant Management Panel",
+        res: "panels/tenant_management_panel.xhtml",
+        desc: "Hybrid Multi-Tenant control center. Provision new tenants, assign isolation strategy (Shared DB column, PostgreSQL Schema, or Dedicated DB), and monitor storage/API quotas."
+      },
+      clients: {
+        title: "Client & API Key Management Panel",
+        res: "panels/client_management_panel.xhtml",
+        desc: "OAuth2 and OIDC application registration. Issue Client IDs, manage SHA-256 hashed secret keys, enforce PKCE verification, and configure token bucket rate limits."
+      },
+      ai: {
+        title: "AI Agent Infrastructure & Tool Plane",
+        res: "panels/ai_agent_infrastructure_panel.xhtml",
+        desc: "Management console for autonomous AI coding and operational agents. Exposes Model Context Protocol (MCP) tool endpoints, role-scoped tokens, execution audit diffs, and approval gates."
+      }
+    };
+
+    function switchMockPanel(key, btn) {
+      document.querySelectorAll('.mockup-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      const p = mockPanels[key];
+      const container = document.getElementById('mockPanelContent');
+      if (!p || !container) return;
+
+      container.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center pb-3 mb-3 border-bottom border-secondary flex-wrap gap-2">
+          <div>
+            <h4 class="text-white mb-0">${p.title}</h4>
+            <span class="small text-muted font-monospace">Resource: <code>${p.res}</code></span>
+          </div>
+          <span class="badge bg-primary">DYNAMIC PRIME-FACES &lt;ui:include&gt;</span>
+        </div>
+        <p class="text-muted small">${p.desc}</p>
+        <div class="p-3 rounded-2 bg-dark border border-secondary mt-3">
+          <div class="small text-success fw-bold mb-1"><i class="bi bi-check-circle-fill"></i> Panel Mounted via AJAX ViewScope</div>
+          <div class="font-monospace small text-muted">panelHandler.activePanel = "${p.title}"</div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // Intelligent SMS Router Simulator
+    // =========================================================================
+    function runSmsRouterSim() {
+      const phone = document.getElementById('smsPhoneInput').value.trim();
+      const type = document.getElementById('smsTypeSelect').value;
+      
+      const badge = document.getElementById('smsSelectedProvider');
+      const score = document.getElementById('smsLatencyScore');
+      const reason = document.getElementById('smsRouteReason');
+      const fallback = document.getElementById('smsFallbackInfo');
+
+      if (phone.startsWith('+98')) {
+        if (type === 'OTP') {
+          badge.className = 'badge bg-success font-monospace';
+          badge.innerText = 'SELECTED: Kavenegar (Primary Direct Route)';
+          score.innerText = 'LATENCY: 290ms • COST: $0.008 • SCORE: 99.6%';
+          reason.innerText = 'Iranian domestic mobile prefix detected. Selected Kavenegar via low-latency OTP direct connection.';
+          fallback.innerText = 'Fallback Chain: FarazSms (Failover < 800ms) &rarr; Twilio Global Gateway';
+        } else {
+          badge.className = 'badge bg-info font-monospace';
+          badge.innerText = 'SELECTED: FarazSms (Cost Optimized)';
+          score.innerText = 'LATENCY: 440ms • COST: $0.005 • SCORE: 98.4%';
+          reason.innerText = 'Bulk notification type selected. Evaluated lowest cost per message for domestic network.';
+          fallback.innerText = 'Fallback Chain: Kavenegar &rarr; Twilio';
+        }
+      } else {
+        badge.className = 'badge bg-primary font-monospace';
+        badge.innerText = 'SELECTED: Twilio International Gateway';
+        score.innerText = 'LATENCY: 380ms • COST: $0.035 • SCORE: 99.8%';
+        reason.innerText = 'Non-domestic international recipient. Routed directly to global Tier-1 telecom gateway.';
+        fallback.innerText = 'Fallback Chain: AWS SNS Global &rarr; Infobip';
+      }
+    }
+
+    // =========================================================================
+    // Dynamic i18n Simulator Data & Method
+    // =========================================================================
+    const i18nTranslations = {
+      en: {
+        dir: "ltr",
+        key: "app.welcome.headline",
+        headline: "Welcome to AppService Enterprise Control Plane",
+        sub: "Empowering modular architectures with zero boilerplate, smart SMS routing, and AI infrastructure."
+      },
+      fa: {
+        dir: "rtl",
+        key: "app.welcome.headline",
+        headline: "به پنل کنترل یکپارچه پلتفرم سازمانی خوش آمدید",
+        sub: "توسعه چابک سامانه‌ها بر پایه معماری ماژولار، مسیریابی هوشمند پیامک و زیرساخت ارتباط با عامل‌های هوش مصنوعی."
+      },
+      ar: {
+        dir: "rtl",
+        key: "app.welcome.headline",
+        headline: "مرحبًا بك في لوحة التحكم الإدارية الموحدة",
+        sub: "تمكين البنى البرمجية المعيارية بأعلى معايير الأمان، والتوجيه الذكي للرسائل، وبنية الوكلاء الأذكياء."
+      },
+      fr: {
+        dir: "ltr",
+        key: "app.welcome.headline",
+        headline: "Bienvenue sur le panneau de contrôle AppService",
+        sub: "Renforcer les architectures modulaires avec zéro code superflu, routage SMS intelligent et infrastructure d'agents IA."
+      }
+    };
+
+    function simulateI18n(lang, btn) {
+      if (btn) {
+        btn.parentElement.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+
+      const item = i18nTranslations[lang];
+      if (!item) return;
+
+      const headline = document.getElementById('i18nSampleText');
+      const sub = document.getElementById('i18nSampleSub');
+      const box = document.getElementById('i18nOutputBox');
+      
+      if (headline) headline.innerText = item.headline;
+      if (sub) sub.innerText = item.sub;
+      if (box) {
+        box.setAttribute('dir', item.dir);
+        box.style.textAlign = item.dir === 'rtl' ? 'right' : 'left';
+      }
+    }
+
+    // =========================================================================
+    // REST API Explorer Payloads (Uniform CRUD Search)
+    // =========================================================================
+    const apiPayloads = {
+      '/api/admin/users/search': `{\n  "success": true,\n  "traceId": "tr-users-9a21",\n  "subject": "users",\n  "page": 0,\n  "size": 20,\n  "totalElements": 1250,\n  "totalPages": 63,\n  "executionTimeMs": 14,\n  "data": [\n    {\n      "id": "usr_94a821",\n      "username": "admin_sys",\n      "email": "admin@appservice.internal",\n      "status": "ACTIVE",\n      "tenantId": "tenant_system"\n    }\n  ]\n}`,
+      '/api/admin/audit-events/search': `{\n  "success": true,\n  "traceId": "tr-audit-881c",\n  "subject": "audit-events",\n  "page": 0,\n  "size": 20,\n  "totalElements": 84200,\n  "totalPages": 4210,\n  "executionTimeMs": 22,\n  "data": [\n    {\n      "id": "aud_1082",\n      "traceId": "tr-req-5921",\n      "actor": "admin_sys",\n      "action": "UPDATE_ROLE",\n      "outcome": "SUCCESS",\n      "timestamp": "2026-11-07T02:15:30Z"\n    }\n  ]\n}`,
+      '/api/admin/tenants/search': `{\n  "success": true,\n  "traceId": "tr-tenants-772a",\n  "subject": "tenants",\n  "page": 0,\n  "size": 20,\n  "totalElements": 48,\n  "totalPages": 3,\n  "executionTimeMs": 8,\n  "data": [\n    {\n      "id": "tnt_corp_a",\n      "name": "Enterprise Corp A",\n      "strategy": "POSTGRESQL_SCHEMA",\n      "status": "ACTIVE"\n    }\n  ]\n}`,
+      '/api/admin/sms/search': `{\n  "success": true,\n  "traceId": "tr-sms-441d",\n  "subject": "sms-logs",\n  "page": 0,\n  "size": 20,\n  "totalElements": 15420,\n  "totalPages": 771,\n  "executionTimeMs": 11,\n  "data": [\n    {\n      "id": "sms_9012",\n      "recipient": "+989121234567",\n      "provider": "Kavenegar",\n      "status": "DELIVERED",\n      "latencyMs": 288\n    }\n  ]\n}`
+    };
+
+    let currentApi = '/api/admin/users/search';
+    function selectApi(endpoint, btn) {
+      currentApi = endpoint;
+      if (btn) {
+        btn.parentElement.querySelectorAll('.list-group-item').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      const pre = document.getElementById('apiPreview');
+      if (pre) pre.innerText = apiPayloads[endpoint] || 'No payload sample';
+    }
+
+    function copyApiCurl() {
+      const curl = `curl -X POST http://localhost:8080${currentApi} \\
+  -H "Authorization: Bearer <JWT_TOKEN>" \\
+  -H "Content-Type: application/json" \\
+  -d '{"filters":[{"field":"status","operator":"EQUALS","value":"ACTIVE"}],"page":0,"size":20}'`;
+      navigator.clipboard.writeText(curl).then(() => {
+        alert('Copied cURL command to clipboard!');
+      });
+    }
+
+    // Initialize Default States on DOM Load
+    document.addEventListener('DOMContentLoaded', () => {
+      switchMockPanel('audit');
+      selectApi('/api/admin/users/search');
+
+      const savedTheme = localStorage.getItem('appservice_redesign_theme');
+      if (savedTheme) {
+        try {
+          const t = JSON.parse(savedTheme);
+          setTheme(t.themeName, t.cssPath, t.bsTheme, t.label);
+        } catch(e) {}
+      }
+    });
+  </script>
+</body>
+</html>

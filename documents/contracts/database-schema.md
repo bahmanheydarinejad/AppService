@@ -206,7 +206,87 @@
 
 ---
 
-## 5. Maintenance & Task Completion Directives
+---
+
+## 5. Enterprise Platform Tables Catalog
+
+### 5.1 Table: `tenant_registry`
+- **Description**: Stores multi-tenant isolation configuration for the dynamic Hybrid Multi-Tenancy Engine.
+
+| Column Name | SQL Type | Constraints | Description |
+|---|---|---|---|
+| `id` | `VARCHAR(255)` | `PRIMARY KEY`, `NOT NULL` | Unique Tenant ID (e.g. `tenant_enterprise_01`). |
+| `name` | `VARCHAR(255)` | `NOT NULL` | Organization name. |
+| `isolation_strategy` | `VARCHAR(50)` | `NOT NULL` | Enum: `SHARED_DB`, `POSTGRESQL_SCHEMA`, `DEDICATED_DB`. |
+| `datasource_url` | `VARCHAR(512)` | Nullable | Connection URL for dedicated database instances. |
+| `schema_name` | `VARCHAR(128)` | Nullable | Target PostgreSQL schema for schema-isolated tenants. |
+| `status` | `VARCHAR(50)` | Default `'ACTIVE'` | Status (`ACTIVE`, `SUSPENDED`). |
+
+---
+
+### 5.2 Table: `audit_event`
+- **Description**: Append-only, tamper-resistant audit ledger for security, user, and configuration modifications.
+
+| Column Name | SQL Type | Constraints | Description |
+|---|---|---|---|
+| `id` | `VARCHAR(255)` | `PRIMARY KEY`, `NOT NULL` | Unique audit event ID. |
+| `trace_id` | `VARCHAR(128)` | Indexed, `NOT NULL` | Distributed correlation trace identifier. |
+| `span_id` | `VARCHAR(128)` | Nullable | Request span identifier. |
+| `actor_id` | `VARCHAR(255)` | Indexed, `NOT NULL` | User ID, service account, or AI agent that triggered the action. |
+| `tenant_id` | `VARCHAR(255)` | Indexed, `NOT NULL` | Tenant ownership boundary. |
+| `action_verb` | `VARCHAR(100)` | `NOT NULL` | Action performed (e.g. `CREATE_ROLE`, `SUSPEND_USER`, `UPDATE_SETTING`). |
+| `entity_type` | `VARCHAR(100)` | `NOT NULL` | Subject entity (e.g. `Account`, `Tenant`, `SmsProvider`). |
+| `entity_id` | `VARCHAR(255)` | Nullable | Target resource identifier. |
+| `outcome` | `VARCHAR(50)` | `NOT NULL` | Outcome: `SUCCESS`, `DENIED`, `FAILURE`. |
+| `ip_address` | `VARCHAR(64)` | Nullable | Origin client IP address. |
+| `before_state` | `TEXT` | Nullable | Sanitized JSON representation of state prior to modification. |
+| `after_state` | `TEXT` | Nullable | Sanitized JSON representation of state after modification. |
+| `timestamp` | `TIMESTAMP` | `NOT NULL`, Indexed | UTC timestamp of event. |
+
+---
+
+### 5.3 Table: `sms_provider_config` & `sms_log`
+- **Description**: Configuration and delivery ledger for the Intelligent Multi-Provider SMS Engine.
+
+| Column Name | SQL Type | Constraints | Description |
+|---|---|---|---|
+| `provider_id` | `VARCHAR(64)` | `PRIMARY KEY` | Provider identifier (`KAVENEGAR`, `FARAZ_SMS`, `TWILIO`, `AWS_SNS`). |
+| `priority_rank` | `INT` | `NOT NULL` | Routing priority ordering. |
+| `cost_per_sms` | `DECIMAL(10,4)`| `NOT NULL` | Base cost per dispatched message. |
+| `rolling_latency_ms`| `BIGINT` | Default `0` | Moving average delivery latency in milliseconds. |
+| `rolling_success_rate`| `DECIMAL(5,2)`| Default `100.00` | Rolling percentage of successful carrier delivery receipts. |
+| `circuit_state` | `VARCHAR(32)` | Default `'CLOSED'` | Circuit breaker state (`CLOSED`, `OPEN`, `HALF_OPEN`). |
+
+---
+
+### 5.4 Table: `ai_agent_account` & `ai_tool_audit`
+- **Description**: Manages AI agent service identities and tracks autonomous tool executions via Model Context Protocol (MCP).
+
+| Column Name | SQL Type | Constraints | Description |
+|---|---|---|---|
+| `agent_id` | `VARCHAR(255)` | `PRIMARY KEY` | Unique AI Agent identifier (e.g. `agent-antigravity-01`). |
+| `agent_name` | `VARCHAR(255)` | `NOT NULL` | Display name and agent type. |
+| `capability_token` | `VARCHAR(512)`| `NOT NULL`, Hashed | Cryptographic token granting role-scoped MCP tool access. |
+| `token_budget` | `BIGINT` | `NOT NULL` | Maximum token consumption limit. |
+| `requires_approval`| `BOOLEAN` | Default `TRUE` | Whether destructive operations require human elevation token. |
+
+---
+
+### 5.5 Table: `i18n_message`
+- **Description**: Dynamic database-backed translation storage with hot-reload cache eviction.
+
+| Column Name | SQL Type | Constraints | Description |
+|---|---|---|---|
+| `id` | `VARCHAR(255)` | `PRIMARY KEY` | Unique key identifier. |
+| `message_key` | `VARCHAR(255)` | `NOT NULL`, Indexed | Translation key (e.g. `app.welcome.headline`). |
+| `locale` | `VARCHAR(32)` | `NOT NULL`, Indexed | Target locale code (`en`, `fa`, `ar`, `fr`). |
+| `message_text` | `TEXT` | `NOT NULL` | Localized translation string. |
+| `tenant_id` | `VARCHAR(255)` | Indexed, Nullable | Tenant custom override (`NULL` for global default). |
+| `direction` | `VARCHAR(8)` | Default `'ltr'` | Layout direction (`ltr` or `rtl`). |
+
+---
+
+## 6. Maintenance & Task Completion Directives
 
 > **When completing ANY task that affects the database:**
 > 1. Add new tables, columns, indexes, or constraints to the catalog above.
