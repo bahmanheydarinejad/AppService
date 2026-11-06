@@ -1,0 +1,169 @@
+databaseChangeLog:
+  - changeSet:
+      id: 08-add-foreign-keys
+      author: appservice
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: natural_person
+            baseColumnNames: avatar_id
+            constraintName: fk_natural_person_avatar
+            referencedTableName: document
+            referencedColumnNames: id
+
+        - addForeignKeyConstraint:
+            baseTableName: account
+            baseColumnNames: natural_person_id
+            constraintName: fk_account_natural_person
+            referencedTableName: natural_person
+            referencedColumnNames: id
+
+        - addForeignKeyConstraint:
+            baseTableName: account
+            baseColumnNames: avatar_id
+            constraintName: fk_account_avatar
+            referencedTableName: document
+            referencedColumnNames: id
+
+        - addForeignKeyConstraint:
+            baseTableName: menu
+            baseColumnNames: parent_id
+            constraintName: fk_menu_parent
+            referencedTableName: menu
+            referencedColumnNames: id
+
+        - addForeignKeyConstraint:
+            baseTableName: panel
+            baseColumnNames: menu_id
+            constraintName: fk_panel_menu
+            referencedTableName: menu
+            referencedColumnNames: id
+
+        - addForeignKeyConstraint:
+            baseTableName: reset_password_token
+            baseColumnNames: account_id
+            constraintName: fk_reset_password_token_account
+            referencedTableName: account
+            referencedColumnNames: id
+
+        - addForeignKeyConstraint:
+            baseTableName: role_accounts
+            baseColumnNames: roles_id
+            constraintName: fk_role_accounts_role
+            referencedTableName: role
+            referencedColumnNames: id
+
+        - addForeignKeyConstraint:
+            baseTableName: role_accounts
+            baseColumnNames: accounts_id
+            constraintName: fk_role_accounts_account
+            referencedTableName: account
+            referencedColumnNames: id
+
+        - addForeignKeyConstraint:
+            baseTableName: role_panels
+            baseColumnNames: roles_id
+            constraintName: fk_role_panels_role
+            referencedTableName: role
+            referencedColumnNames: id
+
+        - addForeignKeyConstraint:
+            baseTableName: role_panels
+            baseColumnNames: panels_id
+            constraintName: fk_role_panels_panel
+            referencedTableName: panel
+            referencedColumnNames: id
+
+        - addForeignKeyConstraint:
+            baseTableName: email_attachments
+            baseColumnNames: email_id
+            constraintName: fk_email_attachments_email
+            referencedTableName: email
+            referencedColumnNames: id
+
+        - addForeignKeyConstraint:
+            baseTableName: email_attachments
+            baseColumnNames: attachments_id
+            constraintName: fk_email_attachments_document
+            referencedTableName: document
+            referencedColumnNames: id
+
+  - changeSet:
+      id: 08-add-indexes
+      author: appservice
+      changes:
+        - createIndex:
+            indexName: idx_natural_person_avatar
+            tableName: natural_person
+            columns:
+              - column:
+                  name: avatar_id
+
+        - createIndex:
+            indexName: idx_account_natural_person
+            tableName: account
+            columns:
+              - column:
+                  name: natural_person_id
+
+        - createIndex:
+            indexName: idx_account_avatar
+            tableName: account
+            columns:
+              - column:
+                  name: avatar_id
+
+        - createIndex:
+            indexName: idx_menu_parent
+            tableName: menu
+            columns:
+              - column:
+                  name: parent_id
+
+        - createIndex:
+            indexName: idx_panel_menu
+            tableName: panel
+            columns:
+              - column:
+                  name: menu_id
+
+        - createIndex:
+            indexName: idx_reset_password_token_account
+            tableName: reset_password_token
+            columns:
+              - column:
+                  name: account_id
+
+        - createIndex:
+            indexName: idx_role_accounts_role
+            tableName: role_accounts
+            columns:
+              - column:
+                  name: roles_id
+
+        - createIndex:
+            indexName: idx_role_accounts_account
+            tableName: role_accounts
+            columns:
+              - column:
+                  name: accounts_id
+
+        - createIndex:
+            indexName: idx_role_panels_role
+            tableName: role_panels
+            columns:
+              - column:
+                  name: roles_id
+
+        - createIndex:
+            indexName: idx_role_panels_panel
+            tableName: role_panels
+            columns:
+              - column:
+                  name: panels_id
+
+        - createIndex:
+            indexName: idx_email_attachments_email
+            tableName: email_attachments
+            columns:
+              - column:
+                  name: email_id
