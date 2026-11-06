@@ -55,6 +55,13 @@
   - [10.1 Pre-Flight Checklist](#101-pre-flight-checklist)
   - [10.2 Modification Checklist](#102-modification-checklist)
   - [10.3 Verification and Done Checklist](#103-verification-and-done-checklist)
+- [11. Code-Graph-RAG Knowledge Graph Integration](#11-code-graph-rag-knowledge-graph-integration)
+  - [11.1 Purpose and Architectural Overview](#111-purpose-and-architectural-overview)
+  - [11.2 Verification and Installation Protocol](#112-verification-and-installation-protocol)
+  - [11.3 Knowledge Graph Generation and Incremental Synchronization](#113-knowledge-graph-generation-and-incremental-synchronization)
+  - [11.4 Graph Querying and Impact Analysis](#114-graph-querying-and-impact-analysis)
+  - [11.5 Mandatory AI Agent Workflow Integration](#115-mandatory-ai-agent-workflow-integration)
+  - [11.6 Diagnostics, Failure Recovery, and Fallback](#116-diagnostics-failure-recovery-and-fallback)
 
 ---
 
@@ -534,9 +541,113 @@ Copy and verify this checklist before declaring task completion:
 - [ ] Rule of Three obeyed (no churn loops or blind retries).
 - [ ] Working tree audited (`git status` shows only intended file changes).
 - [ ] Mandatory task completion contracts updated if affected (api-endpoints.md, database-schema.md, recipes.md).
+- [ ] Code-Graph-RAG synchronized (`cgr start --repo-path . --update-graph --no-embeddings --exclude target`).
 - [ ] Scratch files and temporary artifacts removed.
 - [ ] Structured delivery report generated with verbatim verification proof.
 ```
+
+---
+
+## 11. Code-Graph-RAG Knowledge Graph Integration
+
+### 11.1 Purpose and Architectural Overview
+Code-Graph-RAG (`cgr`) is integrated into **AppService** as a persistent, AST-driven code intelligence and knowledge graph engine. Utilizing Tree-sitter parsers for Java, Python, SQL, JavaScript, and Markdown, it maps repository symbols into a structured property graph capturing:
+- Classes, interfaces, records, methods, and functions.
+- Directed invocation edges (`CALLS`), module containment (`CONTAINS`), and dependencies (`IMPORTS`).
+- Type relationships (`INHERITS`, `IMPLEMENTS`, `OVERRIDES`, `ACCEPTS`, `RETURNS`).
+- Decorators and annotations (e.g. `@RestController`, `@RequestMapping`, `@Transactional`, `@Entity`).
+
+By default, the graph is stored serverless in a high-performance local SQLite database (`~/.cgr/graph.sqlite`), avoiding Docker dependencies while accelerating semantic lookup and cross-component impact analysis.
+
+### 11.2 Verification and Installation Protocol
+Before initiating engineering tasks, agents must verify that Code-Graph-RAG is available in the environment:
+
+```bash
+# 1. Check CLI availability and version
+cgr --version
+
+# 2. Verify graph backend and dependencies
+cgr doctor
+```
+
+If `cgr` is missing or dependencies are unsatisfied, install it using the project's reproducible automation:
+```powershell
+# Windows automated setup (PowerShell)
+.\scripts\setup-cgr.ps1
+
+# Alternative manual pip installation
+pip install -r requirements-cgr.txt
+```
+*Prerequisites*: Python 3.12+ and `ripgrep` (`rg`). If `rg` is not found on Windows, install via `winget install BurntSushi.ripgrep.MSVC`.
+
+### 11.3 Knowledge Graph Generation and Incremental Synchronization
+The knowledge graph must be generated initially and refreshed whenever code changes occur:
+
+```bash
+# Generate / Update knowledge graph (structural parse, skipping slow embeddings)
+cgr start --repo-path . --update-graph --no-embeddings --exclude target
+
+# Inspect node and relationship counts
+cgr stats
+
+# Optional clean rebuild after broad git merges
+cgr start --repo-path . --update-graph --clean --yes --no-embeddings --exclude target
+```
+
+### 11.4 Graph Querying and Impact Analysis
+Agents must query the graph using deterministic CLI subcommands (`cgr graph`) which output structured JSON without requiring external LLM API calls:
+
+| Query Objective | Command Syntax | Output & Use Case |
+|---|---|---|
+| **Resolve Symbol** | `cgr graph resolve <SymbolName>` | Maps short symbol to fully qualified identifiers and source file paths. |
+| **Inspect Definition** | `cgr graph definition <QualifiedName>` | Returns exact file location, line spans, decorators, and source code. |
+| **Find Callers** | `cgr graph callers <QualifiedName>` | Identifies all methods/functions invoking this component (blast radius). |
+| **Find Callees** | `cgr graph callees <QualifiedName>` | Identifies all downstream dependencies invoked by this component. |
+| **Find Implementors** | `cgr graph implementors <Type>` | Discovers all subclasses and interface implementations. |
+| **Find Overrides** | `cgr graph overrides <Method>` | Discovers polymorphically overridden methods. |
+| **Find Importers** | `cgr graph importers <Module>` | Lists all files importing a specific module or package. |
+
+#### Example Query: Resolving DocumentController
+```bash
+cgr graph resolve DocumentController
+```
+```json
+[
+  {
+    "label": "Class",
+    "name": "DocumentController",
+    "path": "src/main/java/ir/appservice/controller/DocumentController.java",
+    "qualified_name": "AppService__1e0d7f0f.src.main.java.ir.appservice.controller.DocumentController.DocumentController",
+    "start_line": 16,
+    "end_line": 46
+  }
+]
+```
+
+### 11.5 Mandatory AI Agent Workflow Integration
+AI coding agents interacting with this codebase **MUST** follow this 3-step Code-Graph-RAG protocol for every implementation task:
+
+1. **Pre-Implementation Impact Analysis**:
+   - Query `cgr graph resolve <TargetSymbol>` to locate the exact qualified component.
+   - Run `cgr graph callers <QualifiedName>` to discover all upstream dependents and avoid breaking changes.
+   - Run `cgr graph callees <QualifiedName>` to understand collaborating services and repositories.
+   - Verify findings against the actual source file before editing.
+2. **Implementation with Architectural Invariants**:
+   - Honor established patterns discovered through the graph.
+   - Keep modifications minimal and compliant with Hexagonal boundaries and SOLID/YAGNI principles.
+3. **Post-Implementation Graph Synchronization**:
+   - Run `cgr start --repo-path . --update-graph --no-embeddings --exclude target` to sync modified AST nodes.
+   - Verify graph integrity with `cgr stats`.
+
+### 11.6 Diagnostics, Failure Recovery, and Fallback
+If Code-Graph-RAG encounters an environment or runtime issue:
+1. **Missing `rg` in PATH**: Ensure the WinGet directory (`%LOCALAPPDATA%\Microsoft\WinGet\Packages\...`) is added to the shell `PATH`.
+2. **Missing Python Modules**: Run `pip install httpx httpcore tree-sitter`.
+3. **PowerShell Globbing Errors**: Always quote paths or pass `--exclude target` directly without wildcard asterisks.
+4. **Fallback Procedure**: If CGR execution is blocked by operating system constraints or environment permissions:
+   - Fall back to targeted string searches (`grep_search`, `read_file`).
+   - Document the fallback reason explicitly in the task handoff report.
+   - Never pretend graph synchronization succeeded without verified terminal output.
 
 ---
 *End of `AGENTS.md` — AI Agent Operational Standards and Best Practices Guide.*

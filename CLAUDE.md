@@ -30,9 +30,10 @@ To maximize execution speed and minimize token consumption, **never scan entire 
 | **API endpoints, REST controllers, routes, security filters** | [`documents/contracts/api-endpoints.md`](file:///c:/Users/Bahma/Documents/GitHub/AppService/documents/contracts/api-endpoints.md) | ~1.5k tokens (replaces scanning all controllers) |
 | **Database tables, JPA entities, Liquibase changelogs, columns** | [`documents/contracts/database-schema.md`](file:///c:/Users/Bahma/Documents/GitHub/AppService/documents/contracts/database-schema.md) | ~2.5k tokens (replaces scanning 10 entities + 8 YAMLs) |
 | **Step-by-step recipes, adding beans/panels, troubleshooting** | [`documents/runbooks/recipes.md`](file:///c:/Users/Bahma/Documents/GitHub/AppService/documents/runbooks/recipes.md) | ~2k tokens (replaces guessing patterns) |
-| **Hexagonal boundaries, ports & adapters, domain isolation** | [`ARCHITECTURE.md`](file:///c:/Users/Bahma/Documents/GitHub/AppService/ARCHITECTURE.md) | Global architectural blueprint |
-| **Universal agent boundaries, verification ladder, git rules** | [`AGENTS.md`](file:///c:/Users/Bahma/Documents/GitHub/AppService/AGENTS.md) | Universal agent operational standard |
-| **Gemini model routing, context caching, prompt schemas** | [`GEMINI.md`](file:///c:/Users/Bahma/Documents/GitHub/AppService/GEMINI.md) | Gemini runtime manual |
+| **Hexagonal boundaries, ports & adapters, domain isolation** | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Global architectural blueprint |
+| **Universal agent boundaries, verification ladder, git rules** | [`AGENTS.md`](AGENTS.md) | Universal agent operational standard |
+| **Code-Graph-RAG AST knowledge graph, impact analysis, symbols**| [`AGENTS.md#11-code-graph-rag-knowledge-graph-integration`](AGENTS.md#11-code-graph-rag-knowledge-graph-integration) | Graph queries, symbol resolve, callers/callees |
+| **Gemini model routing, context caching, prompt schemas** | [`GEMINI.md`](GEMINI.md) | Gemini runtime manual |
 
 ---
 
@@ -51,6 +52,13 @@ mvn test
 
 # Run documentation & anchor integrity E2E tests
 python -m unittest discover -s tests
+
+# Code-Graph-RAG: Query symbol & callers/callees (no LLM required)
+cgr graph resolve DocumentController
+cgr graph callers <QualifiedName>
+
+# Code-Graph-RAG: Sync AST knowledge graph after code edits
+cgr start --repo-path . --update-graph --no-embeddings --exclude target
 
 # Run Spring Boot application (default H2 profile)
 mvn spring-boot:run
@@ -106,5 +114,6 @@ mvn spring-boot:run -Dspring-boot.run.profiles=postgres
 > **On completing ANY task, you MUST update the affected contract/doc files before finishing:**
 > 1. Changed an endpoint or route? -> Update [`documents/contracts/api-endpoints.md`](file:///c:/Users/Bahma/Documents/GitHub/AppService/documents/contracts/api-endpoints.md).
 > 2. Changed a DB entity, column, or migration? -> Update [`documents/contracts/database-schema.md`](file:///c:/Users/Bahma/Documents/GitHub/AppService/documents/contracts/database-schema.md).
-> 3. Changed architecture or core contracts? -> Update [`ARCHITECTURE.md`](file:///c:/Users/Bahma/Documents/GitHub/AppService/ARCHITECTURE.md) and [`AGENTS.md`](file:///c:/Users/Bahma/Documents/GitHub/AppService/AGENTS.md).
-> 4. Changed a workflow or recipe? -> Update [`documents/runbooks/recipes.md`](file:///c:/Users/Bahma/Documents/GitHub/AppService/documents/runbooks/recipes.md).
+> 3. Changed architecture or core contracts? -> Update [`ARCHITECTURE.md`](ARCHITECTURE.md) and [`AGENTS.md`](AGENTS.md).
+> 4. Changed a workflow or recipe? -> Update [`documents/runbooks/recipes.md`](documents/runbooks/recipes.md).
+> 5. Modified code symbols, classes, or calls? -> Synchronize Code-Graph-RAG: `cgr start --repo-path . --update-graph --no-embeddings --exclude target`.

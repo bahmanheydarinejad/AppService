@@ -132,25 +132,43 @@ mvn spring-boot:run -Dspring-boot.run.profiles=h2
 
 ---
 
-## 8. Operational Checklists
+## 8. Recipe: Code-Graph-RAG Impact Analysis & Knowledge Graph Sync
 
-### 8.1 Pre-Flight Checklist
+1. **Verify CGR Availability**:
+   - Run `cgr --version` and `cgr doctor`.
+   - If not installed, execute `.\scripts\setup-cgr.ps1` (or `pip install -r requirements-cgr.txt`).
+2. **Impact Analysis Before Code Edits**:
+   - Resolve symbol: `cgr graph resolve MyService`.
+   - Inspect definition: `cgr graph definition <QualifiedName>`.
+   - Discover callers (blast radius): `cgr graph callers <QualifiedName>`.
+   - Discover callees (collaborators): `cgr graph callees <QualifiedName>`.
+3. **Synchronize Graph Post-Edit**:
+   - Run: `cgr start --repo-path . --update-graph --no-embeddings --exclude target`.
+   - Verify counts: `cgr stats`.
+
+---
+
+## 9. Operational Checklists
+
+### 9.1 Pre-Flight Checklist
 - [ ] Understand requirements and locate target files.
+- [ ] Run CGR impact analysis (`cgr graph callers <Symbol>`).
 - [ ] Check repository status (`git status`).
 - [ ] Verify baseline build (`mvn clean compile`).
 
-### 8.2 Modification Checklist
+### 9.2 Modification Checklist
 - [ ] Apply minimal diff (no drive-by refactoring or reformatting).
 - [ ] Follow SOLID, YAGNI, OOP/OOD, and AOP principles.
 - [ ] Ensure proper layer encapsulation (`Controller` -> `Service` -> `Repository` -> `Entity`).
 
-### 8.3 Verification Checklist
+### 9.3 Verification Checklist
 - [ ] Run targeted tests (`mvn test -Dtest=...`).
 - [ ] Run full test suite (`mvn test`).
 - [ ] Run doc test suite (`python -m unittest discover -s tests`).
 - [ ] Check `git status` for untracked scratch files.
 
-### 8.4 Mandatory Task Completion Checklist
-- [ ] If an endpoint was altered, update [`documents/contracts/api-endpoints.md`](file:///c:/Users/Bahma/Documents/GitHub/AppService/documents/contracts/api-endpoints.md).
-- [ ] If a database table/column was altered, update [`documents/contracts/database-schema.md`](file:///c:/Users/Bahma/Documents/GitHub/AppService/documents/contracts/database-schema.md).
-- [ ] If a workflow or command was altered, update this file ([`documents/runbooks/recipes.md`](file:///c:/Users/Bahma/Documents/GitHub/AppService/documents/runbooks/recipes.md)).
+### 9.4 Mandatory Task Completion Checklist
+- [ ] If an endpoint was altered, update [`documents/contracts/api-endpoints.md`](documents/contracts/api-endpoints.md).
+- [ ] If a database table/column was altered, update [`documents/contracts/database-schema.md`](documents/contracts/database-schema.md).
+- [ ] If a workflow or command was altered, update this file ([`documents/runbooks/recipes.md`](documents/runbooks/recipes.md)).
+- [ ] Synchronize Code-Graph-RAG AST graph (`cgr start --repo-path . --update-graph --no-embeddings --exclude target`).
