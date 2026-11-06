@@ -1,0 +1,92 @@
+databaseChangeLog:
+  - changeSet:
+      id: 06-create-email-table
+      author: appservice
+      changes:
+        - createTable:
+            tableName: email
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_email
+              - column:
+                  name: display_name
+                  type: VARCHAR(255)
+              - column:
+                  name: statue
+                  type: VARCHAR(255)
+                  defaultValue: ACTIVE_STATUS
+              - column:
+                  name: registered_date
+                  type: TIMESTAMP
+              - column:
+                  name: updated_date
+                  type: TIMESTAMP
+              - column:
+                  name: delete_date
+                  type: TIMESTAMP
+              - column:
+                  name: mail_from
+                  type: VARCHAR(255)
+              - column:
+                  name: reply_to
+                  type: VARCHAR(255)
+              - column:
+                  name: mail_to
+                  type: VARCHAR(255)
+              - column:
+                  name: mail_cc
+                  type: VARCHAR(255)
+              - column:
+                  name: mail_bcc
+                  type: VARCHAR(255)
+              - column:
+                  name: sent_date
+                  type: TIMESTAMP
+              - column:
+                  name: subject
+                  type: VARCHAR(255)
+              - column:
+                  name: text
+                  type: VARCHAR(255)
+
+  - changeSet:
+      id: 06-create-reset-password-token-table
+      author: appservice
+      changes:
+        - createTable:
+            tableName: reset_password_token
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_reset_password_token
+              - column:
+                  name: display_name
+                  type: VARCHAR(255)
+              - column:
+                  name: statue
+                  type: VARCHAR(255)
+                  defaultValue: ACTIVE_STATUS
+              - column:
+                  name: registered_date
+                  type: TIMESTAMP
+              - column:
+                  name: updated_date
+                  type: TIMESTAMP
+              - column:
+                  name: delete_date
+                  type: TIMESTAMP
+              - column:
+                  name: token
+                  type: VARCHAR(255)
+              - column:
+                  name: account_id
+                  type: VARCHAR(255)

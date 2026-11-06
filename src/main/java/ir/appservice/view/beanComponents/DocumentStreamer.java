@@ -2,6 +2,8 @@ package ir.appservice.view.beanComponents;
 
 import ir.appservice.model.entity.domain.Document;
 import ir.appservice.model.service.DocumentService;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PhaseId;
 import lombok.Getter;
 import lombok.Setter;
 import org.primefaces.model.DefaultStreamedContent;
@@ -11,8 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.ApplicationScope;
 
-import jakarta.faces.context.FacesContext;
-import jakarta.faces.event.PhaseId;
 import java.io.ByteArrayInputStream;
 
 @Getter
@@ -49,7 +49,7 @@ public class DocumentStreamer {
         } catch (Exception e) {
             logger.error(String.format("Stream failed, Cause: {}", e.getMessage()));
         } finally {
-            logger.trace("Streaming: {}", imageStream.getName());
+            logger.error("Streaming: {}", documentId);
             return imageStream;
         }
     }

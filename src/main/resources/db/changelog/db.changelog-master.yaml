@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changes/01-create-document-table.yaml
+  - include:
+      file: db/changelog/changes/02-create-natural-person-table.yaml
+  - include:
+      file: db/changelog/changes/03-create-account-table.yaml
+  - include:
+      file: db/changelog/changes/04-create-role-table.yaml
+  - include:
+      file: db/changelog/changes/05-create-menu-panel-tables.yaml
+  - include:
+      file: db/changelog/changes/06-create-email-token-tables.yaml
+  - include:
+      file: db/changelog/changes/07-create-join-tables.yaml
+  - include:
+      file: db/changelog/changes/08-create-foreign-keys-and-indexes.yaml
