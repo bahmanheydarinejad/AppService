@@ -20,6 +20,8 @@ public class AuditEvent implements Serializable {
     private String action;
     private String subject;
     private String payloadDiff;
+    private String beforeState;
+    private String afterState;
     private Outcome outcome;
     private String ipAddress;
     private String tenantId;
@@ -97,6 +99,22 @@ public class AuditEvent implements Serializable {
 
     public void setPayloadDiff(String payloadDiff) {
         this.payloadDiff = payloadDiff;
+    }
+
+    public String getBeforeState() {
+        return beforeState;
+    }
+
+    public void setBeforeState(String beforeState) {
+        this.beforeState = beforeState;
+    }
+
+    public String getAfterState() {
+        return afterState;
+    }
+
+    public void setAfterState(String afterState) {
+        this.afterState = afterState;
     }
 
     public Outcome getOutcome() {
