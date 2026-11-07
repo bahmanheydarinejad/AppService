@@ -38,6 +38,10 @@
             <groupId>ir.bahmanheydarinejad</groupId>
             <artifactId>appservice-infrastructure-platform</artifactId>
         </dependency>
+        <dependency>
+            <groupId>ir.bahmanheydarinejad</groupId>
+            <artifactId>appservice-infrastructure-i18n</artifactId>
+        </dependency>
 
         <!-- Spring Boot Starters -->
         <dependency>
@@ -84,4 +88,23 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>ir.appservice.api.AppServiceApiApplication</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

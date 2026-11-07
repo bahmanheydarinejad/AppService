@@ -4,6 +4,7 @@ import ir.appservice.api.rest.service.GenericSearchService;
 import ir.appservice.api.rest.service.JpaSpecificationSearchService;
 import ir.appservice.infrastructure.persistence.entity.UserJpaEntity;
 import ir.appservice.infrastructure.persistence.repository.SpringDataUserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin/users")
 public class UserSearchController extends BaseSearchController<UserJpaEntity, String> {
 
+    @Autowired
     public UserSearchController(SpringDataUserRepository repository) {
         super(new JpaSpecificationSearchService<>(repository, "users"));
     }

@@ -4,6 +4,7 @@ import ir.appservice.api.rest.service.GenericSearchService;
 import ir.appservice.api.rest.service.JpaSpecificationSearchService;
 import ir.appservice.infrastructure.persistence.entity.RoleJpaEntity;
 import ir.appservice.infrastructure.persistence.repository.RoleJpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin/roles")
 public class RoleSearchController extends BaseSearchController<RoleJpaEntity, String> {
 
+    @Autowired
     public RoleSearchController(RoleJpaRepository repository) {
         super(new JpaSpecificationSearchService<>(repository, "roles"));
     }

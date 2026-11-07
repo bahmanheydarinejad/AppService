@@ -1,10 +1,13 @@
 package ir.appservice.infrastructure.platform.mail;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Map;
 
 /**
  * Lightweight template renderer supporting token interpolation (e.g. {{resetLink}}, {{accountName}}).
  */
+@Component
 public class MailTemplateEngine {
 
     /**

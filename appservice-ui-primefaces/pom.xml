@@ -42,10 +42,6 @@
             <groupId>ir.bahmanheydarinejad</groupId>
             <artifactId>appservice-infrastructure-platform</artifactId>
         </dependency>
-        <dependency>
-            <groupId>ir.bahmanheydarinejad</groupId>
-            <artifactId>appservice-api-rest</artifactId>
-        </dependency>
 
         <!-- Spring Boot Web Starter -->
         <dependency>
@@ -82,7 +78,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>ir.appservice.AppServiceApplication</mainClass>
+                    <mainClass>ir.appservice.ui.AppServiceAdminApplication</mainClass>
                 </configuration>
                 <executions>
                     <execution>

@@ -1,0 +1,30 @@
+server:
+  port: 8081
+
+app:
+  version: '@project.version@'
+  name: 'appservice-api-service'
+
+spring:
+  application:
+    name: 'appservice-api-service'
+  profiles:
+    active: h2
+
+  # Liquibase Migrations
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+
+  # JPA & Hibernate Validation
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+logging:
+  level:
+    root: INFO
+    ir.appservice: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: WARN

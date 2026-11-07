@@ -18,6 +18,10 @@ public class PlatformMailEngine {
     private final MailDeliveryLedger deliveryLedger = new MailDeliveryLedger();
     private String defaultFromAddress = "no-reply@appservice.ir";
 
+    public PlatformMailEngine() {
+        this(null);
+    }
+
     public PlatformMailEngine(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }

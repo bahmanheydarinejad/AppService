@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 import java.util.Set;
@@ -13,6 +14,7 @@ import java.util.Set;
  * Sanitizes JSON payloads and state diffs for the tamper-resistant audit ledger.
  * Automatically masks passwords, tokens, API keys, and sensitive secrets.
  */
+@Component
 public class AuditDiffSanitizer {
 
     private static final Set<String> SENSITIVE_FIELD_NAMES = Set.of(

@@ -29,3 +29,5 @@ databaseChangeLog:
       file: db/changelog/changes/14-add-account-auth-columns.yaml
   - include:
       file: db/changelog/changes/15-create-oauth2-client-and-api-key-tables.yaml
+  - include:
+      file: db/changelog/changes/16-create-permission-tables.yaml

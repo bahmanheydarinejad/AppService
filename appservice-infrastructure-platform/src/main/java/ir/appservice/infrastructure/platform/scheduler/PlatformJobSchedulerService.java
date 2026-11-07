@@ -28,6 +28,10 @@ public class PlatformJobSchedulerService {
 
     private final Scheduler scheduler;
 
+    public PlatformJobSchedulerService() {
+        this(null);
+    }
+
     public PlatformJobSchedulerService(Scheduler scheduler) {
         this.scheduler = scheduler;
     }

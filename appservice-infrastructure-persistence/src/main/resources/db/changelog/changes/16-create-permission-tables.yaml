@@ -1,0 +1,65 @@
+databaseChangeLog:
+  - changeSet:
+      id: 16-create-permission-table
+      author: appservice
+      changes:
+        - createTable:
+            tableName: permission
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_permission
+              - column:
+                  name: code
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uk_permission_code
+              - column:
+                  name: description
+                  type: VARCHAR(255)
+              - column:
+                  name: module
+                  type: VARCHAR(100)
+              - column:
+                  name: registered_date
+                  type: TIMESTAMP
+
+  - changeSet:
+      id: 16-create-role-permissions-table
+      author: appservice
+      changes:
+        - createTable:
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: permission_id
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: role_permissions
+            columnNames: role_id, permission_id
+            constraintName: pk_role_permissions
+        - addForeignKeyConstraint:
+            baseTableName: role_permissions
+            baseColumnNames: role_id
+            referencedTableName: role
+            referencedColumnNames: id
+            constraintName: fk_role_permissions_role
+        - addForeignKeyConstraint:
+            baseTableName: role_permissions
+            baseColumnNames: permission_id
+            referencedTableName: permission
+            referencedColumnNames: id
+            constraintName: fk_role_permissions_permission
