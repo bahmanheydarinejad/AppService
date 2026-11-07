@@ -641,6 +641,7 @@
       <ul class="nav-list">
         <li><a href="#dependency-graph"><i class="bi bi-bezier2"></i> Dependency Chain Map</a></li>
         <li><a href="#phased-roadmap"><i class="bi bi-calendar-check"></i> P0 - P2 Phased Roadmap</a></li>
+        <li><a href="#implementation-breakdown"><i class="bi bi-list-check text-warning"></i> Implementation WBS &amp; Status</a></li>
         <li><a href="#qa-acceptance"><i class="bi bi-patch-check"></i> Acceptance &amp; QA Matrix</a></li>
       </ul>
     </div>
@@ -1072,6 +1073,384 @@
             </ul>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- SECTION: Detailed Implementation Work Breakdown Structure (WBS) & Status Tracker -->
+    <section class="mb-5" id="implementation-breakdown">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <div class="feature-icon-wrapper bg-warning bg-opacity-10 text-warning mb-0">
+          <i class="bi bi-list-check"></i>
+        </div>
+        <div>
+          <h3 class="h4 fw-bold text-white mb-0">Detailed Implementation Breakdown &amp; Status Tracker</h3>
+          <p class="text-muted small mb-0">Step-by-step Work Breakdown Structure (WBS). Status updates strictly require user approval.</p>
+        </div>
+      </div>
+
+      <!-- Mandatory User Approval Policy Banner -->
+      <div class="p-3 mb-4 rounded-3 border border-warning bg-warning bg-opacity-10 d-flex align-items-start gap-3">
+        <div class="fs-3 text-warning"><i class="bi bi-shield-exclamation"></i></div>
+        <div>
+          <h6 class="text-warning fw-bold mb-1">MANDATORY STEP STATUS APPROVAL GATE</h6>
+          <p class="small text-muted mb-0">
+            In accordance with project governance standards, <strong>no step's status may be transitioned</strong> (from <span class="badge bg-secondary">PENDING</span> to <span class="badge bg-warning text-dark">IN_PROGRESS</span> or <span class="badge bg-success">COMPLETED</span>) without explicit approval from the USER. Before updating the status of any step, the implementing agent must present the completed artifacts, verifiable build logs (`exit code 0`), and test proof to the user for formal approval.
+          </p>
+        </div>
+      </div>
+
+      <!-- Status Legend & Counters -->
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge bg-secondary px-3 py-2"><i class="bi bi-hourglass me-1"></i> PENDING: 38 Steps</span>
+        <span class="badge bg-warning text-dark px-3 py-2"><i class="bi bi-play-circle me-1"></i> IN_PROGRESS: 0 Steps</span>
+        <span class="badge bg-success px-3 py-2"><i class="bi bi-check-circle me-1"></i> COMPLETED: 0 Steps</span>
+        <span class="badge bg-danger px-3 py-2"><i class="bi bi-slash-circle me-1"></i> BLOCKED: 0 Steps</span>
+      </div>
+
+      <!-- Comprehensive WBS Table -->
+      <div class="table-container mb-4">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th style="width: 10%;">Step ID</th>
+              <th style="width: 18%;">Target Module</th>
+              <th style="width: 32%;">Action &amp; Task Description</th>
+              <th style="width: 25%;">Verification &amp; Acceptance Proof</th>
+              <th style="width: 15%;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- SPRINT 0 -->
+            <tr class="table-dark">
+              <td colspan="5" class="fw-bold text-primary"><i class="bi bi-folder2-open me-2"></i> Sprint 0: Multi-Module Maven Workspace Restructuring</td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-0.1</span></td>
+              <td><code>pom.xml (Root)</code></td>
+              <td>Refactor root POM into parent aggregator (`&lt;packaging&gt;pom&lt;/packaging&gt;`), configure `&lt;modules&gt;` declaration for all 8 artifacts, and centralize dependency management (Spring Boot 4.1.1, JoinFaces 6.1.1, Java 17).</td>
+              <td><code>mvn clean compile</code> succeeds across aggregator root with zero circular dependency warnings.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-0.2</span></td>
+              <td><code>build &amp; CI harness</code></td>
+              <td>Establish shared compiler settings, UTF-8 source encoding, test surefire plugins, and automated verification script.</td>
+              <td>Build pipeline verifies clean baseline across all empty submodules.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+
+            <!-- SPRINT 1 -->
+            <tr class="table-dark">
+              <td colspan="5" class="fw-bold text-primary"><i class="bi bi-folder2-open me-2"></i> Sprint 1: Pure Core Domain Module (`appservice-core-domain`)</td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-1.1</span></td>
+              <td><code>core-domain</code></td>
+              <td>Define domain enums &amp; value objects: `Status`, `Outcome`, `IsolationStrategy` (Shared DB, Schema, Dedicated DB), `CircuitState`, `SmsProviderType`.</td>
+              <td>Pure Java unit tests verify enum contracts; zero external dependencies.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-1.2</span></td>
+              <td><code>core-domain</code></td>
+              <td>Implement clean POJO entities: `User`, `Role`, `Permission`, `Tenant`, `AuditEvent`, `I18nMessage`, `SmsMessage`, `ScheduledJob`. <strong>Zero Spring or JPA annotations</strong>.</td>
+              <td>Compiler verifies domain module compiles with standard JDK 17 library only.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-1.3</span></td>
+              <td><code>core-domain</code></td>
+              <td>Define Inbound Ports (Use Cases: `AuthenticateUserUseCase`, `SearchEntityUseCase`) and Outbound Ports (SPIs: `UserRepositoryPort`, `TenantRepositoryPort`, `AuditLogPort`, `SmsGatewayPort`).</td>
+              <td>Ports define complete boundary contracts as pure Java interfaces.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+
+            <!-- SPRINT 2 -->
+            <tr class="table-dark">
+              <td colspan="5" class="fw-bold text-primary"><i class="bi bi-folder2-open me-2"></i> Sprint 2: Common Support Module (`appservice-common`)</td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-2.1</span></td>
+              <td><code>common</code></td>
+              <td>Implement universal API response envelopes: `ApiResponse&lt;T&gt;` and `PagedApiResponse&lt;T&gt;` containing `success`, `traceId`, `timestamp`, `page`, `size`, `totalElements`.</td>
+              <td>Serialization unit tests verify standard JSON structure and timestamp ISO-8601 formatting.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-2.2</span></td>
+              <td><code>common</code></td>
+              <td>Implement Universal CRUD Search request models: `SearchRequest`, `FilterCriterion`, `SortCriterion`, and `FilterOperator` (EQUALS, CONTAINS, BETWEEN, IN, etc.).</td>
+              <td>Deserialization tests verify complex nested filter criteria parse accurately.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-2.3</span></td>
+              <td><code>common</code></td>
+              <td>Implement global domain exception hierarchy (`EntityNotFoundException`, `TenantAccessDeniedException`) and `TraceContextHolder` (propagating distributed traceId across threads).</td>
+              <td>ThreadLocal safety tests verify trace context propagates and cleans up reliably without memory leaks.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+
+            <!-- SPRINT 3 -->
+            <tr class="table-dark">
+              <td colspan="5" class="fw-bold text-primary"><i class="bi bi-folder2-open me-2"></i> Sprint 3: Persistence &amp; Database Module (`appservice-infrastructure-persistence`)</td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-3.1</span></td>
+              <td><code>persistence</code></td>
+              <td>Author Liquibase master YAML changelogs for core tables: `tenant_registry`, `audit_event`, `sms_provider_config`, `sms_log`, `ai_agent_account`, `i18n_message`, `document`.</td>
+              <td>Liquibase migration executes successfully on H2 and PostgreSQL test containers (`exit code 0`).</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-3.2</span></td>
+              <td><code>persistence</code></td>
+              <td>Implement dynamic `TenantRoutingDataSource` supporting the Hybrid Isolation Strategy: Shared DB (discriminator), PostgreSQL Schema, and Dedicated DB.</td>
+              <td>Integration tests verify queries route dynamically to correct schema/DB based on `TenantContext`.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-3.3</span></td>
+              <td><code>persistence</code></td>
+              <td>Implement `GenericSpecificationBuilder&lt;T&gt;` converting incoming JSON `SearchRequest` filters into dynamic Spring Data JPA Criteria predicates.</td>
+              <td>Unit tests verify multi-column filtering, conjunctions (AND/OR), and type-safe casting across all operators.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-3.4</span></td>
+              <td><code>persistence</code></td>
+              <td>Implement JPA Entity mappers and Outbound Repositories honoring soft-deletion (`deleteDate IS NULL`) and tenant scoping invariants.</td>
+              <td>Integration tests prove soft-deleted entities are automatically excluded from search queries.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+
+            <!-- SPRINT 4 -->
+            <tr class="table-dark">
+              <td colspan="5" class="fw-bold text-primary"><i class="bi bi-folder2-open me-2"></i> Sprint 4: Security Core Module (`appservice-infrastructure-security`)</td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-4.1</span></td>
+              <td><code>security</code></td>
+              <td>Configure OAuth2.1 / OIDC Resource Server with signed JWT decoding (RS256/ES256) and PKCE challenge verification.</td>
+              <td>Security tests verify invalid/expired tokens and altered signatures are rejected with 401 Unauthorized.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-4.2</span></td>
+              <td><code>security</code></td>
+              <td>Implement Dynamic RBAC Authority Provider and Spring Security Method Security (`@PreAuthorize("hasAuthority(...)")`).</td>
+              <td>Security tests verify unauthorized roles are blocked with 403 Forbidden on protected methods.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-4.3</span></td>
+              <td><code>security</code></td>
+              <td>Implement OAuth2 Client &amp; API Key management service with SHA-256 secret hashing and token bucket rate limiters.</td>
+              <td>API key generation stores only hashes; plaintext secrets are never retrievable after initial creation.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+
+            <!-- SPRINT 5 -->
+            <tr class="table-dark">
+              <td colspan="5" class="fw-bold text-primary"><i class="bi bi-folder2-open me-2"></i> Sprint 5: Dynamic i18n &amp; Localization Module (`appservice-infrastructure-i18n`)</td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-5.1</span></td>
+              <td><code>i18n</code></td>
+              <td>Implement database-backed `DynamicMessageSource` with local in-memory Caffeine L1 caching.</td>
+              <td>Benchmark verifies cache hits resolve translations in sub-microsecond latency (&lt; 0.1ms).</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-5.2</span></td>
+              <td><code>i18n</code></td>
+              <td>Implement cache invalidation event publisher (Redis Pub/Sub) enabling live hot-reload without restarting JVM.</td>
+              <td>Multi-node simulation verifies cache eviction propagates across cluster nodes upon translation update.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-5.3</span></td>
+              <td><code>i18n</code></td>
+              <td>Implement Bidirectional Direction Resolver (automatically setting `dir="rtl"` for Persian/Arabic and `dir="ltr"` for Latin scripts).</td>
+              <td>Unit tests verify direction lookup and locale fallback hierarchy.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+
+            <!-- SPRINT 6 -->
+            <tr class="table-dark">
+              <td colspan="5" class="fw-bold text-primary"><i class="bi bi-folder2-open me-2"></i> Sprint 6: Platform Infrastructure Engines (`appservice-infrastructure-platform`)</td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-6.1</span></td>
+              <td><code>platform</code></td>
+              <td>Implement Tamper-Resistant Audit Logger capturing `traceId`, actor, IP, timestamp, and sanitized JSON before/after diffs with secret masking.</td>
+              <td>Audit tests verify sensitive fields (`password`, `secretKey`, `token`) are automatically redacted in diffs.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-6.2</span></td>
+              <td><code>platform</code></td>
+              <td>Implement Intelligent Multi-Provider SMS Gateway with cost/latency scoring and Resilience4j circuit breaker failover.</td>
+              <td>Failover test verifies that 3 consecutive simulated timeouts on Provider A trigger instant fallback to Provider B.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-6.3</span></td>
+              <td><code>platform</code></td>
+              <td>Implement Clustered Quartz Job Scheduler with manual thread control APIs ("Fire Now", pause/resume, execution history).</td>
+              <td>Integration test verifies clustered locks prevent duplicate execution across concurrent nodes.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-6.4</span></td>
+              <td><code>platform</code></td>
+              <td>Implement Multi-SMTP Mail Engine with live Jinja2/Thymeleaf template rendering and bounce tracking ledger.</td>
+              <td>Test send dispatches templated HTML email with token substitution and logs delivery event.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-6.5</span></td>
+              <td><code>platform</code></td>
+              <td>Implement non-blocking binary Document Streaming adapter supporting direct DB Blob and S3 storage with SHA-256 deduplication.</td>
+              <td>Streaming test transfers 50MB file with zero heap buffering and verify SHA-256 match.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-6.6</span></td>
+              <td><code>platform</code></td>
+              <td>Implement AI Agent Infrastructure Plane: Model Context Protocol (MCP) tool endpoints, role-scoped tokens, and tool execution audit logger.</td>
+              <td>MCP test harness verifies tool discovery, schema validation, and tool execution audit recording.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+
+            <!-- SPRINT 7 -->
+            <tr class="table-dark">
+              <td colspan="5" class="fw-bold text-primary"><i class="bi bi-folder2-open me-2"></i> Sprint 7: Driving REST API Layer (`appservice-api-rest`)</td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-7.1</span></td>
+              <td><code>api-rest</code></td>
+              <td>Implement abstract `BaseSearchController&lt;T, ID&gt;` encapsulating the uniform CRUD search signature and validation.</td>
+              <td>Unit test verifies abstract controller correctly delegates to generic search service with paged envelope.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-7.2</span></td>
+              <td><code>api-rest</code></td>
+              <td>Implement concrete subject search endpoints: `POST /api/admin/{users,roles,tenants,audit-events,sms,jobs}/search`.</td>
+              <td>MockMvc integration tests verify identical contract behavior across all 6 entity endpoints.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-7.3</span></td>
+              <td><code>api-rest</code></td>
+              <td>Implement the 8 Dedicated Administrative Management REST Controllers (Audit diff, Quartz fire, SMS routing, Ops metrics, etc.).</td>
+              <td>Spring Security tests verify all management routes enforce respective scope permissions.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-7.4</span></td>
+              <td><code>api-rest</code></td>
+              <td>Generate OpenAPI 3 / Swagger documentation and interactive REST explorer UI.</td>
+              <td>`/v3/api-docs` returns complete, valid OpenAPI specification.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+
+            <!-- SPRINT 8 -->
+            <tr class="table-dark">
+              <td colspan="5" class="fw-bold text-primary"><i class="bi bi-folder2-open me-2"></i> Sprint 8: Decoupled Single-Page PrimeFaces Console (`appservice-ui-primefaces`)</td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-8.1</span></td>
+              <td><code>ui-primefaces</code></td>
+              <td>Implement Master Single-Page Layout with PrimeFaces 14 / JoinFaces and dynamic AJAX panel handler (`&lt;ui:include src="#{panelHandler.activePanel}"/&gt;`).</td>
+              <td>Panel transitions execute over AJAX without full browser page reloads.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-8.2</span></td>
+              <td><code>ui-primefaces</code></td>
+              <td>Implement Dynamic Theming Engine with CSS custom properties and instant theme switcher (AdminLTE, Darkly, Flatly, Cyborg, Pulse, Emerald).</td>
+              <td>Theme switching updates stylesheet link dynamically and persists in user profile.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-8.3</span></td>
+              <td><code>ui-primefaces</code></td>
+              <td>Implement Full RTL/LTR Direction Mirroring in PrimeFaces components and layout styles.</td>
+              <td>UI switches seamlessly to right-to-left alignment when Persian/Arabic locale is active.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-8.4</span></td>
+              <td><code>ui-primefaces</code></td>
+              <td>Implement Backing Bean &amp; XHTML for **Panel 1: Audit Log Dashboard with Trace Filters**.</td>
+              <td>User can filter audit logs by `traceId` and view before/after JSON diffs.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-8.5</span></td>
+              <td><code>ui-primefaces</code></td>
+              <td>Implement Backing Bean &amp; XHTML for **Panel 2: Job Scheduler Management Panel**.</td>
+              <td>Operator can trigger "Fire Now", pause triggers, and inspect execution stack traces.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-8.6</span></td>
+              <td><code>ui-primefaces</code></td>
+              <td>Implement Backing Bean &amp; XHTML for **Panel 3: Mail Management Panel &amp; Live Template Studio**.</td>
+              <td>Administrator can edit Jinja2 templates, preview rendered output, and send test emails.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-8.7</span></td>
+              <td><code>ui-primefaces</code></td>
+              <td>Implement Backing Bean &amp; XHTML for **Panel 4: SMS Management Panel &amp; Health Monitor**.</td>
+              <td>Operator can view provider health scores, configure smart routing rules, and send test SMS.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-8.8</span></td>
+              <td><code>ui-primefaces</code></td>
+              <td>Implement Backing Bean &amp; XHTML for **Panel 5: Monitoring &amp; Operations Telemetry Panel**.</td>
+              <td>Dashboard renders live API latency percentiles, HikariCP pool usage, and JVM heap charts.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-8.9</span></td>
+              <td><code>ui-primefaces</code></td>
+              <td>Implement Backing Bean &amp; XHTML for **Panel 6: Tenant Management &amp; Isolation Wizard Panel**.</td>
+              <td>Administrator can provision new tenants and configure isolation strategy (Shared/Schema/DB).</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-8.10</span></td>
+              <td><code>ui-primefaces</code></td>
+              <td>Implement Backing Bean &amp; XHTML for **Panel 7: OAuth2 Client &amp; API Key Management Panel**.</td>
+              <td>Operator can register clients, configure PKCE enforcement, and rotate secret keys safely.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-8.11</span></td>
+              <td><code>ui-primefaces</code></td>
+              <td>Implement Backing Bean &amp; XHTML for **Panel 8: AI Agent Control &amp; MCP Tool Registry Panel**.</td>
+              <td>Administrator can view registered AI agents, inspect MCP tool schemas, and review tool call diffs.</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+
+            <!-- SPRINT 9 -->
+            <tr class="table-dark">
+              <td colspan="5" class="fw-bold text-primary"><i class="bi bi-folder2-open me-2"></i> Sprint 9: Verification, End-to-End Testing &amp; Hardening</td>
+            </tr>
+            <tr>
+              <td><span class="code-pill">STEP-9.1</span></td>
+              <td><code>e2e-testing</code></td>
+              <td>Execute comprehensive End-to-End Test Suite covering multi-tenancy isolation, security method checks, SMS failover, and dynamic i18n hot-reload.</td>
+              <td>Automated test suite completes with 0 errors, 0 failures (`exit code 0`).</td>
+              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
