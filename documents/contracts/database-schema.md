@@ -80,10 +80,13 @@
 | `registered_date` | `TIMESTAMP` | Nullable | `Date registeredDate` | Registration timestamp. |
 | `updated_date` | `TIMESTAMP` | Nullable | `Date updatedDate` | Update timestamp. |
 | `delete_date` | `TIMESTAMP` | Nullable | `Date deleteDate` | Soft-delete flag. |
-| `account_name` | `VARCHAR(255)` | `UNIQUE` (`uk_account_account_name`), Nullable | `String accountName` | Login username / identifier. |
+| `account_name` | `VARCHAR(255)` | Nullable | `String accountName` | Login username / identifier. |
+| `tenant_id` | `VARCHAR(255)` | Default `'default'`, `INDEX: idx_account_tenant`, Composite `UNIQUE (account_name, tenant_id)` (`uk_account_name_tenant`) | `String tenantId` | Multi-tenant organization identifier. |
 | `password` | `VARCHAR(255)` | Nullable | `String password` | Hashed credential. |
 | `email` | `VARCHAR(255)` | Nullable | `String email` | User email address. |
 | `mobile_number` | `VARCHAR(255)` | Nullable | `String mobileNumber` | Contact telephone. |
+| `failed_attempts` | `INT` | Default `0` | `int failedAttempts` | Consecutive failed login counter. |
+| `last_login_date` | `TIMESTAMP` | Nullable | `Date lastLoginDate` | Timestamp of last successful login. |
 | `natural_person_id`| `VARCHAR(255)`| `FK -> natural_person(id)`, `INDEX: idx_account_natural_person` | `NaturalPerson naturalPerson` | Associated personal identity. |
 | `avatar_id` | `VARCHAR(255)` | `FK -> document(id)`, `INDEX: idx_account_avatar` | `Document avatar` | User avatar document. |
 
@@ -98,6 +101,8 @@
 |---|---|---|---|---|
 | `id` | `VARCHAR(255)` | `PRIMARY KEY`, `NOT NULL` (`pk_role`) | `String id` | Unique identifier. |
 | `display_name` | `VARCHAR(255)` | Nullable | `String displayName` | Role label (e.g. `ADMIN`). |
+| `description` | `VARCHAR(255)` | Nullable | `String description` | Functional role description. |
+| `tenant_id` | `VARCHAR(255)` | Default `'default'`, `INDEX: idx_role_tenant` | `String tenantId` | Multi-tenant organization identifier. |
 | `statue` | `VARCHAR(255)` | Default `'ACTIVE_STATUS'` | `String statue` | Entity status. |
 | `registered_date` | `TIMESTAMP` | Nullable | `Date registeredDate` | Creation timestamp. |
 | `updated_date` | `TIMESTAMP` | Nullable | `Date updatedDate` | Update timestamp. |
@@ -283,6 +288,49 @@
 | `message_text` | `TEXT` | `NOT NULL` | Localized translation string. |
 | `tenant_id` | `VARCHAR(255)` | Indexed, Nullable | Tenant custom override (`NULL` for global default). |
 | `direction` | `VARCHAR(8)` | Default `'ltr'` | Layout direction (`ltr` or `rtl`). |
+
+---
+
+### 5.6 Table: `oauth2_client`
+- **Description**: Registered OAuth2.1 / OIDC client applications with PKCE enforcement, SHA-256 hashed secret storage, and token bucket rate limits.
+- **Liquibase ChangeSet**: `15-create-oauth2-client-and-api-key-tables.yaml`
+
+| Column Name | SQL Type | Constraints | Description |
+|---|---|---|---|
+| `client_id` | `VARCHAR(255)` | `PRIMARY KEY`, `NOT NULL` | Unique OAuth2 Client ID. |
+| `client_secret_hash` | `VARCHAR(255)` | `NOT NULL` | SHA-256 hash of client secret. Plaintext is never stored. |
+| `client_name` | `VARCHAR(255)` | `NOT NULL` | Display name of client application. |
+| `scopes` | `VARCHAR(1024)` | Nullable | Comma-separated permitted scopes (e.g. `read,write,admin`). |
+| `grant_types` | `VARCHAR(512)` | Nullable | Permitted OAuth2 grants (e.g. `authorization_code,client_credentials`). |
+| `redirect_uris` | `VARCHAR(2048)` | Nullable | Valid callback URIs. |
+| `require_pkce` | `BOOLEAN` | Default `TRUE`, `NOT NULL` | PKCE challenge mandatory enforcement flag. |
+| `rate_limit_per_minute` | `INT` | Default `60`, `NOT NULL` | Per-client token bucket request limit per minute. |
+| `status` | `VARCHAR(50)` | Default `'ACTIVE'`, `NOT NULL` | Lifecycle state (`ACTIVE`, `SUSPENDED`, `DELETED`). |
+| `tenant_id` | `VARCHAR(255)` | Indexed, Nullable | Organization tenant identifier. |
+| `registered_date` | `TIMESTAMP` | Nullable | Registration timestamp. |
+| `updated_date` | `TIMESTAMP` | Nullable | Last modification timestamp. |
+| `delete_date` | `TIMESTAMP` | Nullable | Soft-delete timestamp. |
+
+---
+
+### 5.7 Table: `api_key`
+- **Description**: API consumer keys for automated integrations with SHA-256 secret hashing, token bucket throttling, and tenant scoping.
+- **Liquibase ChangeSet**: `15-create-oauth2-client-and-api-key-tables.yaml`
+
+| Column Name | SQL Type | Constraints | Description |
+|---|---|---|---|
+| `id` | `VARCHAR(255)` | `PRIMARY KEY`, `NOT NULL` | Internal primary key. |
+| `key_id` | `VARCHAR(128)` | `UNIQUE`, `NOT NULL` | Public key identifier (e.g. `ak_live_...`). |
+| `secret_hash` | `VARCHAR(255)` | `NOT NULL` | SHA-256 hash of secret key. Plaintext secret is never stored. |
+| `name` | `VARCHAR(255)` | `NOT NULL` | Friendly key description or integration label. |
+| `scopes` | `VARCHAR(1024)` | Nullable | Comma-separated API authorization scopes. |
+| `rate_limit_per_minute` | `INT` | Default `120`, `NOT NULL` | Token bucket request capacity per minute. |
+| `status` | `VARCHAR(50)` | Default `'ACTIVE'`, `NOT NULL` | Key state (`ACTIVE`, `REVOKED`, `DELETED`). |
+| `tenant_id` | `VARCHAR(255)` | Indexed, Nullable | Tenant boundary. |
+| `expires_at` | `TIMESTAMP` | Nullable | Expiration timestamp. |
+| `registered_date` | `TIMESTAMP` | Nullable | Creation timestamp. |
+| `updated_date` | `TIMESTAMP` | Nullable | Last modification timestamp. |
+| `delete_date` | `TIMESTAMP` | Nullable | Soft-delete timestamp. |
 
 ---
 

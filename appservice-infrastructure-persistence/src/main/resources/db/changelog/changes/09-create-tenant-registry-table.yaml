@@ -1,0 +1,72 @@
+databaseChangeLog:
+  - changeSet:
+      id: 09-create-tenant-registry-table
+      author: appservice
+      changes:
+        - createTable:
+            tableName: tenant_registry
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_tenant_registry
+              - column:
+                  name: tenant_code
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uk_tenant_registry_code
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: isolation_strategy
+                  type: VARCHAR(50)
+                  defaultValue: SHARED_DB
+                  constraints:
+                    nullable: false
+              - column:
+                  name: datasource_url
+                  type: VARCHAR(512)
+              - column:
+                  name: schema_name
+                  type: VARCHAR(128)
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: quota_users
+                  type: BIGINT
+                  defaultValueNumeric: 100
+                  constraints:
+                    nullable: false
+              - column:
+                  name: quota_storage_mb
+                  type: BIGINT
+                  defaultValueNumeric: 1024
+                  constraints:
+                    nullable: false
+              - column:
+                  name: kill_switch_active
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: registered_date
+                  type: TIMESTAMP
+              - column:
+                  name: updated_date
+                  type: TIMESTAMP
+              - column:
+                  name: delete_date
+                  type: TIMESTAMP

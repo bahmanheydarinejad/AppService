@@ -1,0 +1,87 @@
+databaseChangeLog:
+  - changeSet:
+      id: 13-create-ai-agent-tables
+      author: appservice
+      changes:
+        - createTable:
+            tableName: ai_agent_account
+            columns:
+              - column:
+                  name: agent_id
+                  type: VARCHAR(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_ai_agent_account
+              - column:
+                  name: agent_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: capability_token
+                  type: VARCHAR(512)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: token_budget
+                  type: BIGINT
+                  defaultValueNumeric: 1000000
+                  constraints:
+                    nullable: false
+              - column:
+                  name: requires_approval
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: ai_tool_audit
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_ai_tool_audit
+              - column:
+                  name: agent_id
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tool_name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: arguments
+                  type: CLOB
+              - column:
+                  name: execution_outcome
+                  type: VARCHAR(32)
+                  defaultValue: SUCCESS
+                  constraints:
+                    nullable: false
+              - column:
+                  name: token_count
+                  type: INT
+                  defaultValueNumeric: 0
+              - column:
+                  name: timestamp
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createIndex:
+            indexName: idx_ai_tool_audit_agent
+            tableName: ai_tool_audit
+            columns:
+              - column:
+                  name: agent_id

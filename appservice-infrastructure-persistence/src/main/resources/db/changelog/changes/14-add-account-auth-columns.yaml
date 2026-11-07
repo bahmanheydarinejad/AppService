@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 14-add-account-auth-columns
+      author: appservice
+      changes:
+        - addColumn:
+            tableName: account
+            columns:
+              - column:
+                  name: tenant_id
+                  type: VARCHAR(255)
+                  defaultValue: default
+              - column:
+                  name: failed_attempts
+                  type: INT
+                  defaultValueNumeric: 0
+              - column:
+                  name: last_login_date
+                  type: TIMESTAMP
+        - dropUniqueConstraint:
+            tableName: account
+            constraintName: uk_account_account_name
+        - addUniqueConstraint:
+            tableName: account
+            columnNames: account_name, tenant_id
+            constraintName: uk_account_name_tenant
+        - addColumn:
+            tableName: role
+            columns:
+              - column:
+                  name: tenant_id
+                  type: VARCHAR(255)
+                  defaultValue: default
+              - column:
+                  name: description
+                  type: VARCHAR(255)

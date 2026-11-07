@@ -1,0 +1,65 @@
+databaseChangeLog:
+  - changeSet:
+      id: 12-create-i18n-message-table
+      author: appservice
+      changes:
+        - createTable:
+            tableName: i18n_message
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_i18n_message
+              - column:
+                  name: message_key
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: locale
+                  type: VARCHAR(32)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: message_text
+                  type: CLOB
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category
+                  type: VARCHAR(64)
+                  defaultValue: general
+              - column:
+                  name: tenant_id
+                  type: VARCHAR(255)
+              - column:
+                  name: direction
+                  type: VARCHAR(8)
+                  defaultValue: ltr
+              - column:
+                  name: version
+                  type: BIGINT
+                  defaultValueNumeric: 1
+              - column:
+                  name: registered_date
+                  type: TIMESTAMP
+              - column:
+                  name: updated_date
+                  type: TIMESTAMP
+        - createIndex:
+            indexName: idx_i18n_message_lookup
+            tableName: i18n_message
+            columns:
+              - column:
+                  name: message_key
+              - column:
+                  name: locale
+        - createIndex:
+            indexName: idx_i18n_message_tenant
+            tableName: i18n_message
+            columns:
+              - column:
+                  name: tenant_id

@@ -1,0 +1,91 @@
+databaseChangeLog:
+  - changeSet:
+      id: 10-create-audit-event-table
+      author: appservice
+      changes:
+        - createTable:
+            tableName: audit_event
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_audit_event
+              - column:
+                  name: trace_id
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: span_id
+                  type: VARCHAR(128)
+              - column:
+                  name: actor_id
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tenant_id
+                  type: VARCHAR(255)
+                  defaultValue: default
+                  constraints:
+                    nullable: false
+              - column:
+                  name: action_verb
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_type
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_id
+                  type: VARCHAR(255)
+              - column:
+                  name: outcome
+                  type: VARCHAR(50)
+                  defaultValue: SUCCESS
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ip_address
+                  type: VARCHAR(64)
+              - column:
+                  name: before_state
+                  type: CLOB
+              - column:
+                  name: after_state
+                  type: CLOB
+              - column:
+                  name: timestamp
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createIndex:
+            indexName: idx_audit_event_trace
+            tableName: audit_event
+            columns:
+              - column:
+                  name: trace_id
+        - createIndex:
+            indexName: idx_audit_event_actor
+            tableName: audit_event
+            columns:
+              - column:
+                  name: actor_id
+        - createIndex:
+            indexName: idx_audit_event_tenant
+            tableName: audit_event
+            columns:
+              - column:
+                  name: tenant_id
+        - createIndex:
+            indexName: idx_audit_event_timestamp
+            tableName: audit_event
+            columns:
+              - column:
+                  name: timestamp

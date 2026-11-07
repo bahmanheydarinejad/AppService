@@ -1,0 +1,111 @@
+databaseChangeLog:
+  - changeSet:
+      id: 11-create-sms-tables
+      author: appservice
+      changes:
+        - createTable:
+            tableName: sms_provider_config
+            columns:
+              - column:
+                  name: provider_id
+                  type: VARCHAR(64)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_sms_provider_config
+              - column:
+                  name: display_name
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: priority_rank
+                  type: INT
+                  defaultValueNumeric: 1
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cost_per_sms
+                  type: DECIMAL(10,4)
+                  defaultValueNumeric: 0.05
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rolling_latency_ms
+                  type: BIGINT
+                  defaultValueNumeric: 0
+              - column:
+                  name: rolling_success_rate
+                  type: DECIMAL(5,2)
+                  defaultValueNumeric: 100.00
+              - column:
+                  name: circuit_state
+                  type: VARCHAR(32)
+                  defaultValue: CLOSED
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: sms_log
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_sms_log
+              - column:
+                  name: recipient
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: CLOB
+                  constraints:
+                    nullable: false
+              - column:
+                  name: provider_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(32)
+                  defaultValue: PENDING
+                  constraints:
+                    nullable: false
+              - column:
+                  name: retry_count
+                  type: INT
+                  defaultValueNumeric: 0
+              - column:
+                  name: latency_ms
+                  type: BIGINT
+                  defaultValueNumeric: 0
+              - column:
+                  name: tenant_id
+                  type: VARCHAR(255)
+              - column:
+                  name: sent_date
+                  type: TIMESTAMP
+              - column:
+                  name: delivered_date
+                  type: TIMESTAMP
+              - column:
+                  name: registered_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createIndex:
+            indexName: idx_sms_log_recipient
+            tableName: sms_log
+            columns:
+              - column:
+                  name: recipient
+        - createIndex:
+            indexName: idx_sms_log_tenant
+            tableName: sms_log
+            columns:
+              - column:
+                  name: tenant_id

@@ -2,12 +2,16 @@ ir\appservice\core\domain\entity\I18nMessage.class
 ir\appservice\core\domain\enums\IsolationStrategy.class
 ir\appservice\core\domain\valueobject\TenantId.class
 ir\appservice\core\domain\valueobject\PhoneNumber.class
+ir\appservice\core\domain\entity\ApiKey.class
+ir\appservice\core\domain\port\outbound\OAuth2ClientRepositoryPort.class
 ir\appservice\core\domain\entity\ScheduledJob.class
 ir\appservice\core\domain\valueobject\TraceId.class
 ir\appservice\core\domain\port\outbound\SmsGatewayPort$SmsReceipt.class
 ir\appservice\core\domain\enums\SmsProviderType.class
+ir\appservice\core\domain\entity\OAuth2Client.class
 ir\appservice\core\domain\port\outbound\SmsGatewayPort.class
 ir\appservice\core\domain\valueobject\EmailAddress.class
+ir\appservice\core\domain\port\outbound\I18nMessageRepositoryPort.class
 ir\appservice\core\domain\entity\SmsMessage.class
 ir\appservice\core\domain\entity\User.class
 ir\appservice\core\domain\port\outbound\AuditLogPort.class
@@ -18,6 +22,7 @@ ir\appservice\core\domain\exception\DomainException.class
 ir\appservice\core\domain\port\inbound\AuthenticateUserUseCase$AuthenticateCommand.class
 ir\appservice\core\domain\valueobject\UserId.class
 ir\appservice\core\domain\port\inbound\AuthenticateUserUseCase.class
+ir\appservice\core\domain\port\outbound\ApiKeyRepositoryPort.class
 ir\appservice\core\domain\port\inbound\SearchEntityUseCase$SearchQuery.class
 ir\appservice\core\domain\entity\Tenant.class
 ir\appservice\core\domain\port\inbound\SearchEntityUseCase.class

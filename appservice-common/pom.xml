@@ -18,11 +18,23 @@
     <description>Common Support Module: Universal API Envelopes, Search Models, Exceptions &amp; Trace Context</description>
 
     <dependencies>
+        <!-- Pure Core Domain Dependency -->
         <dependency>
             <groupId>ir.bahmanheydarinejad</groupId>
             <artifactId>appservice-core-domain</artifactId>
         </dependency>
 
+        <!-- JSON Serialization & Date/Time Support -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
+        <!-- Utility Libraries -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>

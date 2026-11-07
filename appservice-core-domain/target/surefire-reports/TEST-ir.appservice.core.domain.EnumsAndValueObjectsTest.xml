@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.051" tests="10" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.073" tests="10" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="24"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -15,7 +15,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-24\bin"/>
-    <property name="sun.java.command" value="C:\Users\Bahma\AppData\Local\Temp\surefire633788026318505067\surefirebooter-20261107115850759_3.jar C:\Users\Bahma\AppData\Local\Temp\surefire633788026318505067 2026-11-07T11-58-50_556-jvmRun1 surefire-20261107115850759_1tmp surefire_0-20261107115850759_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\Bahma\AppData\Local\Temp\surefire4667594302602377159\surefirebooter-20261107180843822_3.jar C:\Users\Bahma\AppData\Local\Temp\surefire4667594302602377159 2026-11-07T18-08-43_625-jvmRun1 surefire-20261107180843822_1tmp surefire_0-20261107180843822_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\target\test-classes;C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\target\classes;C:\Users\Bahma\.m2\repository\org\junit\jupiter\junit-jupiter\5.11.3\junit-jupiter-5.11.3.jar;C:\Users\Bahma\.m2\repository\org\junit\jupiter\junit-jupiter-api\6.0.3\junit-jupiter-api-6.0.3.jar;C:\Users\Bahma\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\Bahma\.m2\repository\org\junit\platform\junit-platform-commons\6.0.3\junit-platform-commons-6.0.3.jar;C:\Users\Bahma\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\Bahma\.m2\repository\org\jspecify\jspecify\1.0.1\jspecify-1.0.1.jar;C:\Users\Bahma\.m2\repository\org\junit\jupiter\junit-jupiter-params\6.0.3\junit-jupiter-params-6.0.3.jar;C:\Users\Bahma\.m2\repository\org\junit\jupiter\junit-jupiter-engine\6.0.3\junit-jupiter-engine-6.0.3.jar;C:\Users\Bahma\.m2\repository\org\junit\platform\junit-platform-engine\6.0.3\junit-platform-engine-6.0.3.jar;C:\Users\Bahma\.m2\repository\org\assertj\assertj-core\3.26.3\assertj-core-3.26.3.jar;C:\Users\Bahma\.m2\repository\net\bytebuddy\byte-buddy\1.18.11\byte-buddy-1.18.11.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -30,7 +30,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="C:\Users\Bahma\AppData\Local\Temp\surefire633788026318505067\surefirebooter-20261107115850759_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\Bahma\AppData\Local\Temp\surefire4667594302602377159\surefirebooter-20261107180843822_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="24.0.2+12-54"/>
@@ -58,14 +58,14 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="68.0"/>
   </properties>
-  <testcase name="testSmsProviderType" classname="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.001"/>
+  <testcase name="testSmsProviderType" classname="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.002"/>
   <testcase name="testOutcomeContracts" classname="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.002"/>
-  <testcase name="testStatusTransitions" classname="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.001"/>
-  <testcase name="testUserIdValueObject" classname="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.004"/>
-  <testcase name="testTraceIdValueObject" classname="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.006"/>
-  <testcase name="testIsolationStrategy" classname="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.005"/>
-  <testcase name="testPhoneNumberValueObject" classname="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.007"/>
-  <testcase name="testCircuitState" classname="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.005"/>
-  <testcase name="testEmailAddressValueObject" classname="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.004"/>
+  <testcase name="testStatusTransitions" classname="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.013"/>
+  <testcase name="testUserIdValueObject" classname="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.006"/>
+  <testcase name="testTraceIdValueObject" classname="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.012"/>
+  <testcase name="testIsolationStrategy" classname="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.002"/>
+  <testcase name="testPhoneNumberValueObject" classname="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.009"/>
+  <testcase name="testCircuitState" classname="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.003"/>
+  <testcase name="testEmailAddressValueObject" classname="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.006"/>
   <testcase name="testTenantIdValueObject" classname="ir.appservice.core.domain.EnumsAndValueObjectsTest" time="0.003"/>
 </testsuite>

@@ -15,9 +15,10 @@
     <packaging>jar</packaging>
 
     <name>appservice-infrastructure-persistence</name>
-    <description>Persistence &amp; Database Module: Multi-Tenant Routing Datasource, Liquibase, JPA Repositories</description>
+    <description>Persistence &amp; Database Module: Multi-Tenant Routing Datasource, Liquibase, JPA Repositories &amp; Criteria Specification Builder</description>
 
     <dependencies>
+        <!-- Internal Domain & Common Modules -->
         <dependency>
             <groupId>ir.bahmanheydarinejad</groupId>
             <artifactId>appservice-core-domain</artifactId>
@@ -27,7 +28,38 @@
             <artifactId>appservice-common</artifactId>
         </dependency>
 
+        <!-- Spring Data JPA & Persistence Engines -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-liquibase</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+        </dependency>
+
+        <!-- Database Drivers -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- Testing Dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>

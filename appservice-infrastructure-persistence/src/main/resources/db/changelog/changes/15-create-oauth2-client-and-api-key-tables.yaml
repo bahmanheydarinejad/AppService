@@ -1,0 +1,136 @@
+databaseChangeLog:
+  - changeSet:
+      id: 15-create-oauth2-client-and-api-key-tables
+      author: appservice
+      changes:
+        - createTable:
+            tableName: oauth2_client
+            columns:
+              - column:
+                  name: client_id
+                  type: VARCHAR(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_oauth2_client
+              - column:
+                  name: client_secret_hash
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: client_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: scopes
+                  type: VARCHAR(1024)
+              - column:
+                  name: grant_types
+                  type: VARCHAR(512)
+              - column:
+                  name: redirect_uris
+                  type: VARCHAR(2048)
+              - column:
+                  name: require_pkce
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rate_limit_per_minute
+                  type: INT
+                  defaultValueNumeric: 60
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tenant_id
+                  type: VARCHAR(255)
+              - column:
+                  name: registered_date
+                  type: TIMESTAMP
+              - column:
+                  name: updated_date
+                  type: TIMESTAMP
+              - column:
+                  name: delete_date
+                  type: TIMESTAMP
+
+        - createIndex:
+            indexName: idx_oauth2_client_tenant
+            tableName: oauth2_client
+            columns:
+              - column:
+                  name: tenant_id
+
+        - createTable:
+            tableName: api_key
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_api_key
+              - column:
+                  name: key_id
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uk_api_key_key_id
+              - column:
+                  name: secret_hash
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: scopes
+                  type: VARCHAR(1024)
+              - column:
+                  name: rate_limit_per_minute
+                  type: INT
+                  defaultValueNumeric: 120
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tenant_id
+                  type: VARCHAR(255)
+              - column:
+                  name: expires_at
+                  type: TIMESTAMP
+              - column:
+                  name: registered_date
+                  type: TIMESTAMP
+              - column:
+                  name: updated_date
+                  type: TIMESTAMP
+              - column:
+                  name: delete_date
+                  type: TIMESTAMP
+
+        - createIndex:
+            indexName: idx_api_key_tenant
+            tableName: api_key
+            columns:
+              - column:
+                  name: tenant_id

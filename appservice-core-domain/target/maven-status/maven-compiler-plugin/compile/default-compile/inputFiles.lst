@@ -1,5 +1,7 @@
+C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\src\main\java\ir\appservice\core\domain\entity\ApiKey.java
 C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\src\main\java\ir\appservice\core\domain\entity\AuditEvent.java
 C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\src\main\java\ir\appservice\core\domain\entity\I18nMessage.java
+C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\src\main\java\ir\appservice\core\domain\entity\OAuth2Client.java
 C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\src\main\java\ir\appservice\core\domain\entity\Permission.java
 C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\src\main\java\ir\appservice\core\domain\entity\Role.java
 C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\src\main\java\ir\appservice\core\domain\entity\ScheduledJob.java
@@ -15,7 +17,10 @@ C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\src\main\java\
 C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\src\main\java\ir\appservice\core\domain\exception\DomainValidationException.java
 C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\src\main\java\ir\appservice\core\domain\port\inbound\AuthenticateUserUseCase.java
 C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\src\main\java\ir\appservice\core\domain\port\inbound\SearchEntityUseCase.java
+C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\src\main\java\ir\appservice\core\domain\port\outbound\ApiKeyRepositoryPort.java
 C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\src\main\java\ir\appservice\core\domain\port\outbound\AuditLogPort.java
+C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\src\main\java\ir\appservice\core\domain\port\outbound\I18nMessageRepositoryPort.java
+C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\src\main\java\ir\appservice\core\domain\port\outbound\OAuth2ClientRepositoryPort.java
 C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\src\main\java\ir\appservice\core\domain\port\outbound\SmsGatewayPort.java
 C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\src\main\java\ir\appservice\core\domain\port\outbound\TenantRepositoryPort.java
 C:\Users\Bahma\Documents\GitHub\AppService\appservice-core-domain\src\main\java\ir\appservice\core\domain\port\outbound\UserRepositoryPort.java
