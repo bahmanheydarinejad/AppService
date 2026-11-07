@@ -15,6 +15,7 @@ import java.util.Base64;
 import java.util.HexFormat;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Service for OAuth2.1 / OIDC Client registration, secret hashing, PKCE verification, and rate limiting.
@@ -120,6 +121,21 @@ public class OAuth2ClientService {
         }
 
         return true;
+    }
+
+    /**
+     * Rotates client secret, stores SHA-256 hash, and returns newly generated raw secret.
+     */
+    public Optional<ClientRegistrationResult> rotateSecret(String clientId) {
+        Optional<OAuth2Client> clientOpt = clientRepository.findByClientId(clientId);
+        if (clientOpt.isEmpty()) {
+            return Optional.empty();
+        }
+        OAuth2Client client = clientOpt.get();
+        String newRawSecret = UUID.randomUUID().toString().replace("-", "") + UUID.randomUUID().toString().replace("-", "");
+        client.setClientSecretHash(hashSecret(newRawSecret));
+        OAuth2Client saved = clientRepository.save(client);
+        return Optional.of(new ClientRegistrationResult(saved.getClientId(), newRawSecret, saved));
     }
 
     public String hashSecret(String rawSecret) {
