@@ -240,6 +240,11 @@ Spring Security (`ir.appservice.configuration.AppSecurity`) enforces a perimeter
 | `POST` | `/api/admin/ai/mcp/invoke` | Sandboxed AI tool invocation endpoint with parameter verification and audit logging. | `AI_INVOKE` |
 | `POST` | `/api/admin/ai-audit/search` | Standard CRUD search across AI agent prompt tokens, tool calls, and diff records. | `AUDIT_READ` |
 
+### 4.9 OpenAPI Documentation & REST Explorer
+| Method | Route | Description | Scope Required |
+|---|---|---|---|
+| `GET` | `/v3/api-docs` | OpenAPI 3.0.1 machine-readable JSON specification of all platform endpoints. | Public / Configured |
+
 ---
 
 ## 5. Standard HTTP Status Codes & Error Mapping
