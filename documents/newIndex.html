@@ -1101,9 +1101,9 @@
 
       <!-- Status Legend & Counters -->
       <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="badge bg-secondary px-3 py-2"><i class="bi bi-hourglass me-1"></i> PENDING: 26 Steps</span>
+        <span class="badge bg-secondary px-3 py-2"><i class="bi bi-hourglass me-1"></i> PENDING: 20 Steps</span>
         <span class="badge bg-warning text-dark px-3 py-2"><i class="bi bi-play-circle me-1"></i> IN_PROGRESS: 0 Steps</span>
-        <span class="badge bg-success px-3 py-2"><i class="bi bi-check-circle me-1"></i> COMPLETED: 12 Steps</span>
+        <span class="badge bg-success px-3 py-2"><i class="bi bi-check-circle me-1"></i> COMPLETED: 18 Steps</span>
         <span class="badge bg-danger px-3 py-2"><i class="bi bi-slash-circle me-1"></i> BLOCKED: 0 Steps</span>
       </div>
 
@@ -1233,21 +1233,21 @@
               <td><code>security</code></td>
               <td>Configure OAuth2.1 / OIDC Resource Server with signed JWT decoding (RS256/ES256) and PKCE challenge verification.</td>
               <td>Security tests verify invalid/expired tokens and altered signatures are rejected with 401 Unauthorized.</td>
-              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+              <td><span class="badge bg-success"><i class="bi bi-check-circle"></i> COMPLETED</span></td>
             </tr>
             <tr>
               <td><span class="code-pill">STEP-4.2</span></td>
               <td><code>security</code></td>
               <td>Implement Dynamic RBAC Authority Provider and Spring Security Method Security (`@PreAuthorize("hasAuthority(...)")`).</td>
               <td>Security tests verify unauthorized roles are blocked with 403 Forbidden on protected methods.</td>
-              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+              <td><span class="badge bg-success"><i class="bi bi-check-circle"></i> COMPLETED</span></td>
             </tr>
             <tr>
               <td><span class="code-pill">STEP-4.3</span></td>
               <td><code>security</code></td>
               <td>Implement OAuth2 Client &amp; API Key management service with SHA-256 secret hashing and token bucket rate limiters.</td>
               <td>API key generation stores only hashes; plaintext secrets are never retrievable after initial creation.</td>
-              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+              <td><span class="badge bg-success"><i class="bi bi-check-circle"></i> COMPLETED</span></td>
             </tr>
 
             <!-- SPRINT 5 -->
@@ -1259,21 +1259,21 @@
               <td><code>i18n</code></td>
               <td>Implement database-backed `DynamicMessageSource` with local in-memory Caffeine L1 caching.</td>
               <td>Benchmark verifies cache hits resolve translations in sub-microsecond latency (&lt; 0.1ms).</td>
-              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+              <td><span class="badge bg-success"><i class="bi bi-check-circle"></i> COMPLETED</span></td>
             </tr>
             <tr>
               <td><span class="code-pill">STEP-5.2</span></td>
               <td><code>i18n</code></td>
               <td>Implement cache invalidation event publisher (Redis Pub/Sub) enabling live hot-reload without restarting JVM.</td>
               <td>Multi-node simulation verifies cache eviction propagates across cluster nodes upon translation update.</td>
-              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+              <td><span class="badge bg-success"><i class="bi bi-check-circle"></i> COMPLETED</span></td>
             </tr>
             <tr>
               <td><span class="code-pill">STEP-5.3</span></td>
               <td><code>i18n</code></td>
               <td>Implement Bidirectional Direction Resolver (automatically setting `dir="rtl"` for Persian/Arabic and `dir="ltr"` for Latin scripts).</td>
               <td>Unit tests verify direction lookup and locale fallback hierarchy.</td>
-              <td><span class="badge bg-secondary"><i class="bi bi-hourglass"></i> PENDING</span></td>
+              <td><span class="badge bg-success"><i class="bi bi-check-circle"></i> COMPLETED</span></td>
             </tr>
 
             <!-- SPRINT 6 -->
