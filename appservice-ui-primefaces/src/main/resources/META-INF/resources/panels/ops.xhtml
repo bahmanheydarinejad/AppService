@@ -1,0 +1,44 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <div class="card">
+        <h3>📈 Monitoring &amp; Operations Telemetry Panel</h3>
+        <p style="color: #94a3b8;">Real-time API latency percentiles, HikariCP database pool utilization, and JVM memory telemetry.</p>
+
+        <h:form id="opsForm">
+            <p:commandButton value="Refresh Telemetry" action="#{opsMonitoringBean.refreshMetrics}" update=":opsForm" style="margin-bottom: 20px;"/>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px;">
+                <div style="background: #0f172a; padding: 16px; border-radius: 8px;">
+                    <div style="color: #94a3b8; font-size: 13px;">API P50 Latency</div>
+                    <div style="font-size: 24px; font-weight: bold; color: #38bdf8;">#{opsMonitoringBean.p50LatencyMs} ms</div>
+                </div>
+                <div style="background: #0f172a; padding: 16px; border-radius: 8px;">
+                    <div style="color: #94a3b8; font-size: 13px;">API P95 Latency</div>
+                    <div style="font-size: 24px; font-weight: bold; color: #f59e0b;">#{opsMonitoringBean.p95LatencyMs} ms</div>
+                </div>
+                <div style="background: #0f172a; padding: 16px; border-radius: 8px;">
+                    <div style="color: #94a3b8; font-size: 13px;">API P99 Latency</div>
+                    <div style="font-size: 24px; font-weight: bold; color: #ef4444;">#{opsMonitoringBean.p99LatencyMs} ms</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                <div style="background: #0f172a; padding: 16px; border-radius: 8px;">
+                    <h4>HikariCP Database Pool</h4>
+                    <p>Active Connections: <strong>#{opsMonitoringBean.hikariActive}</strong></p>
+                    <p>Idle Connections: <strong>#{opsMonitoringBean.hikariIdle}</strong></p>
+                    <p>Total Connections: <strong>#{opsMonitoringBean.hikariTotal}</strong></p>
+                </div>
+                <div style="background: #0f172a; padding: 16px; border-radius: 8px;">
+                    <h4>JVM Memory Usage</h4>
+                    <p>Heap Used: <strong>#{opsMonitoringBean.heapUsedMb} MB</strong></p>
+                    <p>Heap Maximum: <strong>#{opsMonitoringBean.heapMaxMb} MB</strong></p>
+                    <p>System Load: <strong>#{opsMonitoringBean.systemLoad}</strong></p>
+                </div>
+            </div>
+        </h:form>
+    </div>
+</ui:composition>

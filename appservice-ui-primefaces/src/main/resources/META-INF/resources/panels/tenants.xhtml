@@ -1,0 +1,39 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <div class="card">
+        <h3>🏢 Tenant Management &amp; Isolation Wizard Panel</h3>
+        <p style="color: #94a3b8;">Provision customer tenants, configure multi-tenant isolation strategy (Shared DB, Schema, or Dedicated DB).</p>
+
+        <h:form id="tenantForm">
+            <p:messages id="tenantMsgs" showDetail="true" closable="true"/>
+
+            <h4>Provision New Tenant</h4>
+            <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                <p:inputText value="#{tenantManagementBean.newTenantCode}" placeholder="Tenant Code (e.g. acme_corp)"/>
+                <p:inputText value="#{tenantManagementBean.newTenantName}" placeholder="Tenant Display Name"/>
+                <p:selectOneMenu value="#{tenantManagementBean.selectedStrategy}">
+                    <f:selectItem itemLabel="Shared Database (Discriminator)" itemValue="SHARED_DB"/>
+                    <f:selectItem itemLabel="Separate Schema" itemValue="POSTGRESQL_SCHEMA"/>
+                    <f:selectItem itemLabel="Dedicated Database" itemValue="DEDICATED_DB"/>
+                </p:selectOneMenu>
+                <p:commandButton value="Provision Tenant" action="#{tenantManagementBean.provisionTenant}" update=":tenantForm"/>
+            </div>
+
+            <h4>Registered Customer Tenants</h4>
+            <p:dataTable var="tenant" value="#{tenantManagementBean.tenants}" emptyMessage="No customer tenants registered." rows="10">
+                <p:column headerText="Tenant Code">
+                    <strong><h:outputText value="#{tenant.tenantCode}"/></strong>
+                </p:column>
+                <p:column headerText="Name">
+                    <h:outputText value="#{tenant.name}"/>
+                </p:column>
+                <p:column headerText="Isolation Tier">
+                    <span style="color: #38bdf8;"><h:outputText value="#{tenant.isolationStrategy}"/></span>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </div>
+</ui:composition>

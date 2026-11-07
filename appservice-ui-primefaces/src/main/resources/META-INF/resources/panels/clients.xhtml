@@ -1,0 +1,34 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <div class="card">
+        <h3>🔑 OAuth2 Client &amp; API Key Management Panel</h3>
+        <p style="color: #94a3b8;">Register confidential clients, enforce RFC 7636 PKCE, and rotate SHA-256 API secret keys.</p>
+
+        <h:form id="clientForm">
+            <p:messages id="clientMsgs" showDetail="true" closable="true"/>
+
+            <h4>Register OAuth 2.1 Confidential Client</h4>
+            <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px;">
+                <p:inputText value="#{oauth2ClientBean.newClientName}" placeholder="Client Name"/>
+                <p:selectBooleanCheckbox value="#{oauth2ClientBean.requirePkce}" itemLabel="Enforce PKCE (S256)"/>
+                <p:inputNumber value="#{oauth2ClientBean.rateLimit}" placeholder="Rate limit/min"/>
+                <p:commandButton value="Register Client" action="#{oauth2ClientBean.registerClient}" update=":clientForm"/>
+            </div>
+
+            <h:panelGroup rendered="#{oauth2ClientBean.createdClientSecret != null}" layout="block" style="background: #0f172a; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                <h4 style="color: #4ade80;">Client Created Successfully!</h4>
+                <p>Client ID: <code><h:outputText value="#{oauth2ClientBean.createdClientId}"/></code></p>
+                <p>Raw Client Secret (Store safely, shown once): <code><h:outputText value="#{oauth2ClientBean.createdClientSecret}"/></code></p>
+            </h:panelGroup>
+
+            <h4>Rotate Client Secret</h4>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <p:inputText id="rotateClientIdInput" placeholder="Client ID to rotate" binding="#{rotateClientIdInput}"/>
+                <p:commandButton value="Rotate Secret Key" action="#{oauth2ClientBean.rotateSecret(rotateClientIdInput.value)}" update=":clientForm"/>
+            </div>
+        </h:form>
+    </div>
+</ui:composition>

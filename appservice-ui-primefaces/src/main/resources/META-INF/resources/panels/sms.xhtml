@@ -1,0 +1,45 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <div class="card">
+        <h3>📱 SMS Management Panel &amp; Health Monitor</h3>
+        <p style="color: #94a3b8;">Monitor carrier latency, provider health circuit breakers, and configure smart routing rules.</p>
+
+        <h:form id="smsForm">
+            <p:messages id="smsMsgs" showDetail="true" closable="true"/>
+
+            <h4>Active Routing Policy</h4>
+            <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                <p:selectOneMenu value="#{smsManagementBean.routingPolicy}">
+                    <f:selectItem itemLabel="Cost-Optimized" itemValue="COST_OPTIMIZED"/>
+                    <f:selectItem itemLabel="Latency-Optimized" itemValue="LATENCY_OPTIMIZED"/>
+                    <f:selectItem itemLabel="Balanced" itemValue="BALANCED"/>
+                </p:selectOneMenu>
+                <p:commandButton value="Update Policy" action="#{smsManagementBean.updateRoutingPolicy(smsManagementBean.routingPolicy)}" update=":smsForm"/>
+            </div>
+
+            <h4>Provider Circuit Breakers</h4>
+            <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+                <div style="padding: 12px; background: #0f172a; border-radius: 8px; flex: 1;">
+                    <strong>Kavenegar (Primary):</strong>
+                    <div>Healthy: <span style="color: #4ade80;">#{smsManagementBean.isProviderHealthy('KAVENEGAR')}</span></div>
+                    <div>Circuit State: <span style="color: #38bdf8;">#{smsManagementBean.getCircuitState('KAVENEGAR')}</span></div>
+                </div>
+                <div style="padding: 12px; background: #0f172a; border-radius: 8px; flex: 1;">
+                    <strong>Magfa (Secondary):</strong>
+                    <div>Healthy: <span style="color: #4ade80;">#{smsManagementBean.isProviderHealthy('MAGFA')}</span></div>
+                    <div>Circuit State: <span style="color: #38bdf8;">#{smsManagementBean.getCircuitState('MAGFA')}</span></div>
+                </div>
+            </div>
+
+            <h4>Test SMS Dispatch</h4>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <p:inputText value="#{smsManagementBean.testRecipient}" placeholder="+98912..."/>
+                <p:inputText value="#{smsManagementBean.testContent}" placeholder="SMS Content"/>
+                <p:commandButton value="Dispatch SMS" action="#{smsManagementBean.sendTestSms}" update=":smsForm"/>
+            </div>
+        </h:form>
+    </div>
+</ui:composition>

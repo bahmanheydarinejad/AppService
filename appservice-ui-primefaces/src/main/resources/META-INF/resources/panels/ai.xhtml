@@ -1,0 +1,46 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <div class="card">
+        <h3>🤖 AI Agent Infrastructure &amp; MCP Tool Registry Panel</h3>
+        <p style="color: #94a3b8;">Discover Model Context Protocol (MCP) tool schemas, configure token budgets, and audit tool invocations.</p>
+
+        <h:form id="aiAgentForm">
+            <p:messages id="aiMsgs" showDetail="true" closable="true"/>
+
+            <p:commandButton value="Refresh Tools" action="#{aiAgentPanelBean.loadTools}" update=":aiAgentForm" style="margin-bottom: 16px;"/>
+
+            <h4>Discovered MCP Tool Capabilities</h4>
+            <p:dataTable var="tool" value="#{aiAgentPanelBean.tools}" emptyMessage="No MCP tools registered in cluster." rows="10" style="margin-bottom: 20px;">
+                <p:column headerText="Tool Name">
+                    <strong><h:outputText value="#{tool.name}"/></strong>
+                </p:column>
+                <p:column headerText="Description">
+                    <h:outputText value="#{tool.description}"/>
+                </p:column>
+                <p:column headerText="Requires Elevation">
+                    <span style="color: #{tool.requiresElevation ? '#ef4444' : '#4ade80'};">
+                        <h:outputText value="#{tool.requiresElevation ? 'YES (Human-in-the-Loop)' : 'NO'}"/>
+                    </span>
+                </p:column>
+                <p:column headerText="JSON Schema">
+                    <code style="font-size: 11px;"><h:outputText value="#{tool.inputSchemaJson}"/></code>
+                </p:column>
+            </p:dataTable>
+
+            <h4>Sandboxed AI Tool Invocation Studio</h4>
+            <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                <p:inputText value="#{aiAgentPanelBean.selectedToolName}" placeholder="Tool Name (e.g. system_query)"/>
+                <p:inputText value="#{aiAgentPanelBean.humanApprovalToken}" placeholder="Approval Token (e.g. human_approved_...)"/>
+                <p:commandButton value="Invoke Tool" action="#{aiAgentPanelBean.invokeSelectedTool}" update=":aiAgentForm"/>
+            </div>
+
+            <h:panelGroup rendered="#{aiAgentPanelBean.lastExecutionOutput != null}" layout="block" style="background: #0f172a; padding: 16px; border-radius: 8px;">
+                <h4>Invocation Output / Audit Trace:</h4>
+                <pre><h:outputText value="#{aiAgentPanelBean.lastExecutionOutput}"/></pre>
+            </h:panelGroup>
+        </h:form>
+    </div>
+</ui:composition>

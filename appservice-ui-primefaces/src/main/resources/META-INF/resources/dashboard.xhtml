@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      dir="#{localeBean.direction}"
+      lang="#{localeBean.language}">
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>AppService Administration Console</title>
+    <link rel="stylesheet" href="#{themeSwitcherBean.stylesheetHref}" id="appThemeCss"/>
+    <style>
+        :root {
+            --app-primary: #{themeSwitcherBean.primaryColor};
+        }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; }
+        .app-container { display: flex; height: 100vh; overflow: hidden; }
+        .app-sidebar { width: 260px; background: #1e293b; border-right: 1px solid #334155; display: flex; flex-direction: column; }
+        [dir="rtl"] .app-sidebar { border-right: none; border-left: 1px solid #334155; }
+        .app-brand { padding: 18px; font-weight: bold; font-size: 16px; border-bottom: 1px solid #334155; color: #38bdf8; display: flex; align-items: center; gap: 8px; }
+        .app-nav { flex: 1; padding: 12px; overflow-y: auto; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; color: #94a3b8; text-decoration: none; cursor: pointer; margin-bottom: 4px; transition: all 0.2s; }
+        .nav-item:hover, .nav-item.active { background: #334155; color: #f8fafc; }
+        .app-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #0b1120; }
+        .app-topbar { height: 60px; background: #1e293b; border-bottom: 1px solid #334155; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+        .app-content { flex: 1; padding: 24px; overflow-y: auto; }
+        .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    </style>
+</h:head>
+<h:body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <div class="app-sidebar">
+            <div class="app-brand">
+                <span>⚡ AppService Admin</span>
+            </div>
+            <h:form id="navForm" class="app-nav">
+                <p:commandLink action="#{panelHandler.switchPanel('audit')}" update=":mainContent" styleClass="nav-item #{panelHandler.isPanelActive('audit') ? 'active' : ''}">
+                    <span>🔍 Audit Logs (Trace Filters)</span>
+                </p:commandLink>
+                <p:commandLink action="#{panelHandler.switchPanel('scheduler')}" update=":mainContent" styleClass="nav-item #{panelHandler.isPanelActive('scheduler') ? 'active' : ''}">
+                    <span>⏱ Job Scheduler</span>
+                </p:commandLink>
+                <p:commandLink action="#{panelHandler.switchPanel('mail')}" update=":mainContent" styleClass="nav-item #{panelHandler.isPanelActive('mail') ? 'active' : ''}">
+                    <span>✉ Mail Studio</span>
+                </p:commandLink>
+                <p:commandLink action="#{panelHandler.switchPanel('sms')}" update=":mainContent" styleClass="nav-item #{panelHandler.isPanelActive('sms') ? 'active' : ''}">
+                    <span>📱 SMS Router</span>
+                </p:commandLink>
+                <p:commandLink action="#{panelHandler.switchPanel('monitoring')}" update=":mainContent" styleClass="nav-item #{panelHandler.isPanelActive('monitoring') ? 'active' : ''}">
+                    <span>📈 Ops Telemetry</span>
+                </p:commandLink>
+                <p:commandLink action="#{panelHandler.switchPanel('tenants')}" update=":mainContent" styleClass="nav-item #{panelHandler.isPanelActive('tenants') ? 'active' : ''}">
+                    <span>🏢 Tenants Wizard</span>
+                </p:commandLink>
+                <p:commandLink action="#{panelHandler.switchPanel('clients')}" update=":mainContent" styleClass="nav-item #{panelHandler.isPanelActive('clients') ? 'active' : ''}">
+                    <span>🔑 OAuth2 Clients</span>
+                </p:commandLink>
+                <p:commandLink action="#{panelHandler.switchPanel('ai')}" update=":mainContent" styleClass="nav-item #{panelHandler.isPanelActive('ai') ? 'active' : ''}">
+                    <span>🤖 AI / MCP Registry</span>
+                </p:commandLink>
+            </h:form>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="app-main">
+            <!-- Header Controls: Theme & Locale Switcher -->
+            <div class="app-topbar">
+                <div class="breadcrumb">
+                    <span style="color: #94a3b8;">Console / </span>
+                    <strong style="color: #38bdf8; text-transform: capitalize;">#{panelHandler.activePanelName}</strong>
+                </div>
+                <h:form id="topbarControls" style="display: flex; gap: 12px; align-items: center;">
+                    <!-- Theme Selector -->
+                    <p:selectOneMenu value="#{themeSwitcherBean.currentTheme}" onchange="submit()">
+                        <f:selectItem itemLabel="AdminLTE" itemValue="adminlte"/>
+                        <f:selectItem itemLabel="Darkly" itemValue="darkly"/>
+                        <f:selectItem itemLabel="Flatly" itemValue="flatly"/>
+                        <f:selectItem itemLabel="Cyborg" itemValue="cyborg"/>
+                        <f:selectItem itemLabel="Pulse" itemValue="pulse"/>
+                        <f:selectItem itemLabel="Emerald" itemValue="emerald"/>
+                    </p:selectOneMenu>
+
+                    <!-- Language Selector (RTL/LTR) -->
+                    <p:commandButton value="English (LTR)" action="#{localeBean.switchLanguage('en')}" update="@all" rendered="#{localeBean.rtl}"/>
+                    <p:commandButton value="فارسی (RTL)" action="#{localeBean.switchLanguage('fa')}" update="@all" rendered="#{!localeBean.rtl}"/>
+                </h:form>
+            </div>
+
+            <!-- Dynamic AJAX Single-Page Content -->
+            <div class="app-content">
+                <h:panelGroup id="mainContent" layout="block">
+                    <ui:include src="#{panelHandler.activePanel}"/>
+                </h:panelGroup>
+            </div>
+        </div>
+    </div>
+</h:body>
+</html>
