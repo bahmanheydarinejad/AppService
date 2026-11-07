@@ -31,68 +31,29 @@ Spring Security (`ir.appservice.configuration.AppSecurity`) enforces a perimeter
 
 ---
 
-## 2. REST & HTTP Controller Matrix
+## 2. Inbound Driving Controller & UI Console Matrix
 
-### 2.1 Document Controller (`ir.appservice.controller.DocumentController`)
-- **Base Path**: `/document`
-- **Component Type**: `@Controller`
-- **Class Reference**: [`DocumentController.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/src/main/java/ir/appservice/controller/DocumentController.java)
+### 2.1 Single-Page PrimeFaces Console
+- **Base Path**: `/dashboard.xhtml`
+- **Component Type**: JSF View with Dynamic Include Navigation
+- **View Reference**: [`dashboard.xhtml`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-ui-primefaces/src/main/resources/META-INF/resources/dashboard.xhtml)
+- **Controller/Bean Reference**: [`PanelHandler.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-ui-primefaces/src/main/java/ir/appservice/ui/bean/PanelHandler.java)
 
-| HTTP Method | Route | Parameters | Content-Type | Response Type | Description & Headers |
-|---|---|---|---|---|---|
-| `GET` | `/document` | None | `application/json` | `List<Document>` | Returns JSON array of all active documents (`deleteDate IS NULL`). |
-| `GET` | `/document/{id}` | `id` (Path, `String`) | Variable (`document.getType()`) | Binary stream (`byte[]`) | Streams raw binary file data. Sets headers: `Cache-Control: no-store`, `Pragma: no-cache`, `Expires: 0`. |
-
-#### Response Schema Example: `GET /document`
-```json
-[
-  {
-    "id": "e4b2d5a1-7c9e-4f1b-a2c3-9d8e7f6a5b4c",
-    "displayName": "company-logo.png",
-    "statue": "ACTIVE_STATUS",
-    "registeredDate": "2026-01-15T10:30:00.000+00:00",
-    "updatedDate": null,
-    "deleteDate": null,
-    "type": "image/png",
-    "description": "Corporate branding avatar",
-    "size": 45120
-  }
-]
-```
-
----
-
-### 2.2 REST Index Controller (`ir.appservice.controller.RestIndexController`)
-- **Base Path**: `/api`
+### 2.2 OpenAPI 3.0 Documentation Controller
+- **Base Path**: `/v3/api-docs`
 - **Component Type**: `@RestController`
-- **Class Reference**: [`RestIndexController.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/src/main/java/ir/appservice/controller/RestIndexController.java)
+- **Class Reference**: [`OpenApiController.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-api-rest/src/main/java/ir/appservice/api/rest/controller/OpenApiController.java)
 
-| HTTP Method | Route | Parameters | Content-Type | Response Type | Description & Auth |
-|---|---|---|---|---|---|
-| `GET` | `/api/index` | None | `application/json` | `Account` | Returns demo account metadata for API status verification. Requires authenticated session. |
-
-#### Response Schema Example: `GET /api/index`
-```json
-{
-  "displayName": "Bahman Heydari Nejad",
-  "email": "bahmanheydarinejad@gmail.com",
-  "accountName": null,
-  "statue": "ACTIVE_STATUS",
-  "id": null
-}
-```
-
----
-
-### 2.3 Password Reset Controller (`ir.appservice.controller.ResetPasswordController`)
-- **Base Path**: `/resetPassword`
-- **Component Type**: `@Controller` / JSF View Intermediary
-- **Class Reference**: [`ResetPasswordController.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/src/main/java/ir/appservice/controller/ResetPasswordController.java)
-
-| HTTP Method | Route | Parameters | Response Action | Description |
-|---|---|---|---|---|
-| `GET` | `/resetPassword` | None | Forward `/resetPassword.xhtml` | Navigates user to default password reset entry page. |
-| `GET` | `/resetPassword/{resetPasswordToken}` | `resetPasswordToken` (Path, `String`) | Forward `/resetPassword.xhtml?token={token}` | Validates token existence via `ResetPasswordTokenService.existById()`. Forwards to token verification view if valid. |
+### 2.3 Administration Control Plane Controllers
+- **Class Reference**: [`UserSearchController.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-api-rest/src/main/java/ir/appservice/api/rest/controller/UserSearchController.java) (`/api/admin/users/search`)
+- **Class Reference**: [`AuditManagementController.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-api-rest/src/main/java/ir/appservice/api/rest/controller/AuditManagementController.java) (`/api/admin/audit-events/**`)
+- **Class Reference**: [`SchedulerManagementController.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-api-rest/src/main/java/ir/appservice/api/rest/controller/SchedulerManagementController.java) (`/api/admin/jobs/**`)
+- **Class Reference**: [`SmsManagementController.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-api-rest/src/main/java/ir/appservice/api/rest/controller/SmsManagementController.java) (`/api/admin/sms/**`)
+- **Class Reference**: [`MailManagementController.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-api-rest/src/main/java/ir/appservice/api/rest/controller/MailManagementController.java) (`/api/admin/mail/**`)
+- **Class Reference**: [`OpsMonitoringController.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-api-rest/src/main/java/ir/appservice/api/rest/controller/OpsMonitoringController.java) (`/api/admin/ops/**`)
+- **Class Reference**: [`TenantManagementController.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-api-rest/src/main/java/ir/appservice/api/rest/controller/TenantManagementController.java) (`/api/admin/tenants/**`)
+- **Class Reference**: [`OAuth2ClientManagementController.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-api-rest/src/main/java/ir/appservice/api/rest/controller/OAuth2ClientManagementController.java) (`/api/admin/clients/**`)
+- **Class Reference**: [`McpAgentController.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-api-rest/src/main/java/ir/appservice/api/rest/controller/McpAgentController.java) (`/api/admin/ai/**`)
 
 ---
 

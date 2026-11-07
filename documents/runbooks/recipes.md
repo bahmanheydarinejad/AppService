@@ -16,12 +16,12 @@
 Follow these deterministic steps to introduce a new persistent domain model:
 
 1. **Create Liquibase ChangeSet**:
-   - Add a new migration file in `src/main/resources/db/changelog/changes/` (e.g. `09-create-invoice-table.yaml`).
+   - Add a new migration file in `appservice-infrastructure-persistence/src/main/resources/db/changelog/changes/` (e.g. `17-create-invoice-table.yaml`).
    - Specify table columns, primary key constraint (`pk_invoice`), audit columns (`registered_date`, `updated_date`, `delete_date`), and default status `'ACTIVE_STATUS'`.
 2. **Register in Master ChangeLog**:
-   - Add an `include` entry inside [`src/main/resources/db/changelog/db.changelog-master.yaml`](file:///c:/Users/Bahma/Documents/GitHub/AppService/src/main/resources/db/changelog/db.changelog-master.yaml).
+   - Add an `include` entry inside [`db.changelog-master.yaml`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-infrastructure-persistence/src/main/resources/db/changelog/db.changelog-master.yaml).
 3. **Create Java Entity Class**:
-   - Inherit from [`BaseEntity`](file:///c:/Users/Bahma/Documents/GitHub/AppService/src/main/java/ir/appservice/model/entity/BaseEntity.java) in `ir.appservice.model.entity.domain` or `ir.appservice.model.entity.application`.
+   - Inherit from [`BaseJpaEntity`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-infrastructure-persistence/src/main/java/ir/appservice/infrastructure/persistence/entity/BaseJpaEntity.java) in `appservice-infrastructure-persistence`.
    - Annotate with `@Entity`, `@Table(name = "...")`, `@Getter`, `@Setter`.
    - Ensure foreign keys use explicit JPA annotations (`@ManyToOne(fetch = FetchType.LAZY)`, `@JoinColumn`).
 4. **Compile & Validate**:
@@ -31,52 +31,42 @@ Follow these deterministic steps to introduce a new persistent domain model:
 
 ---
 
-## 2. Recipe: Adding a Repository, Service & Converter
+## 2. Recipe: Adding a Spring Data Repository & Adapter
 
-1. **Create Spring Data Repository**:
-   - In `ir.appservice.model.repository`, define an interface extending [`CrudRepository<T, String>`](file:///c:/Users/Bahma/Documents/GitHub/AppService/src/main/java/ir/appservice/model/repository/CrudRepository.java).
-   - Add targeted query methods (e.g. `findByDisplayNameIgnoreCase`).
-2. **Create Service Layer**:
-   - In `ir.appservice.model.service`, define a `@Service` class extending [`CrudService<T>`](file:///c:/Users/Bahma/Documents/GitHub/AppService/src/main/java/ir/appservice/model/service/CrudService.java).
-   - Inject repository via constructor: `public MyService(MyRepository repository) { super(repository, MyEntity.class); }`.
-   - Implement domain-specific business validations or transactional methods (`@Transactional`).
-3. **Create JSF Converter**:
-   - In `ir.appservice.model.converter`, create a converter extending `BaseConverter<T>`.
-   - Annotate with `@Component` and `@FacesConverter(value = "myEntityConverter", managed = true)`.
+1. **Create Outbound Port**:
+   - In `appservice-core-domain/src/main/java/ir/appservice/core/domain/port/outbound`, define an interface (e.g. `UserRepositoryPort`).
+2. **Create Spring Data Repository**:
+   - In `appservice-infrastructure-persistence/src/main/java/ir/appservice/infrastructure/persistence/repository`, define a Spring Data JPA interface extending `JpaRepository` and `JpaSpecificationExecutor`.
+3. **Implement Adapter**:
+   - In `appservice-infrastructure-persistence/src/main/java/ir/appservice/infrastructure/persistence/adapter`, implement the domain outbound port by injecting the Spring Data repository.
 4. **Targeted Verification**:
-   - Run `mvn test -Dtest=AppServiceTests`.
+   - Run `mvn test -Dtest=MultiTenantLiquibaseJpaTest`.
 
 ---
 
-## 3. Recipe: Adding an AdminFaces / PrimeFaces CRUD Panel View
+## 3. Recipe: Adding a PrimeFaces Single-Page Panel View
 
 1. **Create Backing Bean**:
-   - In `ir.appservice.view.beanComponents.panelBean.crudBean`, create a managed bean extending [`BaseLazyCrudBean<T>`](file:///c:/Users/Bahma/Documents/GitHub/AppService/src/main/java/ir/appservice/view/beanComponents/panelBean/BaseLazyCrudBean.java) or [`BaseCrudBean<T>`](file:///c:/Users/Bahma/Documents/GitHub/AppService/src/main/java/ir/appservice/view/beanComponents/panelBean/crudBean/BaseCrudBean.java).
-   - Annotate with `@Named("myCrudBean")` and `@ViewScoped`.
-2. **Create XHTML Panel Templates**:
-   - In `src/main/resources/META-INF/resources/panels/crud_panels/my_panel/`, create:
-     - `my_panel.xhtml` (Main entry containing `p:dataTable` and action buttons).
-     - `add_dialog.xhtml` (Dialog for creating records).
-     - `edit_dialog.xhtml` (Dialog for editing records).
-     - `view_dialog.xhtml` (Read-only preview dialog).
-3. **Register Menu & Panel in Database**:
-   - Add initialization logic in [`AppInitializer.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/src/main/java/ir/appservice/configuration/initializer/AppInitializer.java) to associate a new `Menu` entry with the `Panel(resourceLocation = "/panels/crud_panels/my_panel/my_panel.xhtml")`.
-4. **Assign Role Permissions**:
-   - Link the newly created `Panel` to appropriate `Role` entities in `role_panels`.
+   - In `appservice-ui-primefaces/src/main/java/ir/appservice/ui/bean`, create a managed bean (e.g. `MyManagementBean`).
+   - Annotate with `@Named("myManagementBean")` and `@ViewScoped`.
+2. **Create XHTML Panel Template**:
+   - In `appservice-ui-primefaces/src/main/resources/META-INF/resources/panels/my_panel.xhtml`, create the panel snippet.
+3. **Register Dynamic View in PanelHandler**:
+   - In [`PanelHandler.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-ui-primefaces/src/main/java/ir/appservice/ui/bean/PanelHandler.java), add the panel routing enum and dynamic include case.
+4. **Link to Dashboard**:
+   - In [`dashboard.xhtml`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-ui-primefaces/src/main/resources/META-INF/resources/dashboard.xhtml), bind the sidebar navigation command button to `panelHandler.setActiveView('my_panel')`.
 
 ---
 
 ## 4. Recipe: Adding & Securing a REST Controller Endpoint
 
 1. **Create Controller**:
-   - In `ir.appservice.controller`, create a class extending [`BaseController`](file:///c:/Users/Bahma/Documents/GitHub/AppService/src/main/java/ir/appservice/controller/BaseController.java).
-   - Annotate with `@RestController` and `@RequestMapping("/api/v1/...")`.
+   - In `appservice-api-rest/src/main/java/ir/appservice/api/rest/controller`, create a class extending [`BaseSearchController`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-api-rest/src/main/java/ir/appservice/api/rest/controller/BaseSearchController.java).
+   - Annotate with `@RestController` and `@RequestMapping("/api/admin/...")`.
 2. **Configure Security Rules**:
-   - In [`AppSecurity.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/src/main/java/ir/appservice/configuration/AppSecurity.java), determine whether the endpoint is public or protected:
-     - If public: add route pattern to `.requestMatchers(...)` under `.permitAll()`.
-     - If protected: leave under `.anyRequest().authenticated()`.
+   - In `appservice-infrastructure-security/src/main/java/ir/appservice/infrastructure/security/config/SecurityConfig.java`, specify endpoint authorization rules (`@PreAuthorize("hasAuthority('ADMIN')")`).
 3. **Exception Handling**:
-   - Use exceptions from `ir.appservice.configuration.exception` (`NotFoundEntityException`, `DuplicateEntityException`).
+   - Rely on [`GlobalRestExceptionHandler`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-api-rest/src/main/java/ir/appservice/api/rest/advice/GlobalRestExceptionHandler.java) for RFC 7807 ProblemDetail responses.
 4. **Update API Contract**:
    - Record endpoint path, parameters, and status codes in [`documents/contracts/api-endpoints.md`](file:///c:/Users/Bahma/Documents/GitHub/AppService/documents/contracts/api-endpoints.md).
 
@@ -86,17 +76,16 @@ Follow these deterministic steps to introduce a new persistent domain model:
 
 | Test Type | Scope | Command | Expected Outcome |
 |---|---|---|---|
-| **Quick Compilation** | Java syntax & dependencies | `mvn clean compile` | `BUILD SUCCESS`, exit code 0. |
-| **Targeted Unit Test** | Single test class | `mvn test -Dtest=AppServiceTests` | 0 failures, 0 errors. |
-| **DB Integration Test** | Liquibase + H2 bootstrap | `mvn test -Dtest=DatabaseConfigurationIntegrationTest` | 0 failures, 0 errors. |
-| **Full Java Test Suite**| All unit & integration tests | `mvn test` | Tests run: 9, Failures: 0, Errors: 0. |
-| **Documentation E2E** | Markdown & Anchor links | `python -m unittest discover -s tests` | Ran 42 tests, OK. |
+| **Full Aggregator CI Verification** | All 8 submodules + parent POM | `powershell -File .\scripts\verify-build.ps1` | `BUILD SUCCESS`, exit code 0 (120 tests pass). |
+| **Quick Compilation** | Java syntax & dependencies | `mvn clean test-compile` | `BUILD SUCCESS`, exit code 0. |
+| **Targeted Submodule Tests** | Single submodule | `mvn test -pl appservice-api-rest` | 0 failures, 0 errors. |
+| **End-to-End System Tests** | Full architecture integration | `mvn test -Dtest=AppServiceEndToEndIntegrationTest` | 5/5 tests pass, exit code 0. |
 
 ---
 
 ## 6. Recipe: Switching Database Profiles
 
-The active profile is controlled in [`src/main/resources/application.yml`](file:///c:/Users/Bahma/Documents/GitHub/AppService/src/main/resources/application.yml) via `spring.profiles.active`.
+The active profile is controlled in [`appservice-ui-primefaces/src/main/resources/application.yml`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-ui-primefaces/src/main/resources/application.yml) via `spring.profiles.active`.
 
 ### Profile Matrix
 - **`h2` (Default)**: Embedded file database located at `./data/appservice.mv.db`. Web console at `/h2-console`.

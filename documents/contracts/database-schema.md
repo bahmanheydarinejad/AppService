@@ -13,14 +13,14 @@
 
 ## 1. Schema Conventions & Global Invariants
 
-- **Primary Keys**: All primary keys are `VARCHAR(255)` UUID strings mapped from [`BaseEntity.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/src/main/java/ir/appservice/model/entity/BaseEntity.java).
-- **Soft-Delete Paradigm**: Records are never hard-deleted in business workflows. When deleted, `delete_date` is populated with the current timestamp. Active queries MUST filter using `WHERE delete_date IS NULL` (automatically handled by `findAllByDeleteDateIsNull()` in [`CrudRepository.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/src/main/java/ir/appservice/model/repository/CrudRepository.java)).
+- **Primary Keys**: All primary keys are `VARCHAR(255)` UUID strings mapped from [`BaseJpaEntity.java`](file:///c:/Users/Bahma/Documents/GitHub/AppService/appservice-infrastructure-persistence/src/main/java/ir/appservice/infrastructure/persistence/entity/BaseJpaEntity.java).
+- **Soft-Delete Paradigm**: Records are never hard-deleted in business workflows. When deleted, `delete_date` is populated with the current timestamp. Active queries MUST filter using `WHERE delete_date IS NULL`.
 - **Lifecycle Status**: The `statue` column defaults to `'ACTIVE_STATUS'` (constants: `ACTIVE_STATUS`, `DE_ACTIVE_STATUS`).
-- **Audit Columns**: Present across all tables via inheritance from `BaseEntity`:
+- **Audit Columns**: Present across all tables via inheritance from `BaseJpaEntity`:
   - `registered_date` (`TIMESTAMP`): Creation timestamp.
   - `updated_date` (`TIMESTAMP`): Last modification timestamp.
   - `delete_date` (`TIMESTAMP`, nullable): Soft-deletion timestamp.
-- **Migration Ownership**: Liquibase owns and executes all DDL mutations (`src/main/resources/db/changelog/db.changelog-master.yaml`). Hibernate `ddl-auto` is set to `validate`.
+- **Migration Ownership**: Liquibase owns and executes all DDL mutations (`appservice-infrastructure-persistence/src/main/resources/db/changelog/db.changelog-master.yaml`). Hibernate `ddl-auto` is set to `validate`.
 
 ---
 
@@ -338,5 +338,5 @@
 
 > **When completing ANY task that affects the database:**
 > 1. Add new tables, columns, indexes, or constraints to the catalog above.
-> 2. Document changes to Liquibase changelog files in `src/main/resources/db/changelog/`.
-> 3. Verify schema validation passes across H2, PostgreSQL, or test profiles (`mvn test -Dtest=DatabaseConfigurationIntegrationTest`).
+> 2. Document changes to Liquibase changelog files in `appservice-infrastructure-persistence/src/main/resources/db/changelog/`.
+> 3. Verify schema validation passes across H2, PostgreSQL, or test profiles (`mvn test -pl appservice-infrastructure-persistence`).
